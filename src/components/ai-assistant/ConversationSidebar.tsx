@@ -10,6 +10,8 @@ import {
   Sparkles,
   Database,
   Lock,
+  Building2,
+  ShieldCheck,
 } from "lucide-react";
 import type { Conversation } from "../../services/aiConversations";
 
@@ -24,6 +26,8 @@ interface ConversationSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   isMobile: boolean;
+  businessName?: string;
+  ownerName?: string;
 }
 
 export function ConversationSidebar({
@@ -37,6 +41,8 @@ export function ConversationSidebar({
   isOpen,
   onClose,
   isMobile,
+  businessName = "Nexora Enterprise",
+  ownerName,
 }: ConversationSidebarProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -101,27 +107,29 @@ export function ConversationSidebar({
   const groups = groupConversations();
 
   const content = (
-    <div className="flex h-full min-h-0 flex-col bg-[#0B0D14] text-[#F3F4F6]">
+    <div className="flex h-full min-h-0 flex-col bg-[#FFFFFF] text-[#19172A] border-r border-[#E7E2F3] select-none">
       {/* Top Header & New Chat Button */}
-      <div className="space-y-2.5 border-b border-[#272B38] p-3">
+      <div className="space-y-2.5 border-b border-[#E7E2F3] p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#6D5EF7] text-white">
               <Sparkles className="h-3.5 w-3.5" />
             </div>
-            <span className="text-xs font-bold text-zinc-200 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[#19172A] tracking-wide">
               Conversations
             </span>
           </div>
+
           {isMobile ? (
             <button
               onClick={onClose}
-              className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+              className="rounded-lg p-1 text-[#6B6880] hover:bg-[#FFFFFF] hover:text-[#19172A]"
+              aria-label="Close conversation drawer"
             >
               <X className="h-4 w-4" />
             </button>
           ) : (
-            <span className="rounded-md bg-zinc-800/80 border border-zinc-700/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300">
+            <span className="rounded-md bg-[#FFFFFF] border border-[#E7E2F3] px-1.5 py-0.5 text-[10px] font-semibold text-[#6B6880]">
               {conversations.length}
             </span>
           )}
@@ -134,28 +142,34 @@ export function ConversationSidebar({
             onNew();
             if (isMobile) onClose();
           }}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#272B38] bg-[#171923] px-3 py-2 text-xs font-semibold text-white transition-colors hover:border-[#3A3F50] hover:bg-[#191C27] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6D5EF7] motion-reduce:transition-none"
+          className="flex w-full items-center justify-between rounded-lg border border-[#E7E2F3] bg-[#FFFFFF] px-3 py-2 text-xs font-semibold text-[#19172A] transition-colors hover:border-[#6D5EF7]/50 hover:bg-[#F0ECFF] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6D5EF7]"
         >
-          <Plus className="h-4 w-4 stroke-[2.5]" />
-          <span>New Conversation</span>
+          <div className="flex items-center gap-2">
+            <Plus className="h-4 w-4 stroke-[2.5] text-[#6D5EF7]" />
+            <span>New Conversation</span>
+          </div>
+          <kbd className="rounded bg-[#FFFFFF] border border-[#E7E2F3] px-1.5 py-0.5 text-[9px] font-mono text-[#6B6880]">
+            ⌘N
+          </kbd>
         </button>
 
         {/* Search Past Chats */}
         {conversations.length > 2 && (
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#6B6880]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations…"
-              className="w-full rounded-lg border border-[#272B38] bg-[#11141D] py-1.5 pl-8 pr-7 text-xs text-white placeholder:text-[#737B8B] focus:border-[#6D5EF7] focus:outline-none focus:ring-2 focus:ring-[#6D5EF7]/20"
+              className="w-full rounded-lg border border-[#E7E2F3] bg-[#F7F5FF] py-1.5 pl-8 pr-7 text-xs text-[#19172A] placeholder:text-[#6B6880]/60 focus:border-[#6D5EF7] focus:outline-none focus:ring-1 focus:ring-[#6D5EF7]"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#6B6880] hover:text-[#19172A]"
+                title="Clear search"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -165,14 +179,14 @@ export function ConversationSidebar({
       </div>
 
       {/* Conversations List */}
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-2 py-3">
+      <div className="min-h-0 flex-1 space-y-3.5 overflow-y-auto overscroll-contain px-2 py-3">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center px-4">
-            <MessageSquare className="h-7 w-7 text-zinc-600 stroke-1" />
-            <p className="mt-2 text-xs font-semibold text-zinc-400">
+            <MessageSquare className="h-7 w-7 text-[#6B6880]/40 stroke-1" />
+            <p className="mt-2 text-xs font-semibold text-[#6B6880]">
               {searchQuery ? "No matches found" : "No conversations yet"}
             </p>
-            <p className="mt-1 text-[11px] text-zinc-500">
+            <p className="mt-1 text-[11px] text-[#6B6880]/60">
               {searchQuery
                 ? "Try a different search query"
                 : "Ask a question to start your first session"}
@@ -181,7 +195,7 @@ export function ConversationSidebar({
         ) : (
           groups.map((group) => (
             <div key={group.label} className="space-y-1">
-              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+              <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#6B6880]/70">
                 {group.label}
               </div>
               {group.items.map((conv) => {
@@ -192,7 +206,7 @@ export function ConversationSidebar({
                   return (
                     <div
                       key={conv.id}
-                      className="flex items-center gap-1.5 rounded-xl border border-indigo-500/60 bg-zinc-900 p-1.5 shadow-2xs"
+                      className="flex items-center gap-1.5 rounded-lg border border-[#6D5EF7] bg-[#FFFFFF] p-1.5 shadow-sm"
                     >
                       <input
                         type="text"
@@ -203,19 +217,21 @@ export function ConversationSidebar({
                           if (e.key === "Escape") handleCancelRename();
                         }}
                         autoFocus
-                        className="w-full bg-transparent px-1.5 text-xs text-white focus:outline-none"
+                        className="w-full bg-transparent px-1.5 text-xs text-[#19172A] focus:outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => handleSaveRename(conv.id)}
-                        className="rounded p-1 text-emerald-400 hover:bg-emerald-950/60"
+                        className="rounded p-1 text-emerald-700 hover:bg-emerald-50"
+                        title="Save title"
                       >
                         <Check className="h-3.5 w-3.5" />
                       </button>
                       <button
                         type="button"
                         onClick={handleCancelRename}
-                        className="rounded p-1 text-zinc-400 hover:bg-zinc-800"
+                        className="rounded p-1 text-[#6B6880] hover:bg-[#F0ECFF]"
+                        title="Cancel"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -226,13 +242,13 @@ export function ConversationSidebar({
                 return (
                   <div
                     key={conv.id}
-                    className={`group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-[#6D5EF7]/50 ${
+                    className={`group relative flex items-center justify-between rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors focus-within:ring-1 focus-within:ring-[#6D5EF7] ${
                       isActive
-                        ? "border-[#3A365E] bg-[#19182A] font-semibold text-white"
-                        : "border-transparent text-[#9CA3AF] hover:bg-[#141722] hover:text-zinc-200"
+                        ? "border-[#6D5EF7]/20 bg-[#F0ECFF] text-[#5B4BE8] font-semibold"
+                        : "border-transparent text-[#6B6880] hover:bg-[#FFFFFF]/60 hover:text-[#19172A]"
                     }`}
                   >
-                    {/* Left Accent indicator for active state */}
+                    {/* Active Accent indicator */}
                     {isActive && (
                       <span className="absolute bottom-2 left-0 top-2 w-0.5 rounded-r-full bg-[#6D5EF7]" />
                     )}
@@ -247,22 +263,22 @@ export function ConversationSidebar({
                     >
                       <MessageSquare
                         className={`h-3.5 w-3.5 shrink-0 ${
-                          isActive ? "text-indigo-400" : "text-zinc-500"
+                          isActive ? "text-[#6D5EF7]" : "text-[#6B6880]/60"
                         }`}
                       />
                       <span className="truncate">{conv.title}</span>
                     </button>
 
                     {/* Actions: Rename / Delete */}
-                    <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                    <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           startRename(conv);
                         }}
-                        className="rounded p-1 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200"
-                        title="Rename"
+                        className="rounded p-1 text-[#6B6880] hover:bg-[#F0ECFF] hover:text-[#19172A]"
+                        title="Rename conversation"
                       >
                         <Pencil className="h-3 w-3" />
                       </button>
@@ -272,8 +288,8 @@ export function ConversationSidebar({
                           e.stopPropagation();
                           setDeleteConfirmId(conv.id);
                         }}
-                        className="rounded p-1 text-zinc-500 hover:bg-rose-950/60 hover:text-rose-400"
-                        title="Delete"
+                        className="rounded p-1 text-[#6B6880] hover:bg-rose-50 hover:text-rose-700"
+                        title="Delete conversation"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
@@ -286,32 +302,49 @@ export function ConversationSidebar({
         )}
       </div>
 
-      {/* Persistence indicator footer */}
-      <div className="border-t border-[#272B38] bg-[#0B0D14] p-3">
-        <div className="flex items-start gap-2.5 text-[11px]">
+      {/* Business Identity & Persistence Status Footer */}
+      <div className="border-t border-[#E7E2F3] bg-[#FFFFFF] p-3 space-y-2">
+        {/* Compact Business Context */}
+        <div className="flex items-center gap-2 rounded-lg bg-[#FFFFFF] p-2 border border-[#E7E2F3]/80">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#6D5EF7]/15 text-[#6D5EF7]">
+            <Building2 className="h-3.5 w-3.5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-[#19172A] truncate leading-tight">
+              {businessName}
+            </p>
+            <p className="text-[10px] text-[#6B6880] truncate leading-tight mt-0.5">
+              {ownerName ? `Owner: ${ownerName}` : "Tenant Workspace"}
+            </p>
+          </div>
+        </div>
+
+        {/* Persistence Status */}
+        <div className="flex items-start gap-2 pt-1 text-[11px]">
           <span
             className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-              persistenceMode === "database" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-amber-500"
+              persistenceMode === "database" ? "bg-[#059669]" : "bg-[#D97706]"
             }`}
           />
           <div className="flex-1 truncate">
-            <p className="font-semibold text-zinc-200 leading-tight flex items-center gap-1">
+            <p className="font-medium text-[#19172A] leading-tight flex items-center gap-1">
               {persistenceMode === "database" ? (
                 <>
-                  <Database className="h-3 w-3 text-emerald-400" />
-                  <span>Cloud DB Synced</span>
+                  <Database className="h-3 w-3 text-emerald-700" />
+                  <span>Cloud database</span>
                 </>
               ) : (
                 <>
-                  <Lock className="h-3 w-3 text-amber-400" />
-                  <span>In-Memory Session</span>
+                  <Lock className="h-3 w-3 text-amber-700" />
+                  <span>Session-only history</span>
                 </>
               )}
             </p>
-            <p className="mt-0.5 text-[10px] text-zinc-500 leading-tight">
+            <p className="mt-0.5 text-[10px] text-[#6B6880] leading-tight flex items-center gap-1">
+              <ShieldCheck className="h-2.5 w-2.5 text-[#6D5EF7]" />
               {persistenceMode === "database"
-                ? "Row-Level Security Active"
-                : "Protected from local storage leaks"}
+                ? "Conversation history is saved"
+                : "History is not saved to cloud"}
             </p>
           </div>
         </div>
@@ -319,17 +352,17 @@ export function ConversationSidebar({
 
       {/* Delete confirmation modal */}
       {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-900 p-5 shadow-2xl text-zinc-100">
-            <h4 className="text-sm font-bold text-white">Delete conversation?</h4>
-            <p className="mt-1.5 text-xs text-zinc-400 leading-normal">
-              Are you sure you want to remove this conversation?
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#19172A]/35 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-sm rounded-2xl border border-[#E7E2F3] bg-[#FFFFFF] p-5 shadow-2xl text-[#19172A]">
+            <h4 className="text-sm font-semibold text-[#19172A]">Delete conversation?</h4>
+            <p className="mt-1.5 text-xs text-[#6B6880] leading-normal">
+              Are you sure you want to remove this conversation and its audit records?
             </p>
             <div className="mt-4 flex items-center justify-end gap-2.5">
               <button
                 type="button"
                 onClick={() => setDeleteConfirmId(null)}
-                className="rounded-xl border border-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-zinc-300 hover:bg-zinc-800"
+                className="rounded-xl border border-[#E7E2F3] bg-[#FFFFFF] px-3.5 py-1.5 text-xs font-semibold text-[#6B6880] hover:bg-[#F0ECFF] hover:text-[#19172A] transition-colors"
               >
                 Cancel
               </button>
@@ -339,7 +372,7 @@ export function ConversationSidebar({
                   onDelete(deleteConfirmId);
                   setDeleteConfirmId(null);
                 }}
-                className="rounded-xl bg-rose-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-rose-500 shadow-2xs"
+                className="rounded-xl bg-rose-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-rose-500 shadow-sm transition-colors"
               >
                 Delete
               </button>
@@ -354,7 +387,7 @@ export function ConversationSidebar({
     if (!isOpen) return null;
     return (
       <div className="fixed inset-0 z-40 flex">
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
+        <div className="fixed inset-0 bg-[#19172A]/35 backdrop-blur-xs" onClick={onClose} />
         <div className="relative w-72 max-w-[80vw] h-full shadow-2xl z-50">{content}</div>
       </div>
     );
@@ -362,5 +395,5 @@ export function ConversationSidebar({
 
   // Desktop sidebar
   if (!isOpen) return null;
-  return <div className="w-64 h-full shrink-0 select-none">{content}</div>;
+  return <aside className="w-64 h-full shrink-0 select-none">{content}</aside>;
 }

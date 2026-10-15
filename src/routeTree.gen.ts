@@ -17,6 +17,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as ApiAiChatRouteImport } from './routes/api/ai-chat'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/_app/settings'
@@ -66,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiChatRoute = ApiAiChatRouteImport.update({
+  id: '/api/ai-chat',
+  path: '/api/ai-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/ai-assistant': typeof AuthenticatedAppAiAssistantRoute
   '/billing': typeof AuthenticatedAppBillingRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/ai-assistant': typeof AuthenticatedAppAiAssistantRoute
   '/billing': typeof AuthenticatedAppBillingRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/_authenticated/_app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/_app/ai-assistant': typeof AuthenticatedAppAiAssistantRoute
   '/_authenticated/_app/billing': typeof AuthenticatedAppBillingRoute
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-email'
     | '/onboarding'
+    | '/api/ai-chat'
     | '/auth/callback'
     | '/ai-assistant'
     | '/billing'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-email'
     | '/onboarding'
+    | '/api/ai-chat'
     | '/auth/callback'
     | '/ai-assistant'
     | '/billing'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/_authenticated/_app'
     | '/_authenticated/onboarding'
+    | '/api/ai-chat'
     | '/auth/callback'
     | '/_authenticated/_app/ai-assistant'
     | '/_authenticated/_app/billing'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  ApiAiChatRoute: typeof ApiAiChatRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
@@ -316,6 +329,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/callback'
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-chat': {
+      id: '/api/ai-chat'
+      path: '/api/ai-chat'
+      fullPath: '/api/ai-chat'
+      preLoaderRoute: typeof ApiAiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/onboarding': {
@@ -447,6 +467,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  ApiAiChatRoute: ApiAiChatRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport

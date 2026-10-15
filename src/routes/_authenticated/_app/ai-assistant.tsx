@@ -10,7 +10,7 @@ import {
   type Conversation,
   type ChatMessage,
 } from "../../../services/aiConversations";
-import { aiAssistantService, type CopilotAction } from "../../../services/ai-assistant";
+import type { CopilotAction } from "../../../services/ai-assistant";
 
 import { Header } from "../../../components/ai-assistant/Header";
 import { ConversationSidebar } from "../../../components/ai-assistant/ConversationSidebar";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/_app/ai-assistant")({
 });
 
 function AiAssistantPage() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const { business } = useBusiness();
   const isMobile = useIsMobile();
 
@@ -50,6 +50,13 @@ function AiAssistantPage() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
+
+  // Auto-collapse sidebar on mobile
+  useEffect(() => {
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
+  }, [isMobile]);
 
   // Initialize persistence mode & load conversations
   useEffect(() => {
@@ -278,19 +285,43 @@ function AiAssistantPage() {
       abortControllerRef.current = controller;
 
       try {
-        const structuredResponse = await aiAssistantService.processQuery(text, {
-          businessId,
-          businessName,
-          ownerName: ownerName,
+        if (!session?.access_token) {
+          throw new Error("Your session has expired. Sign in again to use Nexora Copilot.");
+        }
+
+        const response = await fetch("/api/ai-chat", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: text,
+            history: messages
+              .filter((message) => message.role === "user" || message.role === "assistant")
+              .slice(-12)
+              .map((message) => ({ role: message.role, content: message.content })),
+          }),
           signal: controller.signal,
         });
+        const payload = (await response.json().catch(() => null)) as {
+          answer?: string;
+          error?: { message?: string };
+        } | null;
+        if (!response.ok) {
+          throw new Error(
+            payload?.error?.message || "Nexora Copilot could not complete the request.",
+          );
+        }
+        if (!payload?.answer) {
+          throw new Error("Nexora Copilot returned an empty response. Please retry.");
+        }
 
         // Save assistant response
         const assistantMsg = await aiConversationsService.addMessage(targetConvId, {
           conversationId: targetConvId,
           role: "assistant",
-          content: structuredResponse.conciseAnswer,
-          structuredData: structuredResponse,
+          content: payload.answer,
         });
 
         setMessages((prev) => [...prev, assistantMsg]);
@@ -308,23 +339,34 @@ function AiAssistantPage() {
         if ((err as Error)?.name === "AbortError") {
           toast.info("Generation stopped");
         } else {
-          console.error("Assistant execution error:", err);
+          console.warn("Assistant request failed", {
+            name: err instanceof Error ? err.name : "UnknownError",
+          });
+          const errorMessage =
+            err instanceof Error ? err.message : "Nexora Copilot could not complete the request.";
           const errorMsg = await aiConversationsService.addMessage(targetConvId, {
             conversationId: targetConvId,
             role: "assistant",
-            content:
-              "I encountered an error querying your business ledger. Please verify your connection and retry.",
+            content: errorMessage,
             isError: true,
           });
           setMessages((prev) => [...prev, errorMsg]);
-          toast.error("Query failed to complete");
+          toast.error(errorMessage);
         }
       } finally {
         setIsGenerating(false);
         abortControllerRef.current = null;
       }
     },
-    [input, isGenerating, activeConversationId, businessId, businessName, ownerName, conversations],
+    [
+      input,
+      isGenerating,
+      activeConversationId,
+      businessId,
+      conversations,
+      messages,
+      session?.access_token,
+    ],
   );
 
   // Stop generation
@@ -363,8 +405,8 @@ function AiAssistantPage() {
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-[#0F111A] text-[#F3F4F6] selection:bg-[#6D5EF7]/30">
-      {/* Deep Obsidian Header */}
+    <div className="ai-assistant flex h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] w-full flex-col overflow-hidden bg-[var(--ai-canvas)] text-[var(--ai-text)] selection:bg-[#6D5EF7]/20">
+      {/* Premium Header */}
       <Header
         onToggleSidebar={() => setIsSidebarOpen((v) => !v)}
         onNewChat={handleNewChat}
@@ -373,11 +415,12 @@ function AiAssistantPage() {
         hasMessages={messages.length > 0}
         isSidebarOpen={isSidebarOpen}
         businessName={businessName}
+        persistenceMode={persistenceMode}
       />
 
-      {/* Main Workspace: Sidebar + Conversation Canvas */}
+      {/* Main Workspace: Left Sidebar + Centered Conversation Workspace */}
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
-        {/* Collapsible Sidebar in Midnight Obsidian */}
+        {/* Collapsible Left Sidebar */}
         <ConversationSidebar
           conversations={conversations}
           activeId={activeConversationId}
@@ -389,11 +432,12 @@ function AiAssistantPage() {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           isMobile={isMobile}
+          businessName={businessName}
+          ownerName={ownerName}
         />
 
-        {/* Conversation Workspace Canvas with Deep Ambient Luminescence */}
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[#0F111A]">
-
+        {/* Conversation Workspace Canvas */}
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--ai-canvas)]">
           {/* Scrollable Message History or Empty State */}
           <div
             ref={scrollContainerRef}
@@ -404,10 +448,9 @@ function AiAssistantPage() {
               <EmptyState
                 onSelectPrompt={(prompt) => handleSendMessage(prompt)}
                 businessName={businessName}
-                ownerName={ownerName}
               />
             ) : (
-              <div className="mx-auto w-full max-w-3xl space-y-3">
+              <div className="mx-auto w-full max-w-3xl space-y-3 pb-4">
                 {messages.map((msg) => (
                   <ChatMessageItem
                     key={msg.id}
@@ -425,7 +468,8 @@ function AiAssistantPage() {
             )}
           </div>
 
-          <div className="relative z-10 shrink-0 border-t border-[#272B38] bg-[#0F111A]">
+          {/* Integrated Bottom Composer Container */}
+          <div className="relative z-10 shrink-0 border-t border-[#E7E2F3] bg-[#F7F5FF]/95 backdrop-blur-xs">
             <MessageComposer
               input={input}
               onChange={setInput}

@@ -178,6 +178,18 @@
   }
 }
 
+.ai-assistant {
+  --ai-canvas: #F7F5FF;
+  --ai-surface: #FFFFFF;
+  --ai-surface-soft: #F0ECFF;
+  --ai-border: #E7E2F3;
+  --ai-text: #19172A;
+  --ai-text-secondary: #6B6880;
+  --ai-text-muted: #8A879D;
+  --ai-accent: #6D5EF7;
+  --ai-accent-hover: #5B4BE8;
+}
+
 @utility text-gradient {
   background: var(--gradient-text);
   -webkit-background-clip: text;
@@ -295,6 +307,16 @@
   .landing-page *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .ai-assistant,
+  .ai-assistant *,
+  .ai-assistant *::before,
+  .ai-assistant *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
 }
