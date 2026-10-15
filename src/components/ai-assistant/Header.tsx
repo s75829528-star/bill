@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  Sparkles,
-  PanelLeft,
-  Plus,
-  Download,
-  Trash2,
-  Building2,
-  Copy,
-} from "lucide-react";
+import { Sparkles, PanelLeft, Plus, Download, Trash2, Building2, Copy, Cpu } from "lucide-react";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -18,6 +10,7 @@ interface HeaderProps {
   isSidebarOpen: boolean;
   businessName?: string;
   isLiveDb?: boolean;
+  persistenceMode?: "database" | "session";
 }
 
 export function Header({
@@ -28,7 +21,8 @@ export function Header({
   hasMessages = false,
   isSidebarOpen,
   businessName,
-  isLiveDb,
+  isLiveDb = false,
+  persistenceMode = "session",
 }: HeaderProps) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -38,41 +32,68 @@ export function Header({
     onClearChat?.();
   };
 
+  const isConnected = isLiveDb || persistenceMode === "database";
+
   return (
-    <div className="z-20 flex h-14 shrink-0 items-center justify-between border-b border-[#272B38] bg-[#0B0D14] px-3 transition-colors sm:px-5">
+    <header className="z-20 flex h-14 shrink-0 items-center justify-between border-b border-[#292D3B] bg-[#10121B] px-3 transition-colors sm:px-5 select-none">
       {/* Left side: Toggle button + Title & Status */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onToggleSidebar}
-          className={`flex h-8 w-8 items-center justify-center rounded-lg border border-[#272B38] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6D5EF7] ${
+          className={`flex h-8 w-8 items-center justify-center rounded-lg border border-[#292D3B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7667FF] ${
             isSidebarOpen
-              ? "bg-[#191C27] text-white"
-              : "bg-transparent text-[#9CA3AF] hover:bg-[#191C27] hover:text-white"
+              ? "bg-[#171A26] text-[#F5F5FA]"
+              : "bg-transparent text-[#A1A5B7] hover:bg-[#171A26] hover:text-[#F5F5FA]"
           }`}
-          title="Toggle conversation history"
+          title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
           <PanelLeft className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-2.5">
+          {/* AI Emblem Icon */}
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#7667FF]/15 border border-[#7667FF]/30 text-[#7667FF]">
+            <Sparkles className="h-3.5 w-3.5" />
+          </div>
+
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-white leading-none tracking-tight">
+              <h1 className="text-sm font-semibold text-[#F5F5FA] leading-none tracking-tight">
                 Nexora Copilot
               </h1>
 
-              {/* Status pill with electric emerald luminescence */}
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+              {/* Verified Backend Connection Status Pill */}
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                  isConnected
+                    ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-400"
+                    : "border-amber-500/25 bg-amber-500/10 text-amber-400"
+                }`}
+              >
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                  {isConnected && (
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  )}
+                  <span
+                    className={`relative inline-flex rounded-full h-1.5 w-1.5 ${
+                      isConnected ? "bg-emerald-500" : "bg-amber-400"
+                    }`}
+                  />
                 </span>
-                Live DB
+                {isConnected ? "Live DB" : "Session Memory"}
+              </span>
+
+              {/* Model / Engine Pill */}
+              <span className="hidden lg:inline-flex items-center gap-1 rounded-md border border-[#292D3B] bg-[#171A26] px-2 py-0.5 text-[10px] font-medium text-[#A1A5B7]">
+                <Cpu className="h-3 w-3 text-[#7667FF]" />
+                Grounded Intelligence
               </span>
             </div>
-            <p className="mt-1 hidden text-[11px] font-medium leading-none text-[#9CA3AF] md:block">
-              Verified business intelligence & ledger copilot
+
+            <p className="mt-1 hidden text-[11px] font-normal leading-none text-[#A1A5B7] md:block">
+              Your intelligent business copilot.
             </p>
           </div>
         </div>
@@ -81,10 +102,10 @@ export function Header({
       {/* Right side: Connected business, Export, Clear & New Chat */}
       <div className="flex items-center gap-2">
         {/* Connected business indicator */}
-        <div className="hidden max-w-[190px] items-center gap-1.5 rounded-lg border border-[#272B38] bg-[#11141D] px-2.5 py-1.5 text-[11px] font-medium text-[#9CA3AF] sm:flex">
-          <Building2 className="h-3.5 w-3.5 text-zinc-400" />
-          <span className="max-w-[140px] truncate font-semibold text-[#F3F4F6]">
-            {businessName || "Your Enterprise"}
+        <div className="hidden max-w-[200px] items-center gap-1.5 rounded-lg border border-[#292D3B] bg-[#171A26] px-2.5 py-1.5 text-[11px] font-medium text-[#A1A5B7] sm:flex">
+          <Building2 className="h-3.5 w-3.5 text-[#7667FF]" />
+          <span className="max-w-[140px] truncate font-medium text-[#F5F5FA]">
+            {businessName || "Nexora Enterprise"}
           </span>
         </div>
 
@@ -94,23 +115,23 @@ export function Header({
             <button
               type="button"
               onClick={() => setShowExportMenu((v) => !v)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#272B38] bg-[#11141D] text-[#9CA3AF] transition-colors hover:bg-[#191C27] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6D5EF7]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#292D3B] bg-[#171A26] text-[#A1A5B7] transition-colors hover:bg-[#202534] hover:text-[#F5F5FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7667FF]"
               title="Export report"
             >
               <Download className="h-4 w-4" />
             </button>
 
             {showExportMenu && (
-              <div className="absolute right-0 top-full mt-1.5 w-48 rounded-2xl border border-zinc-800 bg-zinc-900 p-1 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 top-full mt-1.5 w-52 rounded-xl border border-[#292D3B] bg-[#10121B] p-1.5 shadow-2xl z-50 text-[#F5F5FA]">
                 <button
                   type="button"
                   onClick={() => {
                     setShowExportMenu(false);
                     onExportChat();
                   }}
-                  className="flex w-full items-center gap-2 rounded-xl p-2 text-left text-xs text-zinc-200 hover:bg-zinc-800 transition-colors font-medium"
+                  className="flex w-full items-center gap-2 rounded-lg p-2 text-left text-xs text-[#F5F5FA] hover:bg-[#171A26] transition-colors font-medium"
                 >
-                  <Download className="h-3.5 w-3.5 text-indigo-400" />
+                  <Download className="h-3.5 w-3.5 text-[#7667FF]" />
                   <span>Download Markdown (.md)</span>
                 </button>
                 <button
@@ -119,9 +140,9 @@ export function Header({
                     setShowExportMenu(false);
                     onExportChat();
                   }}
-                  className="flex w-full items-center gap-2 rounded-xl p-2 text-left text-xs text-zinc-200 hover:bg-zinc-800 transition-colors font-medium"
+                  className="flex w-full items-center gap-2 rounded-lg p-2 text-left text-xs text-[#A1A5B7] hover:bg-[#171A26] hover:text-[#F5F5FA] transition-colors font-medium"
                 >
-                  <Copy className="h-3.5 w-3.5 text-zinc-400" />
+                  <Copy className="h-3.5 w-3.5 text-[#A1A5B7]" />
                   <span>Copy Audit Transcript</span>
                 </button>
               </div>
@@ -135,30 +156,30 @@ export function Header({
             <button
               type="button"
               onClick={() => setShowClearConfirm(true)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#272B38] bg-[#11141D] text-[#9CA3AF] transition-colors hover:border-rose-900/50 hover:bg-rose-950/60 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6D5EF7]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#292D3B] bg-[#171A26] text-[#A1A5B7] transition-colors hover:border-rose-900/50 hover:bg-rose-950/40 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7667FF]"
               title="Clear conversation"
             >
               <Trash2 className="h-4 w-4" />
             </button>
 
             {showClearConfirm && (
-              <div className="absolute right-0 top-full mt-1.5 w-56 rounded-2xl border border-zinc-800 bg-zinc-900 p-3.5 shadow-2xl z-50 text-xs animate-in fade-in zoom-in-95">
-                <p className="font-bold text-white">Clear chat history?</p>
-                <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">
-                  This will remove current messages from this view.
+              <div className="absolute right-0 top-full mt-1.5 w-60 rounded-xl border border-[#292D3B] bg-[#10121B] p-4 shadow-2xl z-50 text-xs">
+                <p className="font-semibold text-[#F5F5FA]">Clear chat history?</p>
+                <p className="text-[11px] text-[#A1A5B7] mt-1 leading-relaxed">
+                  This will remove current messages from this conversation view.
                 </p>
                 <div className="mt-3 flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setShowClearConfirm(false)}
-                    className="rounded-lg px-2.5 py-1 text-[11px] font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                    className="rounded-lg px-2.5 py-1 text-[11px] font-medium text-[#A1A5B7] hover:bg-[#171A26] hover:text-[#F5F5FA]"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={handleClear}
-                    className="rounded-lg bg-rose-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-2xs hover:bg-rose-500"
+                    className="rounded-lg bg-rose-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-rose-500 shadow-sm transition-colors"
                   >
                     Clear
                   </button>
@@ -168,19 +189,19 @@ export function Header({
           </div>
         )}
 
-        {/* New Chat Primary Action (Electric Luminescent Accent) */}
+        {/* New Chat Primary Action */}
         <button
           type="button"
           onClick={onNewChat}
-          className="flex items-center gap-1.5 rounded-lg bg-[#6D5EF7] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#5B4CE0] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A89FFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0D14] motion-reduce:transition-none"
+          className="flex items-center gap-1.5 rounded-lg bg-[#7667FF] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#897BFF] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7667FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#10121B]"
         >
           <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
           <span className="hidden sm:inline">New Chat</span>
-          <kbd className="hidden md:inline rounded bg-indigo-700/80 border border-indigo-400/30 px-1 py-0.2 text-[9px] font-mono text-indigo-100">
+          <kbd className="hidden md:inline rounded bg-white/15 px-1 py-0.5 text-[9px] font-mono text-white/90">
             ⌘N
           </kbd>
         </button>
       </div>
-    </div>
+    </header>
   );
 }

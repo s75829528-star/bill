@@ -44,12 +44,20 @@ function AiAssistantPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
   const [persistenceMode, setPersistenceMode] = useState<"database" | "session">("session");
+  const [isLiveDb, setIsLiveDb] = useState(false);
   const [pendingAction, setPendingAction] = useState<CopilotAction | null>(null);
 
   // References
   const abortControllerRef = useRef<AbortController | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
+
+  // Auto-collapse sidebar on mobile
+  useEffect(() => {
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
+  }, [isMobile]);
 
   // Initialize persistence mode & load conversations
   useEffect(() => {
@@ -58,6 +66,9 @@ function AiAssistantPage() {
       const mode = await aiConversationsService.getPersistenceMode();
       if (!mounted) return;
       setPersistenceMode(mode);
+      if (mode === "database") {
+        setIsLiveDb(true);
+      }
 
       if (businessId) {
         const loaded = await aiConversationsService.getConversations(businessId);
@@ -363,8 +374,8 @@ function AiAssistantPage() {
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-[#0F111A] text-[#F3F4F6] selection:bg-[#6D5EF7]/30">
-      {/* Deep Obsidian Header */}
+    <div className="flex h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] w-full flex-col overflow-hidden bg-[#0D0F17] text-[#F5F5FA] selection:bg-[#7667FF]/30">
+      {/* Premium Header */}
       <Header
         onToggleSidebar={() => setIsSidebarOpen((v) => !v)}
         onNewChat={handleNewChat}
@@ -373,11 +384,13 @@ function AiAssistantPage() {
         hasMessages={messages.length > 0}
         isSidebarOpen={isSidebarOpen}
         businessName={businessName}
+        isLiveDb={isLiveDb}
+        persistenceMode={persistenceMode}
       />
 
-      {/* Main Workspace: Sidebar + Conversation Canvas */}
+      {/* Main Workspace: Left Sidebar + Centered Conversation Workspace */}
       <div className="relative flex min-h-0 flex-1 overflow-hidden">
-        {/* Collapsible Sidebar in Midnight Obsidian */}
+        {/* Collapsible Left Sidebar */}
         <ConversationSidebar
           conversations={conversations}
           activeId={activeConversationId}
@@ -389,11 +402,12 @@ function AiAssistantPage() {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           isMobile={isMobile}
+          businessName={businessName}
+          ownerName={ownerName}
         />
 
-        {/* Conversation Workspace Canvas with Deep Ambient Luminescence */}
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[#0F111A]">
-
+        {/* Conversation Workspace Canvas */}
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[#0D0F17]">
           {/* Scrollable Message History or Empty State */}
           <div
             ref={scrollContainerRef}
@@ -407,7 +421,7 @@ function AiAssistantPage() {
                 ownerName={ownerName}
               />
             ) : (
-              <div className="mx-auto w-full max-w-3xl space-y-3">
+              <div className="mx-auto w-full max-w-3xl space-y-3 pb-4">
                 {messages.map((msg) => (
                   <ChatMessageItem
                     key={msg.id}
@@ -425,7 +439,8 @@ function AiAssistantPage() {
             )}
           </div>
 
-          <div className="relative z-10 shrink-0 border-t border-[#272B38] bg-[#0F111A]">
+          {/* Integrated Bottom Composer Container */}
+          <div className="relative z-10 shrink-0 border-t border-[#292D3B] bg-[#0D0F17]/95 backdrop-blur-xs">
             <MessageComposer
               input={input}
               onChange={setInput}
