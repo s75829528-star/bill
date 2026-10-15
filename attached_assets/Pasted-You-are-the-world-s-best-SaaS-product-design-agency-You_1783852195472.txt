@@ -1,0 +1,612 @@
+You are the world's best SaaS product design agency.
+
+You are a team of:
+
+• Apple Product Designers
+• Stripe Design Team
+• Linear Design Team
+• Vercel Design Team
+• OpenAI Design Team
+• Figma Product Designers
+• YC Startup Advisors
+• Enterprise UX Researchers
+• Conversion Rate Optimization Experts
+• Senior React Engineers
+• Senior Next.js Engineers
+• TypeScript Architects
+• Tailwind CSS Experts
+• Motion Designers
+• Brand Strategists
+• Product Marketing Experts
+
+==================================================
+
+IMPORTANT
+
+This is NOT a new project.
+
+Continue improving the EXISTING project.
+
+Use the EXISTING GitHub repository.
+
+Do NOT replace the project.
+
+Do NOT remove existing functionality.
+
+Do NOT change routing.
+
+Do NOT break the project.
+
+Refactor and improve the existing codebase only.
+
+==================================================
+
+PROJECT
+
+Name
+
+Nexora
+
+Tagline
+
+The AI Business Operating System
+
+Mission
+
+One intelligent platform to run every aspect of a modern business using AI.
+
+==================================================
+
+PRIMARY GOAL
+
+Create one of the most beautiful SaaS landing pages possible.
+
+When visitors open the website they should immediately think:
+
+• This company is trustworthy.
+• This software looks premium.
+• This product saves businesses time.
+• This feels enterprise-ready.
+• I want to try this.
+
+The page should feel comparable to modern enterprise software companies.
+
+==================================================
+
+DESIGN PHILOSOPHY
+
+Minimal.
+
+Elegant.
+
+Professional.
+
+Luxury.
+
+Modern.
+
+Timeless.
+
+Every pixel should feel intentional.
+
+Avoid visual clutter.
+
+Prioritize readability and trust.
+
+==================================================
+
+COLOR SYSTEM
+
+Primary Background
+
+Pure White (#FFFFFF)
+
+Secondary
+
+#F8FAFC
+
+#F5F7FA
+
+Cards
+
+White
+
+Soft Shadows
+
+Border Radius
+
+16–24px
+
+Accent Colors
+
+Deep Blue
+
+Electric Blue
+
+Subtle Purple
+
+Soft Cyan
+
+Never overuse gradients.
+
+==================================================
+
+TYPOGRAPHY
+
+Create a premium typography hierarchy.
+
+Large Hero Heading
+
+Powerful section titles
+
+Readable paragraphs
+
+Perfect spacing
+
+Excellent contrast
+
+Professional font scale
+
+==================================================
+
+NAVIGATION
+
+Sticky Navigation
+
+Animated logo
+
+Smooth scroll
+
+Modern hover effects
+
+Home
+
+Features
+
+Solutions
+
+Pricing
+
+AI
+
+Resources
+
+About
+
+Contact
+
+Login
+
+Start Free Trial
+
+Book Demo
+
+==================================================
+
+HERO
+
+Design one of the strongest SaaS hero sections possible.
+
+Large headline.
+
+Powerful supporting text.
+
+Clear value proposition.
+
+Primary CTA
+
+Start Free Trial
+
+Secondary CTA
+
+Book Demo
+
+Third CTA
+
+Watch Product Tour
+
+Right Side
+
+Generate a realistic product dashboard.
+
+NOT a placeholder.
+
+Include
+
+Revenue Cards
+
+Sales Graph
+
+Inventory Panel
+
+AI Chat
+
+Customer Analytics
+
+Recent Invoices
+
+Business Health Score
+
+Notifications
+
+Charts
+
+Recent Orders
+
+Profit Widgets
+
+Floating Components
+
+Modern Glass Cards
+
+Subtle Motion
+
+==================================================
+
+GENERATE LOTS OF VISUAL CONTENT
+
+Every major section should contain custom visuals.
+
+Generate many unique visuals including:
+
+• AI Assistant conversations
+
+• Billing software interface
+
+• Inventory management screen
+
+• CRM dashboard
+
+• Customer analytics
+
+• Employee dashboard
+
+• Financial reports
+
+• Revenue analytics
+
+• Sales dashboard
+
+• Business intelligence
+
+• Invoice generator
+
+• Mobile application previews
+
+• Tablet mockups
+
+• Desktop dashboard
+
+• AI insights screen
+
+• Workflow automation diagrams
+
+• Security dashboard
+
+• Cloud infrastructure illustration
+
+• API integration graphics
+
+• Data synchronization
+
+• Business growth illustration
+
+Use realistic product mockups.
+
+Avoid stock photos.
+
+Avoid cartoon graphics.
+
+Everything should match the Nexora branding.
+
+==================================================
+
+FEATURES
+
+Create premium feature cards explaining
+
+Problem
+
+Solution
+
+Business Value
+
+Time Saved
+
+Automation
+
+ROI
+
+Real Business Example
+
+Professional screenshots
+
+Interactive animations
+
+==================================================
+
+BUSINESS MODULES
+
+Billing
+
+GST
+
+Invoices
+
+Quotation
+
+Purchase
+
+Inventory
+
+CRM
+
+Finance
+
+Reports
+
+Analytics
+
+Customers
+
+Suppliers
+
+Expenses
+
+Income
+
+Multi Branch
+
+Cloud Backup
+
+AI Assistant
+
+Security
+
+API
+
+Integrations
+
+Each module deserves its own premium showcase.
+
+==================================================
+
+AI EXPERIENCE
+
+Create a world-class AI section.
+
+Beautiful AI chat interface.
+
+Professional prompts.
+
+Real business examples.
+
+Sales prediction.
+
+Inventory forecast.
+
+Invoice generation.
+
+Payment reminder generation.
+
+Business report generation.
+
+Natural language analytics.
+
+Business intelligence.
+
+==================================================
+
+INTEGRATIONS
+
+Beautiful integration wall.
+
+Google Workspace
+
+Microsoft 365
+
+WhatsApp
+
+Razorpay
+
+Stripe
+
+PhonePe
+
+UPI
+
+Excel
+
+CSV
+
+Google Sheets
+
+Google Drive
+
+Email
+
+Barcode Scanner
+
+Thermal Printer
+
+Developer API
+
+Webhooks
+
+==================================================
+
+TRUST
+
+Enterprise Security
+
+Encryption
+
+Cloud Backup
+
+Role Based Access
+
+Audit Logs
+
+Compliance
+
+High Availability
+
+Automatic Updates
+
+Business Continuity
+
+==================================================
+
+SOCIAL PROOF
+
+Animated customer logos.
+
+Business statistics.
+
+Customer success stories.
+
+Professional testimonials.
+
+Industry awards (only if clearly marked as placeholders until earned).
+
+==================================================
+
+PRICING
+
+Elegant pricing section.
+
+Professional comparison.
+
+Highlight recommended plan.
+
+Show business value instead of just features.
+
+==================================================
+
+FAQ
+
+Create detailed, helpful FAQs for business owners.
+
+==================================================
+
+FOOTER
+
+Professional enterprise footer.
+
+Documentation
+
+Developers
+
+API
+
+Support
+
+Roadmap
+
+Blog
+
+Careers
+
+Privacy
+
+Terms
+
+Status
+
+Newsletter
+
+Social Media
+
+==================================================
+
+MICRO INTERACTIONS
+
+Smooth hover effects.
+
+Premium button animations.
+
+Scroll animations.
+
+Floating cards.
+
+Interactive charts.
+
+Professional transitions.
+
+Loading states.
+
+==================================================
+
+RESPONSIVE
+
+Perfect experience on
+
+Desktop
+
+Laptop
+
+Tablet
+
+Mobile
+
+==================================================
+
+PERFORMANCE
+
+Optimize everything.
+
+Reusable Components
+
+TypeScript
+
+SEO
+
+Accessibility
+
+Semantic HTML
+
+Image Optimization
+
+Lazy Loading
+
+Code Splitting
+
+Fast Loading
+
+Production Ready
+
+==================================================
+
+COPYWRITING
+
+Rewrite all marketing copy.
+
+Avoid generic phrases.
+
+Explain business outcomes.
+
+Explain ROI.
+
+Explain productivity.
+
+Explain automation.
+
+Write like an experienced B2B SaaS copywriter.
+
+==================================================
+
+FINAL QUALITY BAR
+
+Do NOT make it look AI-generated.
+
+Do NOT create generic templates.
+
+Do NOT overuse gradients.
+
+Do NOT overload the page with unnecessary content.
+
+Every section should feel premium, polished, and intentionally designed.
+
+Improve the existing landing page rather than replacing it.
+
+Deliver a landing page that looks launch-ready for a serious B2B SaaS company, with high-quality visuals, polished UX, and production-ready code.

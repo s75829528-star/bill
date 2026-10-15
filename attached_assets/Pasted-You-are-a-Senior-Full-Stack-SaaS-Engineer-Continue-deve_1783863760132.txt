@@ -1,0 +1,313 @@
+You are a Senior Full-Stack SaaS Engineer.
+
+Continue developing the EXISTING Nexora project.
+
+IMPORTANT
+
+Do NOT redesign the landing page.
+
+Do NOT modify the homepage.
+
+Do NOT remove existing components.
+
+Do NOT change branding.
+
+Do NOT break routing.
+
+Do NOT replace the project.
+
+Only ADD the authentication system.
+
+==================================================
+
+PROJECT
+
+Nexora
+
+AI Business Operating System
+
+Tech Stack
+
+React
+
+TypeScript
+
+Vite
+
+Tailwind CSS
+
+Supabase
+
+PostgreSQL
+
+==================================================
+
+OBJECTIVE
+
+Build a complete production-ready authentication system.
+
+==================================================
+
+FEATURES
+
+Create
+
+✓ Sign Up
+
+✓ Login
+
+✓ Forgot Password
+
+✓ Reset Password
+
+✓ Email Verification
+
+✓ Logout
+
+✓ Session Management
+
+✓ Protected Routes
+
+✓ Remember Me
+
+✓ Loading States
+
+✓ Error Handling
+
+✓ Success Messages
+
+==================================================
+
+SUPABASE
+
+Use Supabase Authentication.
+
+Do not create custom password authentication.
+
+Use secure Supabase Auth methods.
+
+Persist sessions.
+
+Automatically restore sessions after refresh.
+
+Handle expired sessions.
+
+Redirect unauthenticated users to Login.
+
+==================================================
+
+DATABASE
+
+Create a user profile table.
+
+Table
+
+profiles
+
+Columns
+
+id (UUID)
+
+full_name
+
+email
+
+created_at
+
+updated_at
+
+avatar_url
+
+business_name
+
+business_type
+
+is_onboarded
+
+The profile should automatically be created after signup.
+
+==================================================
+
+SIGN UP PAGE
+
+Fields
+
+Full Name
+
+Email
+
+Password
+
+Confirm Password
+
+Terms & Conditions
+
+Create Account button
+
+Validation
+
+Strong Password
+
+Valid Email
+
+Password Match
+
+Required Fields
+
+Beautiful loading animation.
+
+Professional UI.
+
+==================================================
+
+LOGIN PAGE
+
+Email
+
+Password
+
+Remember Me
+
+Forgot Password
+
+Login Button
+
+Create Account Link
+
+Professional UI.
+
+==================================================
+
+FORGOT PASSWORD
+
+Enter Email
+
+Send Reset Link
+
+Success Screen
+
+==================================================
+
+EMAIL VERIFICATION
+
+After signup
+
+Show
+
+"Please verify your email before continuing."
+
+Provide
+
+Resend Email button
+
+==================================================
+
+LOGOUT
+
+Secure logout.
+
+Clear session.
+
+Redirect to homepage.
+
+==================================================
+
+PROTECTED ROUTES
+
+Create middleware or route guards.
+
+Unauthenticated users
+
+→ Login
+
+Authenticated users
+
+→ Dashboard
+
+==================================================
+
+USER FLOW
+
+Landing Page
+
+↓
+
+Sign Up
+
+↓
+
+Verify Email
+
+↓
+
+Login
+
+↓
+
+Business Setup Wizard
+
+↓
+
+Dashboard
+
+==================================================
+
+AUTH CONTEXT
+
+Create
+
+Auth Provider
+
+Auth Hook
+
+Session Hook
+
+Protected Route Component
+
+Reusable authentication utilities.
+
+==================================================
+
+UI
+
+Enterprise SaaS design.
+
+Apple-level spacing.
+
+Stripe-style forms.
+
+Professional validation.
+
+Modern buttons.
+
+Responsive.
+
+Accessible.
+
+Keyboard navigation.
+
+Dark mode support later.
+
+==================================================
+
+CODE QUALITY
+
+TypeScript
+
+Reusable Components
+
+Clean Architecture
+
+Well-organized folders
+
+No duplicated code
+
+Production-ready
+
+==================================================
+
+Do NOT implement Billing, Inventory, CRM, AI, or Dashboard features yet.
+
+Only complete authentication and prepare the project for the next phase.
+
+The result should be production-ready and easy to extend.

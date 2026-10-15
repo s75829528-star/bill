@@ -1,0 +1,215 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- DO NOT redesign any UI.
+- DO NOT change colors, typography, spacing, animations, layout, sidebar or navigation.
+- Preserve the premium enterprise SaaS design.
+- Implement functionality only.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the Customers module fully functional using Supabase.
+
+Replace all mock data with real database operations.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+DATABASE
+==================================================
+
+Create a customers table if it does not already exist.
+
+Columns
+
+id
+
+business_id
+
+customer_code
+
+name
+
+company_name
+
+email
+
+phone
+
+gst_number
+
+address
+
+city
+
+state
+
+country
+
+postal_code
+
+credit_limit
+
+opening_balance
+
+status
+
+notes
+
+created_at
+
+updated_at
+
+==================================================
+MULTI-TENANCY
+==================================================
+
+Every customer belongs only to the logged-in business.
+
+Users must never access another business's customers.
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+Create Customer
+
+Edit Customer
+
+Delete Customer
+
+View Customer
+
+Search Customer
+
+Filter Customer
+
+Pagination
+
+Sorting
+
+Status Filter
+
+==================================================
+VALIDATION
+==================================================
+
+Validate
+
+Required fields
+
+Email format
+
+Phone format
+
+Duplicate customer prevention
+
+==================================================
+CUSTOMER PROFILE
+==================================================
+
+Create a professional customer detail page.
+
+Display
+
+Customer Information
+
+Outstanding Balance
+
+Invoices
+
+Recent Payments
+
+Activity Timeline
+
+==================================================
+TABLE
+==================================================
+
+Replace mock table with live Supabase data.
+
+Include
+
+Customer Name
+
+Company
+
+Phone
+
+Email
+
+Outstanding Balance
+
+Status
+
+Actions
+
+==================================================
+LOADING
+==================================================
+
+Professional loading skeletons.
+
+==================================================
+EMPTY STATE
+==================================================
+
+Professional empty state.
+
+"Create your first customer."
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle
+
+Network errors
+
+Database errors
+
+Validation errors
+
+Permission errors
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use
+
+React Query
+
+Optimistic updates
+
+Caching
+
+Pagination
+
+Reusable hooks
+
+==================================================
+IMPORTANT
+==================================================
+
+Do not redesign anything.
+
+Do not touch Billing, Inventory, Finance, Reports or AI.
+
+Only make the Customers module fully production-ready.

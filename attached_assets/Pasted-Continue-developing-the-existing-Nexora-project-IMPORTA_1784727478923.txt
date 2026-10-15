@@ -1,0 +1,275 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Credit Notes module fully production-ready using Supabase.
+
+Replace all mock data.
+
+Use the existing UI only.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+DATABASE
+==================================================
+
+Create tables if they do not exist.
+
+credit_notes
+
+credit_note_items
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every credit note belongs only to the logged-in business.
+
+Businesses must never access another business's credit notes.
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+• Create Credit Note
+• Edit Draft Credit Note
+• Delete Draft Credit Note
+• Preview
+• Print
+• Download PDF
+• Email Credit Note
+• Duplicate
+• Void Credit Note
+
+==================================================
+CREDIT NOTE DETAILS
+==================================================
+
+Each Credit Note should include:
+
+Credit Note Number (auto-generated)
+
+Credit Note Date
+
+Related Invoice
+
+Customer
+
+Reason
+
+Products Returned
+
+Quantity
+
+Unit Price
+
+Discount
+
+Tax
+
+Subtotal
+
+Grand Total
+
+Notes
+
+Status
+
+Created By
+
+Created At
+
+Updated At
+
+==================================================
+CUSTOMERS
+==================================================
+
+Load customers from CRM.
+
+==================================================
+INVOICES
+==================================================
+
+Allow selecting an existing invoice.
+
+Automatically load:
+
+Customer
+
+Invoice Items
+
+Invoice Amount
+
+==================================================
+PRODUCTS
+==================================================
+
+Load products from the selected invoice.
+
+Allow partial quantity returns.
+
+==================================================
+INVENTORY
+==================================================
+
+When products are returned:
+
+Increase inventory stock automatically.
+
+Create inventory movement records.
+
+==================================================
+FINANCE
+==================================================
+
+Automatically:
+
+Reduce Accounts Receivable
+
+Update customer outstanding balance
+
+Create finance adjustment entries
+
+==================================================
+STATUS
+==================================================
+
+Support:
+
+Draft
+
+Issued
+
+Applied
+
+Voided
+
+==================================================
+SEARCH
+==================================================
+
+Search by:
+
+Credit Note Number
+
+Customer
+
+Invoice Number
+
+==================================================
+FILTERS
+==================================================
+
+Support:
+
+Status
+
+Customer
+
+Date Range
+
+==================================================
+VALIDATION
+==================================================
+
+Validate:
+
+Invoice exists
+
+Customer exists
+
+Returned quantity cannot exceed invoiced quantity
+
+Positive values only
+
+==================================================
+TABLE
+==================================================
+
+Replace mock data.
+
+Display:
+
+Credit Note Number
+
+Invoice Number
+
+Customer
+
+Date
+
+Amount
+
+Status
+
+Actions
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+React Query
+
+Optimistic Updates
+
+Reusable Hooks
+
+Caching
+
+Pagination
+
+Loading Skeletons
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+Validation Errors
+
+Database Errors
+
+Permission Errors
+
+Network Errors
+
+==================================================
+IMPORTANT
+==================================================
+
+Keep the current UI exactly the same.
+
+Replace all dummy data with Supabase.
+
+Every existing button should perform real database operations.
+
+Integrate Credit Notes with Billing, Inventory, CRM and Finance.
+
+The Credit Notes module should be production-ready.

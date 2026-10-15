@@ -1,0 +1,285 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+AI EXECUTION MODE (IMPORTANT)
+==================================================
+
+Optimize for minimal AI credit usage.
+
+- Analyze only files directly related to the Billing → Payments module.
+- Do NOT scan the entire project.
+- Do NOT modify unrelated modules.
+- Reuse existing hooks, services, utilities and components.
+- Make the smallest possible changes required.
+- Avoid duplicate code.
+- Follow the existing architecture.
+- Do not regenerate files that already work.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Billing → Payments module fully production-ready using Supabase.
+
+Replace all mock data with real database operations.
+
+Use the existing UI only.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+DATABASE
+==================================================
+
+Create tables if they do not exist.
+
+payments
+
+payment_allocations
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every payment belongs only to the logged-in business.
+
+Businesses must never access another business's payments.
+
+Implement proper Row Level Security compatibility.
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+• Receive Payment
+• Edit Payment
+• Delete Payment
+• Refund Payment
+• Void Payment
+• Preview
+• Search
+• Filters
+• Pagination
+
+==================================================
+PAYMENT DETAILS
+==================================================
+
+Each payment should include:
+
+• Payment Number
+• Customer
+• Related Invoice
+• Payment Date
+• Amount
+• Payment Method
+• Reference Number
+• Notes
+• Currency
+• Status
+• Created By
+• Created At
+• Updated At
+
+==================================================
+PAYMENT METHODS
+==================================================
+
+Support:
+
+• Cash
+• UPI
+• Bank Transfer
+• Credit Card
+• Debit Card
+• Cheque
+• Wallet
+• Other
+
+==================================================
+CUSTOMERS
+==================================================
+
+Load customers from CRM.
+
+Allow searching customers.
+
+==================================================
+INVOICES
+==================================================
+
+Load unpaid and partially paid invoices.
+
+Automatically calculate:
+
+• Outstanding Amount
+• Remaining Balance
+• Payment Allocation
+
+Support:
+
+• Full Payments
+• Partial Payments
+• Multiple Payments
+
+==================================================
+INVOICE STATUS
+==================================================
+
+Automatically update invoice status:
+
+Unpaid
+
+Partially Paid
+
+Paid
+
+==================================================
+FINANCE
+==================================================
+
+Automatically create finance records when payments are received.
+
+Update revenue.
+
+Update cash flow.
+
+Update customer outstanding balances.
+
+==================================================
+DASHBOARD
+==================================================
+
+Automatically update dashboard metrics after payments.
+
+==================================================
+STATUS
+==================================================
+
+Support:
+
+Pending
+
+Completed
+
+Failed
+
+Refunded
+
+Voided
+
+==================================================
+SEARCH
+==================================================
+
+Search by:
+
+• Payment Number
+• Customer
+• Invoice Number
+• Reference Number
+
+==================================================
+FILTERS
+==================================================
+
+Support:
+
+• Status
+• Payment Method
+• Customer
+• Date Range
+
+==================================================
+TABLE
+==================================================
+
+Replace mock data.
+
+Display:
+
+• Payment Number
+• Customer
+• Invoice
+• Date
+• Amount
+• Method
+• Status
+• Actions
+
+==================================================
+VALIDATION
+==================================================
+
+Validate:
+
+• Positive payment amount
+• Invoice exists
+• Customer exists
+• Payment cannot exceed outstanding balance
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+• React Query
+• Optimistic Updates
+• Caching
+• Reusable Hooks
+• Loading Skeletons
+• TypeScript Best Practices
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+• Validation Errors
+• Database Errors
+• Permission Errors
+• Network Errors
+
+==================================================
+IMPORTANT
+==================================================
+
+Do NOT redesign anything.
+
+Keep the existing Payments UI exactly the same.
+
+Replace all dummy data with Supabase.
+
+Every existing button should perform real database operations.
+
+Integrate Payments with:
+
+• Billing
+• CRM
+• Finance
+• Dashboard
+• Reports
+
+The Payments module should be fully production-ready.

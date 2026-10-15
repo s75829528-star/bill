@@ -1,0 +1,167 @@
+You are a senior product designer redesigning the Nexora landing page.
+
+This is an enterprise SaaS website.
+
+I want the website to feel premium like Stripe, Linear, OpenAI, Vercel and Apple.
+
+----------------------------------------
+
+IMPORTANT
+
+The current Integrations section is misleading.
+
+It currently suggests that every integration is already available.
+
+This is NOT true.
+
+Nexora is still in its first version (MVP).
+
+Do NOT advertise integrations that are not yet implemented.
+
+----------------------------------------
+
+Redesign the Integrations section.
+
+Create two groups.
+
+AVAILABLE TODAY
+
+Only show integrations that actually exist in Version 1.
+
+COMING SOON
+
+Everything else should appear inside a beautiful roadmap.
+
+Each upcoming integration should have:
+
+• Coming Soon badge
+
+• Planned quarter
+
+• Short description
+
+• Soft disabled styling
+
+• Premium enterprise appearance
+
+Do NOT make users think these features already exist.
+
+Transparency builds trust.
+
+----------------------------------------
+
+Completely redesign the "Coming Soon" section.
+
+The current cards look like a generic Tailwind template.
+
+Remove:
+
+• Too many pills
+• Too many badges
+• Small feature chips
+• Generic layouts
+• Template-looking cards
+
+Instead create elegant enterprise roadmap cards.
+
+Each card should contain:
+
+Feature Name
+
+Professional illustration
+
+One strong business description
+
+Expected Release
+
+Development Status
+
+Business Value
+
+Optional Learn More button
+
+Use large whitespace.
+
+Use premium typography.
+
+Use subtle borders.
+
+Use soft shadows.
+
+No visual clutter.
+
+----------------------------------------
+
+Typography
+
+Current typography feels generic.
+
+Improve every heading.
+
+Improve paragraph spacing.
+
+Improve font hierarchy.
+
+Use a modern enterprise design language.
+
+Large bold headings.
+
+Comfortable reading width.
+
+Premium spacing.
+
+Professional alignment.
+
+----------------------------------------
+
+Visual Design
+
+Use Apple's minimalism.
+
+Use Stripe's professionalism.
+
+Use Linear's typography.
+
+Use OpenAI's simplicity.
+
+Use Vercel's spacing.
+
+Every section should feel luxurious.
+
+----------------------------------------
+
+Animations
+
+Premium only.
+
+Subtle fade.
+
+Smooth hover.
+
+Elegant card transitions.
+
+No flashy effects.
+
+----------------------------------------
+
+Overall Goal
+
+The landing page should look like software from a company preparing for enterprise customers.
+
+Prioritize trust over marketing.
+
+Only promise what exists today.
+
+Everything planned for the future should be clearly marked as "Coming Soon" with an elegant roadmap design.
+
+Visitors should leave thinking:
+
+"This company is honest."
+
+"This software looks premium."
+
+"This roadmap gives me confidence."
+
+Do not redesign the entire website.
+
+Only improve the Integrations section, the Roadmap section, typography, spacing and overall visual quality while preserving the existing branding and project structure.

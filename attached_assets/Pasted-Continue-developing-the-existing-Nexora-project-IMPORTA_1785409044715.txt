@@ -1,0 +1,200 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, icons, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Transform the existing Dashboard from a UI prototype into a fully functional real-time business dashboard using Supabase.
+
+Replace every mock value, dummy chart, and fake activity with live business data.
+
+Keep the current design exactly the same.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every dashboard must display only data belonging to the logged-in business.
+
+All queries must filter using business_id.
+
+Implement proper Row Level Security compatibility.
+
+==================================================
+DASHBOARD CARDS
+==================================================
+
+Replace every dashboard KPI card using live Supabase data.
+
+Examples include:
+
+• Total Revenue
+• Today's Revenue
+• Monthly Revenue
+• Total Sales
+• Total Orders
+• Total Customers
+• Total Products
+• Inventory Value
+• Total Expenses
+• Net Profit
+• Outstanding Payments
+• Pending Invoices
+• Paid Invoices
+• Overdue Invoices
+• Low Stock Products
+
+Calculate all values dynamically.
+
+==================================================
+RECENT ACTIVITY
+==================================================
+
+Replace dummy activities.
+
+Display real events including:
+
+• Invoice Created
+• Invoice Paid
+• Customer Added
+• Product Added
+• Stock Updated
+• Expense Added
+• Payment Received
+• Credit Note Created
+
+Sort by newest first.
+
+==================================================
+CHARTS
+==================================================
+
+Replace all dummy charts.
+
+Load live data.
+
+Support:
+
+• Sales Trend
+• Revenue Trend
+• Monthly Sales
+• Invoice Status Distribution
+• Expense Breakdown
+• Top Selling Products
+• Inventory Value Trend
+• Customer Growth
+• Revenue vs Expenses
+
+Charts must automatically refresh after changes.
+
+==================================================
+QUICK ACTIONS
+==================================================
+
+Connect every Quick Action button.
+
+Examples:
+
+• New Invoice
+• Add Customer
+• Add Product
+• Record Expense
+• Receive Payment
+• Create Quote
+
+Navigate to the existing modules.
+
+==================================================
+LIVE UPDATES
+==================================================
+
+Dashboard should refresh automatically after:
+
+• Invoice Created
+• Invoice Updated
+• Payment Received
+• Customer Added
+• Product Added
+• Expense Added
+• Inventory Updated
+
+Use React Query cache invalidation where appropriate.
+
+==================================================
+SEARCH
+==================================================
+
+If dashboard search exists, connect it to live data.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+• React Query
+• Optimistic Updates
+• Memoization
+• Reusable Hooks
+• Efficient Supabase Queries
+• Pagination where required
+• Loading Skeletons
+• Lazy Loading
+• Error Boundaries
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+• Network Errors
+• Database Errors
+• Permission Errors
+• Empty State
+
+==================================================
+EMPTY STATE
+==================================================
+
+If a new business has no data:
+
+Show professional empty states instead of dummy values.
+
+Display helpful onboarding messages encouraging the user to:
+
+• Create their first product
+• Create their first customer
+• Create their first invoice
+
+==================================================
+IMPORTANT
+==================================================
+
+Do NOT redesign anything.
+
+Keep every existing dashboard widget exactly as it is.
+
+Only replace dummy data with live Supabase data.
+
+Every dashboard metric must update automatically based on real business activity.
+
+The Dashboard should function like a production ERP dashboard similar to Zoho Books, Odoo or ERPNext.

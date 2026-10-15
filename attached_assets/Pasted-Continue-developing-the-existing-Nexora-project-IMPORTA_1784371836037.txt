@@ -1,0 +1,143 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT change colors, typography, layout, spacing, sidebar or navigation.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Inventory module fully functional for Product Management using Supabase.
+
+IMPORTANT
+
+There must NOT be a separate Products page.
+
+Inventory is the master product management module.
+
+==================================================
+DATABASE
+==================================================
+
+Create if not exists
+
+products
+
+categories
+
+suppliers
+
+Each product contains
+
+id
+
+business_id
+
+sku
+
+barcode
+
+name
+
+description
+
+category_id
+
+supplier_id
+
+purchase_price
+
+selling_price
+
+tax_rate
+
+unit
+
+opening_stock
+
+current_stock
+
+minimum_stock
+
+maximum_stock
+
+status
+
+image_url
+
+created_at
+
+updated_at
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support
+
+Add Product
+
+Edit Product
+
+Delete Product
+
+Archive Product
+
+Restore Product
+
+View Product
+
+Search
+
+Filters
+
+Sorting
+
+Pagination
+
+==================================================
+VALIDATION
+==================================================
+
+Unique SKU
+
+Unique Barcode
+
+Required Fields
+
+Positive Prices
+
+Positive Stock
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Each product belongs only to the logged-in business.
+
+Never expose another business's products.
+
+==================================================
+PERFORMANCE
+==================================================
+
+React Query
+
+Caching
+
+Optimistic Updates
+
+Reusable Hooks
+
+Loading States
+
+Error Handling
+
+Do not redesign anything.

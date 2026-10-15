@@ -1,0 +1,186 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify the landing page.
+- Do NOT change colors, spacing, typography, icons, animations, layout or navigation.
+- Preserve the existing enterprise SaaS design.
+- Implement functionality only.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Implement the production backend foundation using Supabase.
+
+This task ONLY covers:
+
+1. Authentication
+2. Business Profile
+
+Do not work on Billing, Inventory, CRM, Finance, Reports or AI in this task.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode any URL or API keys.
+
+==================================================
+AUTHENTICATION
+==================================================
+
+Implement production-ready authentication.
+
+Support:
+
+• Sign Up
+• Login
+• Logout
+• Password Reset
+• Session Persistence
+• Protected Routes
+• Auto Redirect after login
+• Auto Redirect after logout
+
+Users must stay logged in after refreshing.
+
+==================================================
+DATABASE
+==================================================
+
+Create only these tables if they do not exist.
+
+profiles
+
+businesses
+
+==================================================
+PROFILE
+==================================================
+
+Store
+
+id
+
+email
+
+full_name
+
+phone
+
+created_at
+
+updated_at
+
+==================================================
+BUSINESS
+==================================================
+
+Each authenticated user owns one business.
+
+Store
+
+business_name
+
+owner_name
+
+gst_number
+
+phone
+
+email
+
+address
+
+city
+
+state
+
+country
+
+postal_code
+
+currency
+
+financial_year
+
+timezone
+
+logo_url
+
+created_at
+
+updated_at
+
+==================================================
+BUSINESS SETUP
+==================================================
+
+The existing Business Setup Wizard should become functional.
+
+When completed:
+
+Save all information into Supabase.
+
+If business already exists:
+
+Skip the wizard.
+
+Go directly to Dashboard.
+
+==================================================
+ROUTE PROTECTION
+==================================================
+
+Unauthenticated users
+
+→ Login
+
+Authenticated users without business
+
+→ Setup Wizard
+
+Authenticated users with business
+
+→ Dashboard
+
+==================================================
+CODE QUALITY
+==================================================
+
+Use
+
+React Query
+
+TypeScript
+
+Reusable hooks
+
+Loading states
+
+Error handling
+
+Reusable services
+
+Clean folder structure
+
+==================================================
+IMPORTANT
+==================================================
+
+Do not redesign anything.
+
+Do not modify any completed modules.
+
+Do not generate mock data.
+
+Only connect Authentication and Business Profile to Supabase.
+
+Everything should work exactly like a production SaaS application.

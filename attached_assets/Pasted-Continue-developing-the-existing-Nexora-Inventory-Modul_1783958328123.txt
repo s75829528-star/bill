@@ -1,0 +1,551 @@
+Continue developing the existing Nexora Inventory Module.
+
+IMPORTANT
+
+- DO NOT redesign the Inventory module.
+- DO NOT modify the Landing Page.
+- DO NOT modify Authentication.
+- DO NOT modify Business Setup.
+- DO NOT modify Dashboard.
+- DO NOT modify Billing.
+- Keep the existing premium white SaaS design.
+- Preserve the current layout, navigation, spacing, typography, icons, and animations.
+- Continue using the existing GitHub repository and project structure.
+- Only ADD enterprise-level inventory capabilities.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Upgrade the Inventory module to enterprise ERP quality.
+
+The goal is to make Inventory comparable to:
+
+• Zoho Inventory
+• Odoo Inventory
+• SAP Business One
+• Oracle NetSuite
+• Microsoft Dynamics 365
+• Cin7
+• Fishbowl
+• Katana ERP
+
+No backend.
+
+No Supabase.
+
+No API.
+
+Use realistic mock data only.
+
+==================================================
+ENHANCE INVENTORY DASHBOARD
+==================================================
+
+Add professional KPI cards:
+
+Total Inventory Value
+
+Available Stock
+
+Reserved Stock
+
+Out of Stock
+
+Low Stock
+
+Critical Stock
+
+Purchase Orders Pending
+
+Suppliers
+
+Products
+
+Categories
+
+Today's Stock Movement
+
+Inventory Turnover
+
+Dead Stock
+
+Fast Moving Products
+
+Slow Moving Products
+
+Stock Accuracy
+
+Warehouse Utilization (placeholder)
+
+Add Charts:
+
+Inventory Value Trend
+
+Stock Movement
+
+Category Distribution
+
+Supplier Distribution
+
+Purchase Trend
+
+Consumption Trend
+
+Top Selling Products
+
+Top Purchased Products
+
+Inventory Aging
+
+Monthly Stock Comparison
+
+Add Insights:
+
+Products to Reorder
+
+Excess Inventory
+
+Fastest Growing Category
+
+Highest Value Product
+
+Inventory Health Score
+
+==================================================
+PRODUCT MANAGEMENT
+==================================================
+
+Enhance Products with:
+
+Multiple Product Images
+
+SKU
+
+Barcode
+
+QR Code
+
+HSN/SAC Code
+
+Brand
+
+Category
+
+Subcategory
+
+Supplier
+
+Manufacturer
+
+Purchase Price
+
+Selling Price
+
+MRP
+
+Cost Price
+
+GST
+
+Tax Group
+
+Minimum Stock
+
+Maximum Stock
+
+Reorder Quantity
+
+Lead Time
+
+Weight
+
+Dimensions
+
+Color
+
+Size
+
+Material
+
+Description
+
+Internal Notes
+
+Product Tags
+
+Status
+
+Active/Inactive
+
+Archive Product
+
+Clone Product
+
+Duplicate Product
+
+Bulk Import Placeholder
+
+Bulk Export
+
+==================================================
+PRODUCT DETAILS PAGE
+==================================================
+
+Professional Product Profile
+
+Overview
+
+Stock Summary
+
+Stock History
+
+Purchase History
+
+Sales History
+
+Supplier Information
+
+Barcode
+
+Images Gallery
+
+Attachments Placeholder
+
+Timeline
+
+Activity Log
+
+==================================================
+SUPPLIERS
+==================================================
+
+Enhance Supplier module.
+
+Supplier Profile
+
+Supplier Rating
+
+Purchase History
+
+Outstanding Amount
+
+GSTIN
+
+PAN
+
+Email
+
+Phone
+
+Address
+
+Primary Contact
+
+Payment Terms
+
+Lead Time
+
+Recent Orders
+
+Documents Placeholder
+
+==================================================
+PURCHASE ORDERS
+==================================================
+
+Professional Purchase Workflow.
+
+Draft
+
+Pending Approval
+
+Approved
+
+Ordered
+
+Partially Received
+
+Completed
+
+Cancelled
+
+Purchase Order Preview
+
+Print Preview
+
+PDF Placeholder
+
+Supplier Notes
+
+==================================================
+PURCHASE RECEIVING
+==================================================
+
+Goods Received Note
+
+Receive Partial Quantity
+
+Receive Full Quantity
+
+Quality Check Placeholder
+
+Received By
+
+Reference Number
+
+==================================================
+STOCK MANAGEMENT
+==================================================
+
+Stock In
+
+Stock Out
+
+Stock Transfer Placeholder
+
+Stock Adjustment
+
+Damaged Goods
+
+Returned Goods
+
+Expired Goods
+
+Lost Inventory
+
+Manual Adjustment
+
+Reason Codes
+
+Approval Workflow Placeholder
+
+==================================================
+LOW STOCK
+==================================================
+
+Professional Alerts
+
+Low Stock
+
+Critical Stock
+
+Out of Stock
+
+Reorder Suggestions
+
+Estimated Days Remaining
+
+Priority Levels
+
+==================================================
+BARCODE MANAGEMENT
+==================================================
+
+Barcode Generator
+
+Barcode Preview
+
+Print Barcode Labels
+
+QR Code Labels
+
+Scanner UI Placeholder
+
+Label Templates
+
+==================================================
+WAREHOUSE
+==================================================
+
+Prepare architecture for future.
+
+Warehouse Dashboard
+
+Warehouse List
+
+Storage Locations
+
+Bin Locations
+
+Rack Locations
+
+Single Warehouse for now
+
+Multi-Warehouse placeholder
+
+==================================================
+REPORTS
+==================================================
+
+Inventory Reports
+
+Stock Valuation
+
+Inventory Movement
+
+Inventory Aging
+
+Fast Moving Products
+
+Slow Moving Products
+
+Dead Stock
+
+Purchase Report
+
+Supplier Report
+
+Category Performance
+
+Brand Performance
+
+==================================================
+GLOBAL SEARCH
+==================================================
+
+Search by:
+
+Product Name
+
+SKU
+
+Barcode
+
+Supplier
+
+Category
+
+Brand
+
+HSN
+
+==================================================
+FILTERS
+==================================================
+
+Advanced Filters
+
+Category
+
+Brand
+
+Supplier
+
+Stock Status
+
+Price
+
+GST
+
+Purchase Date
+
+Created Date
+
+Warehouse
+
+==================================================
+EXPORT
+==================================================
+
+Prepare UI for:
+
+PDF
+
+Excel
+
+CSV
+
+Print
+
+==================================================
+QUICK ACTIONS
+==================================================
+
+Add Product
+
+Receive Stock
+
+Create Purchase Order
+
+Adjust Stock
+
+Generate Barcode
+
+View Reports
+
+==================================================
+ACTIVITY TIMELINE
+==================================================
+
+Recent Products Added
+
+Purchase Orders Created
+
+Stock Received
+
+Stock Adjusted
+
+Supplier Added
+
+Inventory Updated
+
+Barcode Generated
+
+==================================================
+AI PLACEHOLDERS
+==================================================
+
+Reserve space for future AI.
+
+Examples:
+
+Predict Stock Shortage
+
+Suggest Reorder Quantity
+
+Inventory Health Analysis
+
+Demand Forecast
+
+Supplier Recommendation
+
+Stock Optimization
+
+Do NOT implement AI.
+
+Only create placeholders.
+
+==================================================
+DESIGN
+==================================================
+
+Maintain the existing premium design.
+
+Every enhancement should feel native.
+
+No redesign.
+
+No duplicate pages.
+
+No unnecessary animations.
+
+Everything should look like it was originally part of the Inventory module.
+
+==================================================
+IMPORTANT
+==================================================
+
+Maintain enterprise SaaS quality.
+
+Use realistic Indian business products and suppliers.
+
+Keep all data mocked.
+
+Do not connect to any backend.
+
+Do not modify existing functionality.
+
+Only extend and improve the Inventory module.
+
+The finished Inventory module should look like a commercial ERP product ready for production.

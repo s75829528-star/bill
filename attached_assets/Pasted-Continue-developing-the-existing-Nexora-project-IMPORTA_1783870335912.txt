@@ -1,0 +1,137 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Do NOT redesign the landing page.
+- Do NOT modify the authentication flow.
+- Do NOT remove existing functionality.
+- Continue using the existing GitHub repository and project structure.
+- Maintain clean architecture and reusable components.
+
+OBJECTIVE
+
+Build a production-ready Business Setup Wizard that appears automatically the first time a user logs in.
+
+FLOW
+
+Landing Page
+↓
+Sign Up / Login
+↓
+Business Setup Wizard (first login only)
+↓
+Dashboard
+
+REQUIREMENTS
+
+Create a beautiful multi-step onboarding wizard with a progress indicator.
+
+Step 1 — Welcome
+- Welcome message
+- Brief explanation of Nexora
+- "Let's set up your business" button
+
+Step 2 — Business Information
+- Business Name
+- Business Type (Retail, Wholesale, Restaurant, Pharmacy, Manufacturing, Service, Other)
+- Business Logo (optional)
+
+Step 3 — Owner Details
+- Owner Name
+- Phone Number
+- Business Email
+
+Step 4 — Business Details
+- GST Number (optional)
+- PAN (optional)
+- Currency
+- Time Zone
+- Financial Year Start
+
+Step 5 — Business Address
+- Address
+- City
+- State
+- Country
+- PIN Code
+
+Step 6 — Preferences
+- Default Invoice Prefix
+- Invoice Number Format
+- Tax Enabled (Yes/No)
+- Default Language
+- Theme Preference (Light/Dark)
+
+Step 7 — Completion
+- Show a success animation
+- Save all information
+- Mark onboarding as completed
+- Redirect to Dashboard
+
+DATABASE
+
+Create a business table linked to the authenticated user.
+
+Suggested fields:
+- id
+- owner_id
+- business_name
+- business_type
+- owner_name
+- phone
+- email
+- gst_number
+- pan_number
+- currency
+- timezone
+- financial_year
+- address
+- city
+- state
+- country
+- postal_code
+- invoice_prefix
+- invoice_number_format
+- tax_enabled
+- language
+- logo_url
+- onboarding_completed
+- created_at
+- updated_at
+
+LOGIC
+
+- Only first-time users should see the setup wizard.
+- Returning users should go directly to the dashboard.
+- Auto-save progress after each step.
+- Allow users to resume if they leave halfway.
+- Validate all required fields.
+- Show friendly error messages.
+
+UI/UX
+
+Design it like a premium enterprise SaaS.
+
+Use:
+- Large clean cards
+- Stepper at the top
+- Smooth transitions
+- Modern forms
+- Excellent spacing
+- Responsive design
+- Accessible components
+- Professional icons
+- Loading and success states
+
+CODE QUALITY
+
+- React + TypeScript
+- Reusable components
+- Clean folder structure
+- Production-ready
+- No placeholder data
+- Well-documented code
+
+Do not implement Billing, Inventory, CRM, AI, or Reports yet.
+
+Only complete the Business Setup Wizard and prepare the project for the dashboard.

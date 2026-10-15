@@ -1,0 +1,464 @@
+Continue using the existing repository and current codebase.
+
+DO NOT redesign the landing page, authentication, dashboard, navigation, or existing components.
+
+Maintain the exact same premium white SaaS design system that already exists.
+
+Use the existing:
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- TanStack Router
+- Existing sidebar
+- Existing dashboard layout
+- Existing typography
+- Existing color palette
+- Existing spacing
+- Existing animations
+
+Everything should feel like one consistent application.
+
+====================================================
+OBJECTIVE
+====================================================
+
+Build the COMPLETE Billing Module UI for Nexora.
+
+This is a production-quality SaaS billing experience for Indian businesses.
+
+No backend yet.
+
+Use realistic mock data.
+
+Do NOT connect a database.
+
+Use reusable components.
+
+====================================================
+CREATE THESE PAGES
+====================================================
+
+Billing Dashboard
+
+Invoice List
+
+Create Invoice
+
+View Invoice
+
+Edit Invoice
+
+Quotation List
+
+Create Quotation
+
+Credit Notes
+
+Recurring Invoices
+
+Invoice Templates
+
+Payment History
+
+====================================================
+BILLING SIDEBAR
+====================================================
+
+When clicking Billing from the left navigation, open a Billing workspace containing:
+
+Overview
+
+Invoices
+
+Quotations
+
+Credit Notes
+
+Recurring
+
+Payments
+
+Templates
+
+Settings
+
+====================================================
+INVOICE LIST
+====================================================
+
+Professional data table with:
+
+Invoice Number
+
+Customer
+
+GSTIN
+
+Status
+
+Amount
+
+Tax
+
+Created Date
+
+Due Date
+
+Payment Status
+
+Actions
+
+Features:
+
+Search
+
+Filters
+
+Sort
+
+Pagination
+
+Status badges
+
+Bulk select
+
+Export CSV
+
+Export Excel
+
+Print
+
+Delete
+
+Duplicate
+
+====================================================
+CREATE INVOICE
+====================================================
+
+Professional invoice builder.
+
+Sections:
+
+Customer Information
+
+Business Information
+
+Invoice Details
+
+Invoice Items
+
+GST Summary
+
+Payment Information
+
+Notes
+
+Terms & Conditions
+
+====================================================
+CUSTOMER SECTION
+====================================================
+
+Customer Search
+
+Create New Customer
+
+GSTIN
+
+Phone
+
+Email
+
+Address
+
+Shipping Address
+
+Outstanding Balance
+
+====================================================
+PRODUCT TABLE
+====================================================
+
+Columns:
+
+Product
+
+Barcode
+
+HSN/SAC
+
+Quantity
+
+Unit
+
+Price
+
+Discount %
+
+GST %
+
+Total
+
+Buttons:
+
+Add Item
+
+Remove Item
+
+Duplicate Item
+
+Search Product
+
+Barcode Scan Button (UI only)
+
+====================================================
+GST FEATURES
+====================================================
+
+Auto calculate:
+
+CGST
+
+SGST
+
+IGST
+
+CESS
+
+GST Summary Card
+
+Tax Breakdown
+
+Round Off
+
+====================================================
+PAYMENT
+====================================================
+
+Modes:
+
+Cash
+
+UPI
+
+Card
+
+Bank Transfer
+
+Credit
+
+Wallet
+
+Payment Status:
+
+Paid
+
+Pending
+
+Partial
+
+Overdue
+
+====================================================
+RIGHT SIDE SUMMARY
+====================================================
+
+Sticky summary card showing:
+
+Subtotal
+
+Discount
+
+Tax
+
+Grand Total
+
+Amount Paid
+
+Balance
+
+Save Draft
+
+Preview
+
+Generate PDF
+
+Print
+
+====================================================
+INVOICE PREVIEW
+====================================================
+
+Beautiful A4 Invoice Preview
+
+Professional GST Invoice
+
+Company Logo
+
+QR Code
+
+Terms
+
+Signature
+
+Customer Details
+
+Tax Summary
+
+====================================================
+PDF PREVIEW
+====================================================
+
+Professional printable PDF layout.
+
+No backend.
+
+Mock preview only.
+
+====================================================
+THERMAL PRINT PREVIEW
+====================================================
+
+Generate thermal printer preview.
+
+58mm
+
+80mm
+
+Store Receipt style
+
+====================================================
+QUOTATIONS
+====================================================
+
+Quotation List
+
+Create Quotation
+
+Convert to Invoice button
+
+Quotation Status
+
+Expiry Date
+
+====================================================
+CREDIT NOTES
+====================================================
+
+Credit Note List
+
+Create Credit Note
+
+Linked Invoice
+
+Refund Amount
+
+Reason
+
+====================================================
+RECURRING INVOICES
+====================================================
+
+Monthly
+
+Weekly
+
+Quarterly
+
+Yearly
+
+Next Billing Date
+
+Pause
+
+Resume
+
+====================================================
+PAYMENTS
+====================================================
+
+Payment History
+
+Pending Payments
+
+Received Payments
+
+Refunds
+
+Transaction Timeline
+
+====================================================
+DASHBOARD CARDS
+====================================================
+
+Top cards:
+
+Today's Sales
+
+Invoices Created
+
+Pending Payments
+
+Overdue Invoices
+
+Collected Amount
+
+GST Payable
+
+====================================================
+UI REQUIREMENTS
+====================================================
+
+Premium SaaS quality.
+
+Looks comparable to:
+
+Stripe Dashboard
+
+Linear
+
+Vercel
+
+Notion
+
+HubSpot
+
+Zoho
+
+FreshBooks
+
+Clean white interface.
+
+Rounded cards.
+
+Excellent spacing.
+
+Consistent typography.
+
+Smooth animations.
+
+Responsive on desktop, tablet and mobile.
+
+No dark mode.
+
+====================================================
+IMPORTANT
+====================================================
+
+Do NOT implement backend.
+
+Do NOT use placeholders like Lorem Ipsum.
+
+Use realistic Indian business names.
+
+Use realistic GST numbers.
+
+Generate believable invoice numbers.
+
+Use realistic products.
+
+Everything should look production-ready.
+
+The entire Billing module should feel like a software that could be sold tomorrow.

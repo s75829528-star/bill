@@ -1,0 +1,427 @@
+You are redesigning an existing landing page for Nexora.
+
+IMPORTANT
+
+Do NOT rebuild the page.
+
+Do NOT change branding.
+
+Do NOT change routing.
+
+Do NOT remove existing functionality.
+
+Do NOT make random design changes.
+
+Instead, redesign the page using the same design philosophy as Stripe, OpenAI, Linear, Vercel, Notion, Apple, Ramp, Mercury, Arc Browser, Figma and Anthropic.
+
+================================================
+
+CRITICAL DESIGN PHILOSOPHY
+
+This website must NOT look like a startup template.
+
+It must NOT look AI-generated.
+
+It must NOT look like Bootstrap.
+
+It must NOT look like ThemeForest.
+
+It must NOT use old marketing patterns.
+
+Remove all sections that say
+
+"The Problem"
+
+"The Solution"
+
+"Business Value"
+
+"Time Saved"
+
+"Why Us"
+
+These are outdated SaaS patterns.
+
+Modern SaaS companies DO NOT design like this.
+
+================================================
+
+Instead...
+
+Every section should showcase the PRODUCT.
+
+Do not explain the product.
+
+SHOW the product.
+
+People buy software because they can imagine themselves using it.
+
+Every section should look like a premium software showcase.
+
+================================================
+
+Replace every feature section with this structure
+
+Large Product Screenshot
+
+↓
+
+Powerful Headline
+
+↓
+
+Short business-focused explanation
+
+↓
+
+Feature checklist
+
+↓
+
+Small trust badges
+
+↓
+
+Beautiful floating UI components
+
+================================================
+
+For Billing
+
+Headline
+
+Billing that works as fast as your business.
+
+Description
+
+Create GST-compliant invoices, quotations, purchase bills and recurring invoices from one intelligent workspace.
+
+Instead of showing
+
+Problem
+
+Solution
+
+Business Value
+
+Create
+
+Large Invoice UI
+
+Invoice Preview
+
+Floating Analytics Cards
+
+GST Status
+
+Payment Status
+
+Revenue Cards
+
+Invoice History
+
+Customer Details
+
+QR Payments
+
+Thermal Printing
+
+Beautiful Product Mockups
+
+================================================
+
+For Inventory
+
+Show
+
+Inventory Dashboard
+
+Stock Cards
+
+Warehouse UI
+
+Barcode Preview
+
+Expiry Tracking
+
+Purchase Orders
+
+Inventory Analytics
+
+Low Stock Alerts
+
+Beautiful Charts
+
+Instead of explaining inventory...
+
+Show inventory.
+
+================================================
+
+For CRM
+
+Show
+
+Customer Timeline
+
+Customer Cards
+
+Sales Pipeline
+
+Customer Insights
+
+Lead Tracking
+
+Recent Activities
+
+Instead of saying
+
+"Manage Customers"
+
+Actually display the customer management software.
+
+================================================
+
+For Reports
+
+Create
+
+Modern Analytics Dashboard
+
+Beautiful Graphs
+
+Business Health Score
+
+Revenue
+
+Profit
+
+Expenses
+
+Cash Flow
+
+Sales Trends
+
+Top Products
+
+Recent Orders
+
+================================================
+
+For AI Assistant
+
+Create one of the most beautiful AI interfaces possible.
+
+Professional AI Chat
+
+Business Analysis
+
+Sales Prediction
+
+Inventory Forecast
+
+Invoice Generator
+
+Business Recommendations
+
+Natural Language Search
+
+Beautiful AI animations
+
+================================================
+
+SECTION DESIGN
+
+Every section must feel unique.
+
+Alternate layouts.
+
+Image Left
+
+Text Right
+
+Then
+
+Image Right
+
+Text Left
+
+Then
+
+Large Full Width Showcase
+
+Then
+
+Split Layout
+
+Do NOT repeat identical cards.
+
+================================================
+
+VISUAL QUALITY
+
+Generate lots of product visuals.
+
+Not stock photos.
+
+Generate
+
+Desktop mockups
+
+Laptop mockups
+
+Tablet mockups
+
+Mobile app screens
+
+Floating dashboards
+
+Charts
+
+Graphs
+
+Business analytics
+
+Invoice UI
+
+CRM UI
+
+Inventory UI
+
+Finance UI
+
+AI Chat UI
+
+Cloud Infrastructure
+
+API Integrations
+
+Workflow diagrams
+
+Illustrations
+
+Business growth graphics
+
+Security graphics
+
+Generate MANY premium visuals.
+
+================================================
+
+CARDS
+
+Replace colorful marketing boxes.
+
+Use elegant enterprise cards.
+
+White backgrounds.
+
+Soft shadows.
+
+Thin borders.
+
+Rounded corners.
+
+Beautiful spacing.
+
+Premium hover animations.
+
+================================================
+
+TYPOGRAPHY
+
+Large headings.
+
+Minimal paragraphs.
+
+Readable content.
+
+Excellent hierarchy.
+
+Lots of whitespace.
+
+Professional font sizing.
+
+================================================
+
+ANIMATIONS
+
+Premium only.
+
+Subtle fade.
+
+Scroll reveal.
+
+Floating dashboard cards.
+
+Smooth transitions.
+
+Professional micro interactions.
+
+Nothing flashy.
+
+================================================
+
+SPACING
+
+Increase whitespace significantly.
+
+Let the design breathe.
+
+Every section should feel luxurious.
+
+================================================
+
+TRUST
+
+Replace marketing claims with trust.
+
+Enterprise Security
+
+Cloud Infrastructure
+
+Automatic Backups
+
+Role Based Access
+
+99.9% Uptime
+
+Secure Authentication
+
+Professional badges.
+
+================================================
+
+IMAGES
+
+Generate high-quality product visuals throughout the website.
+
+Every major section should contain realistic SaaS UI mockups.
+
+Avoid placeholders.
+
+Avoid stock photos.
+
+Avoid generic icons.
+
+The website should feel like visitors are looking directly into the software.
+
+================================================
+
+FINAL GOAL
+
+When someone visits this landing page they should immediately think
+
+"This software looks world-class."
+
+"This company looks established."
+
+"This feels like enterprise software."
+
+"I trust this platform."
+
+The final result should look like it was designed by the same design team that built Stripe, OpenAI or Linear.
+
+Do not add unnecessary sections.
+
+Instead make every existing section significantly more premium, modern, realistic, polished and visually impressive.

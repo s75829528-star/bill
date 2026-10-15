@@ -1,0 +1,441 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue using the existing GitHub repository.
+- DO NOT redesign or modify the Landing Page.
+- DO NOT modify Authentication.
+- DO NOT modify Business Setup Wizard.
+- DO NOT modify Dashboard.
+- DO NOT modify Billing Module.
+- DO NOT modify Inventory Module.
+- Maintain the existing premium white SaaS design system.
+- Preserve the existing sidebar, top navigation, typography, spacing, reusable components, icons, cards, tables and animations.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Build a complete professional CRM Module for Nexora.
+
+The CRM should feel like a commercial SaaS product similar to HubSpot CRM, Salesforce, Zoho CRM and Freshsales while remaining simple enough for small and medium businesses.
+
+Use realistic mock data.
+
+No backend.
+
+No Supabase.
+
+No API.
+
+==================================================
+CRM NAVIGATION
+==================================================
+
+CRM
+
+├── Overview
+├── Customers
+├── Customer Groups
+├── Leads
+├── Follow Ups
+├── Activities
+├── Customer Reports
+└── CRM Settings
+
+==================================================
+CRM DASHBOARD
+==================================================
+
+Create premium dashboard cards:
+
+• Total Customers
+• Active Customers
+• New Customers
+• Returning Customers
+• Leads
+• Converted Leads
+• Outstanding Receivables
+• Average Customer Value
+• Customer Growth Rate
+
+Charts
+
+• Customer Growth
+• Revenue by Customer
+• Customer Distribution
+• Lead Conversion
+• Monthly Customer Acquisition
+
+Widgets
+
+• Top Customers
+• Recent Customers
+• Recent Activities
+• Upcoming Follow-ups
+• Outstanding Customers
+
+Quick Actions
+
+• Add Customer
+• Create Lead
+• Schedule Follow-up
+• View Reports
+
+==================================================
+CUSTOMER MANAGEMENT
+==================================================
+
+Professional customer table.
+
+Columns
+
+Customer Name
+
+Company
+
+GSTIN
+
+Phone
+
+Email
+
+City
+
+Outstanding Amount
+
+Last Purchase
+
+Status
+
+Actions
+
+Features
+
+Search
+
+Advanced Filters
+
+Sorting
+
+Pagination
+
+Export CSV
+
+Export Excel
+
+Bulk Delete
+
+Bulk Edit
+
+==================================================
+CUSTOMER PROFILE
+==================================================
+
+Each customer should have a professional profile page.
+
+Sections
+
+Overview
+
+Business Information
+
+Contact Details
+
+GST Information
+
+Billing Address
+
+Shipping Address
+
+Purchase History
+
+Invoice History
+
+Outstanding Payments
+
+Credit Limit
+
+Credit Days
+
+Customer Notes
+
+Activity Timeline
+
+==================================================
+CUSTOMER GROUPS
+==================================================
+
+Create customer groups.
+
+Examples
+
+Retail
+
+Wholesale
+
+Corporate
+
+VIP
+
+Distributor
+
+Dealer
+
+Each group should show
+
+Customer Count
+
+Revenue
+
+Outstanding Amount
+
+==================================================
+LEADS
+==================================================
+
+Professional Lead Management.
+
+Fields
+
+Lead Name
+
+Company
+
+Contact Person
+
+Phone
+
+Email
+
+Source
+
+Status
+
+Expected Revenue
+
+Assigned User
+
+Priority
+
+Actions
+
+Create
+
+Edit
+
+Delete
+
+Convert to Customer
+
+==================================================
+FOLLOW UPS
+==================================================
+
+Professional Follow-up Management.
+
+Views
+
+Today's Follow-ups
+
+Upcoming
+
+Completed
+
+Overdue
+
+Fields
+
+Customer
+
+Purpose
+
+Date
+
+Time
+
+Priority
+
+Status
+
+Notes
+
+==================================================
+ACTIVITY TIMELINE
+==================================================
+
+Show timeline entries.
+
+Customer Created
+
+Invoice Generated
+
+Payment Received
+
+Customer Updated
+
+Lead Created
+
+Lead Converted
+
+Note Added
+
+==================================================
+CUSTOMER REPORTS
+==================================================
+
+Create reports.
+
+Top Customers
+
+Revenue by Customer
+
+Outstanding Customers
+
+Inactive Customers
+
+Customer Growth
+
+Lead Conversion
+
+==================================================
+CRM SETTINGS
+==================================================
+
+Customer Number Format
+
+Default Credit Days
+
+Customer Categories
+
+Default Currency
+
+Default Country
+
+==================================================
+SEARCH
+==================================================
+
+Global CRM Search
+
+Search by
+
+Customer Name
+
+Company
+
+GSTIN
+
+Phone
+
+Email
+
+Invoice Number
+
+==================================================
+MOCK DATA
+==================================================
+
+Generate realistic Indian business data.
+
+Create
+
+100 Customers
+
+50 Leads
+
+Realistic
+
+Company Names
+
+GST Numbers
+
+Phone Numbers
+
+Email Addresses
+
+Outstanding Balances
+
+Purchase History
+
+Invoice History
+
+==================================================
+DESIGN
+==================================================
+
+Enterprise SaaS quality.
+
+Comparable to
+
+HubSpot
+
+Salesforce
+
+Zoho CRM
+
+Freshsales
+
+Microsoft Dynamics
+
+Maintain the existing Nexora design language.
+
+Professional white interface.
+
+Beautiful cards.
+
+Professional tables.
+
+Excellent spacing.
+
+Responsive.
+
+Smooth animations.
+
+Reusable React + TypeScript components.
+
+==================================================
+DO NOT BUILD
+==================================================
+
+Do NOT include
+
+AI Assistant
+
+AI Chat
+
+AI Insights
+
+WhatsApp Integration
+
+Email Integration
+
+SMS Integration
+
+Multi-Branch
+
+Multi-Company
+
+API Integrations
+
+Automation Workflows
+
+Backend
+
+Supabase
+
+Payment Gateway
+
+==================================================
+IMPORTANT
+==================================================
+
+Do not redesign existing modules.
+
+Only build and integrate the CRM module.
+
+Keep all data mocked.
+
+Every page should feel production-ready and seamlessly integrate with Billing and Inventory.
+
+The final CRM should look like a commercial SaaS product that is ready to connect to a backend later.

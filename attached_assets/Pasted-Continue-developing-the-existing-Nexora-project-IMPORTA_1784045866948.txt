@@ -1,0 +1,321 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue using the existing GitHub repository.
+- DO NOT modify any existing module.
+- Preserve the existing premium white SaaS design system.
+- Maintain the existing sidebar, top navigation, typography, spacing, animations, reusable components, cards, tables and icons.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Build a complete Settings & Administration Module for the Nexora MVP.
+
+This module should provide all business configuration and administration features.
+
+Use realistic mock data only.
+
+No backend.
+
+No Supabase.
+
+No APIs.
+
+==================================================
+SETTINGS NAVIGATION
+==================================================
+
+Settings
+
+├── Business Profile
+├── Company Branding
+├── Users
+├── Roles & Permissions
+├── Tax & GST
+├── Invoice Settings
+├── Product Settings
+├── Customer Settings
+├── Financial Settings
+├── Notifications
+├── Security
+├── Backup & Restore (UI Only)
+├── Preferences
+└── About
+
+==================================================
+BUSINESS PROFILE
+==================================================
+
+Business Name
+
+Business Type
+
+GSTIN
+
+PAN
+
+Address
+
+City
+
+State
+
+Country
+
+Postal Code
+
+Phone
+
+Email
+
+Website
+
+Business Description
+
+==================================================
+COMPANY BRANDING
+==================================================
+
+Company Logo
+
+Favicon
+
+Primary Color
+
+Secondary Color
+
+Invoice Logo Preview
+
+==================================================
+USERS
+==================================================
+
+Professional User Management
+
+Columns
+
+Name
+
+Role
+
+Email
+
+Status
+
+Last Login
+
+Actions
+
+Functions
+
+Add User
+
+Edit User
+
+Deactivate User
+
+Reset Password Placeholder
+
+==================================================
+ROLES & PERMISSIONS
+==================================================
+
+Roles
+
+Owner
+
+Admin
+
+Manager
+
+Sales
+
+Inventory
+
+Accountant
+
+Viewer
+
+Permission Matrix
+
+Billing
+
+Inventory
+
+CRM
+
+Finance
+
+Reports
+
+Settings
+
+==================================================
+TAX & GST
+==================================================
+
+GST Number
+
+CGST
+
+SGST
+
+IGST
+
+Default Tax
+
+Invoice Tax Settings
+
+==================================================
+INVOICE SETTINGS
+==================================================
+
+Invoice Prefix
+
+Invoice Number Format
+
+Default Terms
+
+Default Notes
+
+Payment Terms
+
+Default Currency
+
+==================================================
+PRODUCT SETTINGS
+==================================================
+
+Default Unit
+
+Barcode Format
+
+Low Stock Threshold
+
+Product Number Format
+
+==================================================
+CUSTOMER SETTINGS
+==================================================
+
+Customer Number Format
+
+Default Credit Days
+
+Customer Categories
+
+==================================================
+FINANCIAL SETTINGS
+==================================================
+
+Financial Year
+
+Currency
+
+Decimal Precision
+
+==================================================
+NOTIFICATIONS
+==================================================
+
+Toggle UI for
+
+Low Stock
+
+Invoice Due
+
+Payment Received
+
+New Customer
+
+System Alerts
+
+==================================================
+SECURITY
+==================================================
+
+Password Policy
+
+Two-Factor Authentication Placeholder
+
+Session Timeout
+
+Login Activity
+
+==================================================
+BACKUP & RESTORE
+==================================================
+
+UI only
+
+Manual Backup
+
+Restore Placeholder
+
+Recent Backups
+
+==================================================
+PREFERENCES
+==================================================
+
+Language
+
+Date Format
+
+Time Zone
+
+Theme Placeholder
+
+==================================================
+ABOUT
+==================================================
+
+Version
+
+License
+
+Terms
+
+Privacy
+
+Support
+
+==================================================
+DESIGN
+==================================================
+
+Maintain the existing Nexora premium design.
+
+Enterprise SaaS quality.
+
+Responsive.
+
+Beautiful cards.
+
+Professional forms.
+
+Reusable React + TypeScript components.
+
+==================================================
+DO NOT BUILD
+==================================================
+
+No backend.
+
+No database.
+
+No Supabase.
+
+No API.
+
+No AI.
+
+Everything should use mock data only.
+
+==================================================
+IMPORTANT
+==================================================
+
+The Settings module should feel like the final administration center of a production-ready ERP application and integrate seamlessly with all existing Nexora modules.

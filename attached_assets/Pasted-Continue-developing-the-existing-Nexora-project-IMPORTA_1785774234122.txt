@@ -1,0 +1,292 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+AI EXECUTION MODE
+==================================================
+
+Optimize for minimal AI credit usage.
+
+- Analyze only files related to Billing → Templates.
+- Do NOT scan the entire project.
+- Do NOT modify unrelated modules.
+- Reuse existing components, hooks, services and utilities.
+- Make only the minimum code changes required.
+- Do not regenerate existing working code.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Billing → Templates module fully production-ready using Supabase.
+
+Replace all mock data with real database operations.
+
+Use the existing UI only.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+DATABASE
+==================================================
+
+Create a templates table if it does not exist.
+
+Columns:
+
+id
+
+business_id
+
+template_name
+
+template_type
+
+header_text
+
+footer_text
+
+terms_conditions
+
+logo_url
+
+primary_color
+
+secondary_color
+
+font_family
+
+show_logo
+
+show_signature
+
+show_qr_code
+
+show_payment_details
+
+show_bank_details
+
+is_default
+
+status
+
+created_at
+
+updated_at
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every template belongs only to the logged-in business.
+
+Businesses must never access another business's templates.
+
+Implement Row Level Security compatibility.
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+• Create Template
+• Edit Template
+• Duplicate Template
+• Delete Template
+• Preview Template
+• Set Default
+• Activate
+• Deactivate
+• Search
+• Filters
+• Pagination
+
+==================================================
+TEMPLATE TYPES
+==================================================
+
+Support:
+
+• GST Invoice
+• Quotation
+• Credit Note
+• Payment Receipt
+• Purchase Order
+• Delivery Challan
+• Proforma Invoice
+• Debit Note
+
+==================================================
+CUSTOMIZATION
+==================================================
+
+Allow businesses to configure:
+
+• Company Logo
+• Header
+• Footer
+• Terms & Conditions
+• Signature Block
+• QR Code
+• Bank Details
+• Payment Instructions
+• Theme Colors
+• Font Family
+
+==================================================
+DEFAULT TEMPLATE
+==================================================
+
+Only one default template per template type.
+
+When a document is created:
+
+Invoice → Use default Invoice template.
+
+Quotation → Use default Quotation template.
+
+Credit Note → Use default Credit Note template.
+
+Automatically apply the correct template.
+
+==================================================
+PREVIEW
+==================================================
+
+Generate a live preview using sample business data.
+
+Do not modify the existing UI.
+
+==================================================
+SEARCH
+==================================================
+
+Search by:
+
+Template Name
+
+Template Type
+
+==================================================
+FILTERS
+==================================================
+
+Support:
+
+Template Type
+
+Status
+
+Default
+
+==================================================
+TABLE
+==================================================
+
+Replace mock data.
+
+Display:
+
+Template Name
+
+Template Type
+
+Default
+
+Status
+
+Updated Date
+
+Actions
+
+==================================================
+VALIDATION
+==================================================
+
+Validate:
+
+Required fields
+
+Only one default template per type
+
+Valid logo uploads
+
+==================================================
+STORAGE
+==================================================
+
+Use Supabase Storage for uploaded logos.
+
+Store only file metadata in the database.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+React Query
+
+Optimistic Updates
+
+Caching
+
+Reusable Hooks
+
+Pagination
+
+Loading Skeletons
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+Validation Errors
+
+Database Errors
+
+Permission Errors
+
+Network Errors
+
+==================================================
+IMPORTANT
+==================================================
+
+Keep the current UI exactly the same.
+
+Replace all dummy data with Supabase.
+
+Every existing button should perform real database operations.
+
+Integrate Templates with:
+
+• Billing
+• CRM
+• Finance
+• Reports
+• Documents
+
+Whenever an Invoice, Quotation, Credit Note or Receipt is generated, automatically use the selected default template for that document type.
+
+The Templates module should be fully production-ready.

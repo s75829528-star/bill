@@ -1,0 +1,425 @@
+Continue developing the existing Nexora Billing Module.
+
+IMPORTANT
+
+- DO NOT redesign the Billing module.
+- DO NOT change the current UI, layout, spacing, typography, color palette, navigation, or design system.
+- Keep the existing premium white SaaS appearance.
+- Preserve all current pages and components.
+- Only ADD professional enterprise features.
+- Continue using the existing GitHub repository and project structure.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Upgrade the Billing module to enterprise ERP quality.
+
+The goal is to make Billing comparable to Zoho Books, QuickBooks, TallyPrime, Oracle NetSuite, SAP Business One, FreshBooks, and Microsoft Dynamics.
+
+No backend.
+No Supabase.
+No API.
+Use realistic mock data.
+
+==================================================
+ENHANCE DASHBOARD
+==================================================
+
+Add:
+
+Revenue Analytics
+
+Invoice Collection Rate
+
+Average Invoice Value
+
+Average Payment Time
+
+Top Customers
+
+Top Selling Products
+
+Monthly Comparison
+
+Invoice Trends
+
+GST Collected
+
+Outstanding Amount
+
+Upcoming Payments
+
+Payment Distribution
+
+Business Insights Cards
+
+==================================================
+ENHANCE CREATE INVOICE
+==================================================
+
+Support:
+
+Draft
+
+Save & New
+
+Save & Continue
+
+Preview
+
+Duplicate Invoice
+
+Clone Previous Invoice
+
+Auto Invoice Number
+
+Invoice Prefix
+
+Due Date Calculator
+
+Payment Terms
+
+Currency Selector
+
+Exchange Rate Placeholder
+
+Internal Notes
+
+Customer Notes
+
+Terms & Conditions
+
+Attachments
+
+Signature Upload
+
+Salesperson
+
+Reference Number
+
+PO Number
+
+Delivery Date
+
+Delivery Address
+
+Billing Address
+
+Shipping Address
+
+==================================================
+PRODUCTS
+==================================================
+
+Add:
+
+Product Images
+
+HSN/SAC Code
+
+Barcode
+
+SKU
+
+Batch Number
+
+Expiry Date Placeholder
+
+Stock Availability
+
+Warehouse Placeholder
+
+Tax Group
+
+Discount Rules
+
+==================================================
+CUSTOMERS
+==================================================
+
+Show:
+
+Outstanding Balance
+
+Credit Limit
+
+Credit Days
+
+Last Purchase
+
+Total Purchases
+
+Customer Rating
+
+Customer Type
+
+GSTIN
+
+PAN
+
+Shipping Addresses
+
+==================================================
+PAYMENTS
+==================================================
+
+Create professional payment section.
+
+Payment Methods
+
+Cash
+
+UPI
+
+Card
+
+Cheque
+
+NEFT
+
+RTGS
+
+Bank Transfer
+
+Wallet
+
+Credit
+
+Payment Status
+
+Pending
+
+Paid
+
+Partially Paid
+
+Refunded
+
+Cancelled
+
+Transaction Timeline
+
+==================================================
+INVOICE TABLE
+==================================================
+
+Enhance with:
+
+Pinned Columns
+
+Column Selector
+
+Saved Views
+
+Bulk Print
+
+Bulk Download
+
+Bulk Email
+
+Bulk Delete
+
+Bulk Mark Paid
+
+Advanced Filters
+
+Date Range
+
+Customer
+
+Status
+
+Amount
+
+Salesperson
+
+==================================================
+SEARCH
+==================================================
+
+Global Invoice Search
+
+Invoice Number
+
+Customer
+
+GSTIN
+
+Phone
+
+Amount
+
+Reference
+
+Barcode
+
+==================================================
+DOCUMENTS
+==================================================
+
+Invoice
+
+Quotation
+
+Proforma Invoice
+
+Delivery Challan
+
+Credit Note
+
+Debit Note
+
+Recurring Invoice
+
+Purchase Invoice Placeholder
+
+==================================================
+PREVIEW
+==================================================
+
+Professional Preview
+
+A4 Preview
+
+Thermal Receipt Preview
+
+PDF Preview
+
+Email Preview
+
+WhatsApp Preview
+
+==================================================
+PRINT
+==================================================
+
+Support:
+
+A4
+
+A5
+
+80mm Thermal
+
+58mm Thermal
+
+==================================================
+REPORTS
+==================================================
+
+Invoice Analytics
+
+Payment Analytics
+
+Customer Sales
+
+GST Summary
+
+Top Products
+
+Monthly Revenue
+
+Outstanding Payments
+
+Collection Report
+
+==================================================
+SHORTCUTS
+==================================================
+
+Keyboard Shortcuts
+
+Ctrl + N
+
+New Invoice
+
+Ctrl + P
+
+Print
+
+Ctrl + S
+
+Save Draft
+
+==================================================
+AI PLACEHOLDERS
+==================================================
+
+Reserve UI for future AI.
+
+Examples
+
+Generate Invoice Description
+
+Suggest Discount
+
+Predict Payment Delay
+
+Smart GST Check
+
+Suggest Related Products
+
+Do not implement AI.
+
+Only create placeholders.
+
+==================================================
+EXPORT
+==================================================
+
+Prepare UI for:
+
+PDF
+
+Excel
+
+CSV
+
+JSON
+
+Print
+
+==================================================
+ACTIVITY TIMELINE
+==================================================
+
+Recent Invoices
+
+Payments Received
+
+Invoices Edited
+
+Invoices Printed
+
+Draft Saved
+
+==================================================
+DESIGN
+==================================================
+
+Keep the existing design.
+
+Every enhancement must look native.
+
+No redesign.
+
+No duplicate pages.
+
+No unnecessary animations.
+
+Everything should look as if it was originally part of the Billing module.
+
+==================================================
+IMPORTANT
+==================================================
+
+Maintain the same premium SaaS quality.
+
+Every page should feel like a commercial ERP product.
+
+Use realistic Indian business data.
+
+Do not remove any existing functionality.
+
+Only extend and improve the existing Billing module.

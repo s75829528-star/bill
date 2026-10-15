@@ -1,0 +1,954 @@
+Continue developing the existing Nexora project from the existing GitHub repository.
+
+==================================================
+🚨 CRITICAL — EXECUTE THE WORK
+==============================
+
+DO NOT only analyze the task.
+
+DO NOT give me a plan and wait for confirmation.
+
+DO NOT describe what you would implement.
+
+ACTUALLY IMPLEMENT the required backend/database functionality in the existing project.
+
+Use VERY SMALL AI CREDITS.
+
+Optimize your execution aggressively:
+
+* Inspect ONLY files related to Inventory → Purchase Orders and Purchase Bills.
+* Do NOT scan the entire repository.
+* Reuse existing Supabase helpers, hooks, services, types, components and database patterns.
+* Do NOT regenerate files that already work.
+* Do NOT refactor unrelated code.
+* Do NOT redesign existing UI.
+* Make the minimum number of code changes required.
+* If an existing implementation already solves part of the requirement, extend it instead of rebuilding it.
+* After implementation, run the minimum relevant checks/build/typecheck needed to verify the changes.
+* Fix errors caused by your implementation.
+* Do not stop at analysis.
+
+==================================================
+UI PRESERVATION — ABSOLUTE
+==========================
+
+DO NOT redesign the UI.
+
+DO NOT change:
+
+* Colors
+* Typography
+* Spacing
+* Sidebar
+* Navigation
+* Layout
+* Animations
+* Existing component design
+* Existing page structure
+
+Use the existing Purchase Orders and Purchase Bills UI.
+
+Only connect the existing UI to real backend functionality.
+
+==================================================
+OBJECTIVE
+=========
+
+Make BOTH modules production-ready:
+
+1. Inventory → Purchase Orders
+2. Inventory → Purchase Bills
+
+Use the existing Supabase project.
+
+Replace mock/dummy data with real Supabase data.
+
+The final workflow should be:
+
+Supplier
+↓
+Purchase Order
+↓
+Goods Received
+↓
+Purchase Bill
+↓
+Supplier Payable
+↓
+Payment
+↓
+Finance / Reports
+
+==================================================
+PART 1 — PURCHASE ORDERS
+========================
+
+Create/use:
+
+purchase_orders
+
+purchase_order_items
+
+Only create tables if they do not already exist.
+
+Before creating anything, inspect the existing schema and reuse existing tables/columns where possible.
+
+---
+
+## PURCHASE ORDERS
+
+Required fields:
+
+id
+
+business_id
+
+po_number
+
+supplier_id
+
+order_date
+
+expected_delivery_date
+
+currency
+
+subtotal
+
+discount
+
+tax_amount
+
+shipping_amount
+
+grand_total
+
+notes
+
+terms_conditions
+
+status
+
+created_by
+
+created_at
+
+updated_at
+
+---
+
+## PURCHASE ORDER ITEMS
+
+Required fields:
+
+id
+
+purchase_order_id
+
+product_id
+
+description
+
+quantity
+
+received_quantity
+
+unit_price
+
+discount
+
+tax_rate
+
+tax_amount
+
+line_total
+
+created_at
+
+updated_at
+
+==================================================
+PURCHASE ORDER STATUS
+=====================
+
+Support:
+
+Draft
+
+Pending Approval
+
+Approved
+
+Sent
+
+Partially Received
+
+Received
+
+Cancelled
+
+Rejected
+
+Use the existing status system if one already exists.
+
+==================================================
+PURCHASE ORDER NUMBER
+=====================
+
+Automatically generate unique PO numbers per business.
+
+Example:
+
+PO-000001
+PO-000002
+PO-000003
+
+Do not depend only on frontend generation.
+
+Prevent duplicates at database level.
+
+==================================================
+PURCHASE ORDER FUNCTIONALITY
+============================
+
+Make the existing buttons actually work:
+
+* Create
+* Save Draft
+* Edit
+* Duplicate
+* Delete Draft
+* View
+* Preview
+* Print
+* Download PDF if already supported
+* Send if already supported
+* Approve
+* Reject
+* Cancel
+* Mark as Received
+* Search
+* Filter
+* Sort
+* Pagination
+
+Do not invent a new UI.
+
+==================================================
+SUPPLIER INTEGRATION
+====================
+
+Use the existing Suppliers module.
+
+When creating a PO:
+
+* Load suppliers belonging to the current business.
+* Allow supplier search.
+* Store supplier_id.
+* Never duplicate supplier data unnecessarily.
+
+==================================================
+PRODUCT INTEGRATION
+===================
+
+Use the existing Products module.
+
+Allow product search by:
+
+* Product name
+* SKU
+* Barcode
+
+When selected, load:
+
+* Product name
+* SKU
+* Unit
+* Purchase price
+* Tax rate
+
+Allow quantity and purchase price to be modified for this specific PO.
+
+==================================================
+PURCHASE ORDER CALCULATIONS
+===========================
+
+Calculate:
+
+Subtotal
+
+Discount
+
+Tax
+
+Shipping
+
+Grand Total
+
+Do not blindly trust totals supplied by the frontend.
+
+Use proper numeric/decimal calculations.
+
+==================================================
+GOODS RECEIVING
+===============
+
+IMPORTANT:
+
+Creating a Purchase Order MUST NOT increase inventory stock.
+
+Stock increases only when goods are actually received.
+
+Support:
+
+* Full receiving
+* Partial receiving
+* Multiple receiving events
+
+Example:
+
+Ordered: 100
+
+First receipt: 60
+
+Remaining: 40
+
+Second receipt: 40
+
+Final status: Received
+
+Prevent receiving more than the ordered quantity.
+
+Track:
+
+ordered_quantity
+
+received_quantity
+
+remaining_quantity
+
+==================================================
+INVENTORY MOVEMENT
+==================
+
+When goods are received:
+
+* Increase current_stock.
+* Create an inventory movement using the existing inventory architecture.
+* Record the received quantity.
+* Link the movement to the Purchase Order.
+* Prevent duplicate stock increases if the same receiving action is retried.
+
+Reuse the existing inventory movement system if available.
+
+==================================================
+PART 2 — PURCHASE BILLS
+=======================
+
+Make Inventory → Purchase Bills fully production-ready.
+
+Use the existing Purchase Bills UI.
+
+Replace all dummy data.
+
+Create/use:
+
+purchase_bills
+
+purchase_bill_items
+
+Only create them if equivalent tables do not already exist.
+
+---
+
+## PURCHASE BILLS
+
+Required fields:
+
+id
+
+business_id
+
+bill_number
+
+supplier_id
+
+purchase_order_id
+
+bill_date
+
+due_date
+
+currency
+
+subtotal
+
+discount
+
+tax_amount
+
+shipping_amount
+
+rounding_amount
+
+grand_total
+
+paid_amount
+
+balance_due
+
+notes
+
+terms_conditions
+
+status
+
+created_by
+
+created_at
+
+updated_at
+
+---
+
+## PURCHASE BILL ITEMS
+
+Required fields:
+
+id
+
+purchase_bill_id
+
+product_id
+
+purchase_order_item_id
+
+description
+
+quantity
+
+unit_price
+
+discount
+
+tax_rate
+
+tax_amount
+
+line_total
+
+created_at
+
+updated_at
+
+==================================================
+PURCHASE BILL STATUS
+====================
+
+Support:
+
+Draft
+
+Unpaid
+
+Partially Paid
+
+Paid
+
+Overdue
+
+Cancelled
+
+Use the existing finance/payment status architecture if available.
+
+==================================================
+BILL NUMBER
+===========
+
+Purchase bill numbers must be unique per business.
+
+Do not rely only on frontend-generated numbers.
+
+Use database constraints where appropriate.
+
+==================================================
+CREATE PURCHASE BILL
+====================
+
+Allow a purchase bill to be created:
+
+1. From an existing Purchase Order
+
+OR
+
+2. Manually, if the existing UI supports manual bills.
+
+When creating from a PO:
+
+Automatically load:
+
+* Supplier
+* Products
+* Quantities
+* Purchase prices
+* Taxes
+* Discounts
+
+Allow the user to adjust bill quantities where appropriate.
+
+==================================================
+PURCHASE ORDER → PURCHASE BILL
+==============================
+
+Support this relationship:
+
+Purchase Order
+↓
+Purchase Bill
+
+Store purchase_order_id.
+
+Do NOT duplicate the entire PO unnecessarily.
+
+A purchase bill may reference the source PO.
+
+Prevent billing quantities greater than valid received/ordered quantities according to the existing business workflow.
+
+==================================================
+SUPPLIER PAYABLE
+================
+
+When a Purchase Bill is finalized:
+
+Create/update the supplier payable using the existing Finance architecture.
+
+IMPORTANT:
+
+Creating a Purchase Order does NOT create a payable.
+
+A payable is created when the Purchase Bill is finalized.
+
+Example:
+
+Purchase Bill = ₹50,000
+
+paid_amount = ₹0
+
+balance_due = ₹50,000
+
+Status = Unpaid
+
+==================================================
+PAYMENTS
+========
+
+Use the existing Payments/Finance system.
+
+When a supplier payment is recorded:
+
+Update:
+
+paid_amount
+
+balance_due
+
+status
+
+Example:
+
+Bill = ₹50,000
+
+Payment = ₹20,000
+
+Paid = ₹20,000
+
+Balance = ₹30,000
+
+Status = Partially Paid
+
+When:
+
+Balance = ₹0
+
+Status = Paid
+
+Do not create a duplicate payment system.
+
+==================================================
+OVERDUE
+=======
+
+If:
+
+due_date < current date
+
+AND
+
+balance_due > 0
+
+then the bill should be considered overdue.
+
+Use the existing finance/reporting architecture if available.
+
+Do not rely only on frontend calculations for important financial state.
+
+==================================================
+INVENTORY INTEGRATION
+=====================
+
+IMPORTANT:
+
+Do not increase stock twice.
+
+If stock was already increased when goods were received against the Purchase Order, creating the Purchase Bill must NOT increase stock again.
+
+The correct flow is:
+
+Purchase Order
+↓
+Goods Received
+↓
+Inventory Stock Increase
+↓
+Purchase Bill
+↓
+Supplier Payable
+
+If the existing Nexora architecture uses a different documented inventory workflow, reuse it consistently rather than creating duplicate stock movements.
+
+==================================================
+FINANCE INTEGRATION
+===================
+
+Connect Purchase Bills to:
+
+* Supplier Payables
+* Payments
+* Finance
+* Reports
+
+Reuse existing finance tables/services.
+
+Do NOT create duplicate finance systems.
+
+==================================================
+SEARCH
+======
+
+Purchase Orders:
+
+* PO Number
+* Supplier
+* Product
+* SKU
+
+Purchase Bills:
+
+* Bill Number
+* Supplier
+* PO Number
+* Product
+* SKU
+
+Use database-level search where possible.
+
+==================================================
+FILTERS
+=======
+
+Purchase Orders:
+
+* Supplier
+* Status
+* Order Date
+* Expected Delivery Date
+* Date Range
+
+Purchase Bills:
+
+* Supplier
+* Status
+* Bill Date
+* Due Date
+* Date Range
+* Payment Status
+
+==================================================
+PAGINATION
+==========
+
+Use real database pagination.
+
+Do NOT load the entire table into the browser.
+
+Reuse existing React Query pagination patterns.
+
+==================================================
+MULTI-TENANCY + SECURITY
+========================
+
+Every record must belong to the authenticated business.
+
+Use:
+
+business_id
+
+Implement/maintain Supabase Row Level Security.
+
+Users must never be able to:
+
+* View another business's POs
+* View another business's bills
+* Modify another business's records
+* Access another business's supplier data
+* Access another business's product data
+* Access another business's financial data
+
+Do not trust business_id supplied directly by the client.
+
+Use the existing authentication/business architecture.
+
+==================================================
+VALIDATION
+==========
+
+Purchase Orders:
+
+* Supplier required
+* At least one item required
+* Quantity > 0
+* Valid product
+* Valid dates
+* Expected delivery cannot be before order date
+* Received quantity cannot exceed ordered quantity
+
+Purchase Bills:
+
+* Supplier required
+* At least one item required
+* Bill number unique
+* Valid dates
+* Due date cannot be invalid
+* Quantity > 0
+* Valid product
+* Valid financial amounts
+* Payment cannot exceed outstanding balance
+
+==================================================
+DATABASE INTEGRITY
+==================
+
+Use appropriate:
+
+* Foreign keys
+* Unique constraints
+* Check constraints
+* Indexes
+* RLS policies
+
+Add indexes for frequently queried fields such as:
+
+business_id
+
+supplier_id
+
+status
+
+order_date
+
+bill_date
+
+due_date
+
+po_number
+
+bill_number
+
+==================================================
+PERFORMANCE
+===========
+
+Use:
+
+* React Query
+* Existing Supabase helpers
+* Existing hooks
+* Database-level filtering
+* Database-level sorting
+* Pagination
+* Caching
+* Optimistic updates where safe
+* Efficient joins
+
+Do not make unnecessary API/database calls.
+
+==================================================
+ERROR HANDLING
+==============
+
+Handle:
+
+* Validation errors
+* Database errors
+* RLS/permission errors
+* Network errors
+* Duplicate PO numbers
+* Duplicate bill numbers
+* Invalid supplier
+* Invalid product
+* Invalid receiving quantity
+* Invalid payment amount
+* Stock update conflicts
+
+Show clear user-friendly errors using the existing notification/error UI.
+
+==================================================
+LOADING / EMPTY STATES
+======================
+
+Reuse existing:
+
+* Loading states
+* Skeletons
+* Empty states
+* Error states
+
+Do not create a new visual design.
+
+==================================================
+REPORTS
+=======
+
+Ensure Purchase Orders and Purchase Bills can be queried by the existing Reports module.
+
+Useful report data should include:
+
+Purchase total
+
+Supplier purchases
+
+Outstanding supplier payable
+
+Paid purchases
+
+Unpaid purchases
+
+Overdue purchases
+
+Purchase order value
+
+Received purchase value
+
+Pending purchase orders
+
+Do not redesign Reports.
+
+Only expose the necessary backend data.
+
+==================================================
+DOCUMENTS
+=========
+
+If the existing Documents module supports attachments:
+
+Allow relevant purchase documents/attachments to be associated with:
+
+* Purchase Order
+* Purchase Bill
+
+Reuse the existing Supabase Storage architecture.
+
+Do not create a second document system.
+
+==================================================
+FINAL DATABASE RELATIONSHIP
+===========================
+
+The intended architecture is:
+
+Business
+│
+├── Suppliers
+│
+├── Products
+│
+├── Purchase Orders
+│       │
+│       └── Purchase Order Items
+│
+├── Purchase Bills
+│       │
+│       └── Purchase Bill Items
+│
+├── Inventory Movements
+│
+├── Supplier Payables
+│
+└── Supplier Payments
+
+Relationships:
+
+Supplier
+↓
+Purchase Order
+↓
+Purchase Order Items
+↓
+Goods Received
+↓
+Inventory Movement
+
+Purchase Order
+↓
+Purchase Bill
+↓
+Supplier Payable
+↓
+Payment
+
+==================================================
+VERY IMPORTANT — DO NOT OVERBUILD
+=================================
+
+Use the smallest implementation that makes these modules genuinely production-ready.
+
+Do NOT:
+
+* Build a new UI
+* Build a new authentication system
+* Build a new Products system
+* Build a new Supplier system
+* Build a new Payments system
+* Build a new Finance system
+* Build a new Documents system
+* Refactor unrelated modules
+* Add unnecessary dependencies
+* Generate unnecessary files
+* Rewrite working code
+
+Reuse what Nexora already has.
+
+==================================================
+EXECUTION REQUIREMENT
+=====================
+
+START IMPLEMENTING NOW.
+
+Do not stop after creating a plan.
+
+Do not just return SQL.
+
+Do not just explain the architecture.
+
+Actually modify the existing project.
+
+After implementation:
+
+1. Check TypeScript errors.
+2. Check Supabase/database errors.
+3. Check the affected Purchase Order and Purchase Bill flows.
+4. Fix errors caused by your changes.
+5. Verify that existing modules are not broken.
+6. Summarize ONLY what was actually implemented.
+
+Keep AI credit usage as LOW as POSSIBLE while still completing the work.

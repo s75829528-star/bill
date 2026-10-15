@@ -1,0 +1,518 @@
+Continue developing the EXISTING Nexora project.
+
+IMPORTANT
+
+- DO NOT modify the Landing Page.
+- DO NOT modify Authentication.
+- DO NOT modify Business Setup Wizard.
+- DO NOT modify Dashboard.
+- DO NOT modify Billing Module.
+- Continue using the existing GitHub repository.
+- Maintain the current premium white SaaS design system.
+- Keep the same sidebar, top navigation, typography, spacing, animations, and component library.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Build a COMPLETE Inventory Management Module.
+
+This should look like a world-class enterprise inventory system similar to Zoho Inventory, Odoo Inventory, SAP Business One, Oracle NetSuite, and Microsoft Dynamics.
+
+IMPORTANT
+
+No backend.
+
+No Supabase connection.
+
+No API.
+
+Use realistic mock data only.
+
+Everything should be production-quality UI.
+
+==================================================
+INVENTORY NAVIGATION
+==================================================
+
+Inventory
+
+├── Overview
+├── Products
+├── Categories
+├── Brands
+├── Units
+├── Suppliers
+├── Purchase Orders
+├── Purchase Bills
+├── Stock In
+├── Stock Out
+├── Stock Adjustments
+├── Low Stock
+├── Barcode Management
+├── Inventory Reports
+└── Inventory Settings
+
+==================================================
+INVENTORY DASHBOARD
+==================================================
+
+Create a premium dashboard showing:
+
+Total Products
+
+Total Stock Value
+
+Items in Stock
+
+Out of Stock
+
+Low Stock Items
+
+Purchase Orders Pending
+
+Suppliers
+
+Today's Stock Movements
+
+Cards should contain trends and percentage changes.
+
+Charts
+
+Stock Movement
+
+Inventory Value
+
+Category Distribution
+
+Top Selling Products
+
+Most Purchased Products
+
+Recent Inventory Activity Timeline
+
+Quick Actions
+
+Add Product
+
+Create Purchase Order
+
+Receive Stock
+
+Adjust Stock
+
+View Reports
+
+==================================================
+PRODUCT MANAGEMENT
+==================================================
+
+Professional Products table.
+
+Columns
+
+Product Image
+
+Product Name
+
+SKU
+
+Barcode
+
+Category
+
+Brand
+
+Supplier
+
+Purchase Price
+
+Selling Price
+
+Current Stock
+
+Minimum Stock
+
+Status
+
+Actions
+
+Features
+
+Search
+
+Filters
+
+Sorting
+
+Pagination
+
+Bulk Actions
+
+Export CSV
+
+Export Excel
+
+Import Placeholder
+
+Product Detail Page
+
+Duplicate Product
+
+Archive Product
+
+==================================================
+PRODUCT FORM
+==================================================
+
+Create Product
+
+Fields
+
+Product Name
+
+SKU
+
+Barcode
+
+Category
+
+Brand
+
+Unit
+
+Supplier
+
+Purchase Price
+
+Selling Price
+
+Tax
+
+HSN/SAC Code
+
+Opening Stock
+
+Minimum Stock Level
+
+Maximum Stock Level
+
+Description
+
+Images
+
+Status
+
+==================================================
+CATEGORY MANAGEMENT
+==================================================
+
+Category List
+
+Category Cards
+
+Create Category
+
+Edit Category
+
+Delete Category
+
+Category Analytics
+
+==================================================
+BRAND MANAGEMENT
+==================================================
+
+Create Brand
+
+Brand Logo
+
+Brand Description
+
+Product Count
+
+==================================================
+UNIT MANAGEMENT
+==================================================
+
+Manage Units
+
+Piece
+
+Kg
+
+Gram
+
+Liter
+
+Box
+
+Packet
+
+Dozen
+
+Meter
+
+Custom Units
+
+==================================================
+SUPPLIERS
+==================================================
+
+Supplier List
+
+Supplier Profile
+
+Supplier Contact
+
+GST Number
+
+Outstanding Amount
+
+Purchase History
+
+Supplier Rating
+
+==================================================
+PURCHASE ORDERS
+==================================================
+
+Purchase Order List
+
+Create Purchase Order
+
+Pending
+
+Approved
+
+Received
+
+Cancelled
+
+Purchase Order Detail
+
+==================================================
+PURCHASE BILLS
+==================================================
+
+Purchase Bill List
+
+Create Purchase Bill
+
+Bill Preview
+
+Vendor Details
+
+GST Summary
+
+Payment Status
+
+==================================================
+STOCK IN
+==================================================
+
+Receive Inventory
+
+Reference Number
+
+Supplier
+
+Products
+
+Quantity
+
+Warehouse (prepare for future)
+
+Notes
+
+Timeline
+
+==================================================
+STOCK OUT
+==================================================
+
+Issue Stock
+
+Reason
+
+Invoice Reference
+
+Quantity
+
+Timeline
+
+==================================================
+STOCK ADJUSTMENT
+==================================================
+
+Increase Stock
+
+Decrease Stock
+
+Reason
+
+Approval Status
+
+Adjustment History
+
+==================================================
+LOW STOCK
+==================================================
+
+Professional alert page.
+
+Low Stock List
+
+Critical Stock
+
+Out of Stock
+
+Recommended Reorder Quantity
+
+Priority Labels
+
+==================================================
+BARCODE MANAGEMENT
+==================================================
+
+Barcode Generator
+
+Barcode Preview
+
+Barcode Labels
+
+Print Labels
+
+Barcode Scanner UI (placeholder)
+
+QR Code Support
+
+==================================================
+REPORTS
+==================================================
+
+Inventory Reports
+
+Stock Value
+
+Stock Movement
+
+Dead Stock
+
+Fast Moving Products
+
+Category Performance
+
+Supplier Performance
+
+==================================================
+SETTINGS
+==================================================
+
+Inventory Preferences
+
+Default Units
+
+Stock Alert Threshold
+
+Barcode Format
+
+Tax Settings
+
+Number Format
+
+==================================================
+MOCK DATA
+==================================================
+
+Use realistic Indian business data.
+
+Products
+
+Laptop
+
+Monitor
+
+Keyboard
+
+Mouse
+
+Printer
+
+Scanner
+
+UPS
+
+Router
+
+CCTV Camera
+
+SSD
+
+HDD
+
+RAM
+
+Cable
+
+Office Chair
+
+Office Desk
+
+Suppliers should use realistic company names.
+
+Generate believable SKU and barcode values.
+
+==================================================
+UI REQUIREMENTS
+==================================================
+
+Enterprise SaaS Quality.
+
+Looks comparable to:
+
+Stripe
+
+Linear
+
+Notion
+
+Zoho Inventory
+
+SAP Business One
+
+Oracle NetSuite
+
+Modern spacing
+
+Premium cards
+
+Beautiful tables
+
+Responsive
+
+Professional icons
+
+Smooth animations
+
+Excellent typography
+
+Perfect alignment
+
+Consistent design language
+
+==================================================
+IMPORTANT
+==================================================
+
+Do NOT connect any backend.
+
+Do NOT use Supabase.
+
+Do NOT use APIs.
+
+Keep everything in reusable mock data files.
+
+Every button should have proper UI interactions using mock data.
+
+The Inventory module should feel like a complete commercial product that is ready to connect to a backend later without redesigning the interface.

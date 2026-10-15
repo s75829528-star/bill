@@ -1,0 +1,336 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue using the existing GitHub repository.
+- DO NOT modify the Landing Page.
+- DO NOT modify Authentication.
+- DO NOT modify Business Setup Wizard.
+- DO NOT modify Dashboard.
+- DO NOT modify Billing.
+- DO NOT modify Inventory.
+- DO NOT modify CRM.
+- DO NOT modify Finance.
+- Maintain the existing premium white SaaS design system.
+- Preserve the existing sidebar, navigation, typography, spacing, reusable components, tables, cards, and animations.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Build a complete Reports & Analytics Module.
+
+This should become the central business intelligence area for Nexora.
+
+The design should feel comparable to:
+
+• Microsoft Power BI
+• Zoho Analytics
+• Tableau
+• Looker Studio
+• Stripe Dashboard
+• HubSpot Analytics
+
+Use realistic mock data only.
+
+No backend.
+
+No Supabase.
+
+No API.
+
+==================================================
+REPORTS NAVIGATION
+==================================================
+
+Reports
+
+├── Executive Dashboard
+├── Sales Reports
+├── Billing Reports
+├── Inventory Reports
+├── CRM Reports
+├── Finance Reports
+├── GST Reports
+├── Customer Reports
+├── Product Reports
+├── Export Center
+└── Report Settings
+
+==================================================
+EXECUTIVE DASHBOARD
+==================================================
+
+Create professional KPI cards.
+
+Revenue
+
+Profit
+
+Expenses
+
+Inventory Value
+
+Outstanding Payments
+
+Customer Growth
+
+Products Sold
+
+Invoices Created
+
+Average Order Value
+
+Cash Flow
+
+Monthly Growth
+
+Net Margin
+
+==================================================
+CHARTS
+==================================================
+
+Revenue Trend
+
+Monthly Sales
+
+Profit Trend
+
+Cash Flow
+
+Inventory Value
+
+Stock Movement
+
+Customer Growth
+
+Top Customers
+
+Top Products
+
+Top Categories
+
+Expense Breakdown
+
+GST Collection
+
+==================================================
+SALES REPORTS
+==================================================
+
+Daily
+
+Weekly
+
+Monthly
+
+Quarterly
+
+Yearly
+
+Top Customers
+
+Top Products
+
+Revenue by Category
+
+==================================================
+BILLING REPORTS
+==================================================
+
+Invoices
+
+Paid
+
+Pending
+
+Overdue
+
+Collection Rate
+
+Average Invoice Value
+
+==================================================
+INVENTORY REPORTS
+==================================================
+
+Inventory Value
+
+Low Stock
+
+Dead Stock
+
+Fast Moving Products
+
+Slow Moving Products
+
+Category Performance
+
+Supplier Performance
+
+==================================================
+CRM REPORTS
+==================================================
+
+Customer Growth
+
+Lead Conversion
+
+Top Customers
+
+Inactive Customers
+
+Outstanding Customers
+
+==================================================
+FINANCE REPORTS
+==================================================
+
+Income
+
+Expenses
+
+Profit & Loss
+
+Cash Flow
+
+Receivables
+
+Payables
+
+==================================================
+GST REPORTS
+==================================================
+
+CGST
+
+SGST
+
+IGST
+
+GST Summary
+
+Monthly GST
+
+==================================================
+CUSTOMER REPORTS
+==================================================
+
+Purchase History
+
+Customer Lifetime Value
+
+Average Purchase
+
+Outstanding
+
+==================================================
+PRODUCT REPORTS
+==================================================
+
+Best Selling Products
+
+Least Selling Products
+
+Stock Value
+
+Category Performance
+
+==================================================
+FILTERS
+==================================================
+
+Global Date Range
+
+Today
+
+Yesterday
+
+This Week
+
+This Month
+
+Last Month
+
+This Quarter
+
+This Year
+
+Custom Range
+
+==================================================
+EXPORT CENTER
+==================================================
+
+Prepare UI for
+
+PDF
+
+Excel
+
+CSV
+
+Print
+
+==================================================
+REPORT SETTINGS
+==================================================
+
+Default Date Range
+
+Currency
+
+Tax Display
+
+Theme
+
+==================================================
+MOCK DATA
+==================================================
+
+Generate realistic Indian business analytics.
+
+==================================================
+DESIGN
+==================================================
+
+Enterprise SaaS quality.
+
+Premium white interface.
+
+Professional charts.
+
+Beautiful KPI cards.
+
+Responsive.
+
+Modern analytics.
+
+Reusable React + TypeScript components.
+
+==================================================
+DO NOT BUILD
+==================================================
+
+No AI
+
+No backend
+
+No Supabase
+
+No API integrations
+
+No automation
+
+No scheduled reports
+
+==================================================
+IMPORTANT
+==================================================
+
+Use mock data only.
+
+The Reports module should integrate visually with Billing, Inventory, CRM, and Finance.
+
+It should feel like the analytics center of a commercial ERP product.

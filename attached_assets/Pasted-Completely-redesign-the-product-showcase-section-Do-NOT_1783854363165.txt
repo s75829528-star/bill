@@ -1,0 +1,204 @@
+Completely redesign the product showcase section.
+
+Do NOT create one long scrolling page where Billing, Inventory, CRM, Reports, Finance, AI and other modules appear one after another.
+
+Instead create ONE premium interactive Product Showcase section.
+
+At the top of the section create modern navigation tabs.
+
+Example tabs:
+
+Billing
+
+Inventory
+
+CRM
+
+Reports
+
+Finance
+
+AI Assistant
+
+Customers
+
+Multi Branch
+
+Analytics
+
+Each tab should look like premium segmented controls similar to Apple, Stripe or Linear.
+
+When a user clicks a tab:
+
+• The content changes instantly with a smooth animation.
+• Do NOT navigate to another page.
+• Do NOT scroll.
+• Only replace the showcase content inside the section.
+
+Each tab should display:
+
+Large realistic application mockup
+
+Professional dashboard
+
+Feature checklist
+
+Business description
+
+Business metrics
+
+Floating UI cards
+
+Analytics
+
+Charts
+
+Illustrations
+
+Buttons
+
+Trust badges
+
+Smooth transitions.
+
+Each module should have its own completely unique layout.
+
+Example:
+
+Billing
+
+Show invoice software.
+
+GST invoices.
+
+Quotation.
+
+Purchase bills.
+
+Invoice timeline.
+
+Payment tracking.
+
+QR Payments.
+
+Thermal printer.
+
+-----------------------------------
+
+Inventory
+
+Show warehouse dashboard.
+
+Barcode scanner.
+
+Stock analytics.
+
+Expiry management.
+
+Purchase orders.
+
+Low stock alerts.
+
+Inventory charts.
+
+-----------------------------------
+
+CRM
+
+Show customer management dashboard.
+
+Lead pipeline.
+
+Customer timeline.
+
+Customer analytics.
+
+Sales funnel.
+
+Communication history.
+
+-----------------------------------
+
+Reports
+
+Show beautiful analytics dashboard.
+
+Revenue charts.
+
+Profit.
+
+Business health score.
+
+Sales trends.
+
+Top products.
+
+Tax reports.
+
+-----------------------------------
+
+Finance
+
+Cash flow.
+
+Expenses.
+
+Income.
+
+Bank reconciliation.
+
+Financial insights.
+
+-----------------------------------
+
+AI Assistant
+
+Beautiful AI chat interface.
+
+Business insights.
+
+Invoice generation.
+
+Sales forecasting.
+
+Inventory forecasting.
+
+Natural language business search.
+
+-----------------------------------
+
+Animation Requirements
+
+Use Framer Motion.
+
+Fade transition.
+
+Slide animation.
+
+Smooth content replacement.
+
+No page reload.
+
+No scroll jump.
+
+Keep tab state.
+
+Responsive on desktop, tablet and mobile.
+
+Use beautiful active tab indicators.
+
+Hover animations.
+
+Premium shadows.
+
+Rounded corners.
+
+Enterprise spacing.
+
+The section should feel like using real software instead of reading a website.
+
+The entire showcase should be one interactive experience.
+
+The user should explore products by clicking tabs rather than scrolling through long sections.
+
+This should become one of the most visually impressive sections of the entire landing page.

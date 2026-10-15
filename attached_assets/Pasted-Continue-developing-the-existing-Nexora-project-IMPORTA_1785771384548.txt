@@ -1,0 +1,320 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+AI EXECUTION MODE
+==================================================
+
+Optimize for minimal AI credit usage.
+
+- Analyze only files related to Billing → Documents.
+- Do NOT scan the entire project.
+- Do NOT modify unrelated modules.
+- Reuse existing hooks, services, components and utilities.
+- Make only the minimum changes required.
+- Do not regenerate existing working code.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Billing → Documents module fully production-ready using Supabase.
+
+Replace all mock data with real database operations.
+
+Use the existing UI only.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+STORAGE
+==================================================
+
+Use Supabase Storage.
+
+Create a bucket named:
+
+billing-documents
+
+Store only document metadata in the database.
+
+==================================================
+DATABASE
+==================================================
+
+Create a documents table if it does not exist.
+
+Columns:
+
+id
+
+business_id
+
+document_name
+
+document_type
+
+file_name
+
+file_path
+
+file_size
+
+mime_type
+
+linked_module
+
+linked_record_id
+
+uploaded_by
+
+created_at
+
+updated_at
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every document belongs only to the logged-in business.
+
+Businesses must never access another business's files.
+
+Implement Row Level Security compatibility.
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+• Upload Document
+• Replace Document
+• Download
+• Preview
+• Rename
+• Move
+• Delete
+• Archive
+• Restore
+• Search
+• Filters
+• Pagination
+
+==================================================
+SUPPORTED FILE TYPES
+==================================================
+
+Support:
+
+PDF
+
+PNG
+
+JPG
+
+JPEG
+
+WEBP
+
+DOCX
+
+XLSX
+
+CSV
+
+TXT
+
+ZIP
+
+==================================================
+DOCUMENT TYPES
+==================================================
+
+Support:
+
+Invoice
+
+Quotation
+
+Credit Note
+
+Payment Receipt
+
+GST
+
+Purchase Order
+
+Delivery Challan
+
+Customer Attachment
+
+Import File
+
+Other
+
+==================================================
+LINKING
+==================================================
+
+Allow documents to be linked with:
+
+Invoices
+
+Quotations
+
+Credit Notes
+
+Payments
+
+Customers
+
+Products
+
+==================================================
+SEARCH
+==================================================
+
+Search by:
+
+Document Name
+
+File Name
+
+Customer
+
+Invoice Number
+
+Quotation Number
+
+==================================================
+FILTERS
+==================================================
+
+Support:
+
+Document Type
+
+Date Range
+
+File Type
+
+Linked Module
+
+==================================================
+TABLE
+==================================================
+
+Replace mock data.
+
+Display:
+
+Document Name
+
+Document Type
+
+Linked Module
+
+File Size
+
+Uploaded By
+
+Upload Date
+
+Actions
+
+==================================================
+PREVIEW
+==================================================
+
+Preview supported file types directly inside Nexora.
+
+==================================================
+DOWNLOAD
+==================================================
+
+Allow downloading the original uploaded file.
+
+==================================================
+PERMISSIONS
+==================================================
+
+Users can only manage documents belonging to their business.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+React Query
+
+Pagination
+
+Caching
+
+Lazy Loading
+
+Reusable Hooks
+
+Loading Skeletons
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+Upload Errors
+
+Network Errors
+
+Database Errors
+
+Permission Errors
+
+Unsupported File Types
+
+Maximum File Size
+
+==================================================
+IMPORTANT
+==================================================
+
+Do NOT redesign anything.
+
+Keep the existing Documents UI exactly the same.
+
+Replace all dummy data with Supabase.
+
+Use Supabase Storage for file storage.
+
+Store metadata in Supabase tables.
+
+Every existing button should perform real operations.
+
+Integrate Documents with:
+
+• Billing
+• CRM
+• Inventory
+• Finance
+
+The Documents module should be fully production-ready.

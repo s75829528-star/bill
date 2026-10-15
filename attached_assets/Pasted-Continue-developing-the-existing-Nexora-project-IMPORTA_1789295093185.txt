@@ -1,0 +1,325 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+AI EXECUTION MODE — MINIMAL CREDITS
+==================================================
+
+- Analyze only files related to Inventory → Brands.
+- Do NOT scan the entire project.
+- Do NOT modify Products, Billing, CRM, Finance or other modules unless required for the Brands integration.
+- Reuse existing components, hooks, Supabase helpers and patterns.
+- Make the smallest possible changes.
+- Do not regenerate working files.
+- Do not perform unrelated refactoring or cleanup.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Inventory → Brands module fully production-ready using Supabase.
+
+Replace all mock/dummy brand data with real database operations.
+
+Keep the existing Brands UI exactly as it is.
+
+==================================================
+DATABASE
+==================================================
+
+Create a brands table if it does not already exist.
+
+brands
+
+Columns:
+
+id
+
+business_id
+
+name
+
+description
+
+logo_url
+
+website
+
+status
+
+created_at
+
+updated_at
+
+==================================================
+MULTI-TENANCY
+==================================================
+
+Every brand must belong to exactly one business.
+
+Use business_id.
+
+A business must never be able to view, create, edit or delete another business's brands.
+
+Implement proper Supabase Row Level Security policies.
+
+==================================================
+BRAND FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+• Add Brand
+• Edit Brand
+• Delete Brand
+• View Brand
+• Duplicate Brand
+• Activate Brand
+• Deactivate Brand
+• Search
+• Filter
+• Sorting
+• Pagination
+
+==================================================
+BRAND DETAILS
+==================================================
+
+A brand should support:
+
+Brand Name
+
+Description
+
+Logo
+
+Website
+
+Status
+
+==================================================
+VALIDATION
+==================================================
+
+Validate:
+
+• Brand name is required
+• Brand name must be unique per business
+• Website must be a valid URL when provided
+• Logo must use an allowed image format
+• Prevent deletion when the brand is being used by products, unless the existing UI specifically supports reassignment
+
+==================================================
+PRODUCT INTEGRATION
+==================================================
+
+Integrate Brands with the existing Products module.
+
+Add/use:
+
+products.brand_id → brands.id
+
+When creating or editing a product:
+
+• Allow selecting a brand
+• Load brands belonging to the current business
+• Search brands
+• Display the selected brand
+
+Do NOT redesign the Products UI.
+
+Only add the minimum backend/data integration required.
+
+==================================================
+BRAND DELETE PROTECTION
+==================================================
+
+Before deleting a brand:
+
+Check whether products are associated with it.
+
+If products are using the brand:
+
+• Do not silently delete the brand
+• Return a clear error
+• Tell the user that products are currently associated with the brand
+• Allow the user to deactivate the brand instead
+
+==================================================
+SEARCH
+==================================================
+
+Implement instant search by:
+
+• Brand Name
+• Description
+
+==================================================
+FILTERS
+==================================================
+
+Support:
+
+• Status
+• Has Products
+• Date Created
+
+==================================================
+SORTING
+==================================================
+
+Support sorting by:
+
+• Brand Name
+• Created Date
+• Updated Date
+• Product Count
+
+==================================================
+TABLE
+==================================================
+
+Replace mock data.
+
+Display the existing table fields from the current UI.
+
+Where applicable show:
+
+• Brand
+• Description
+• Product Count
+• Status
+• Created Date
+• Actions
+
+Do not change the existing table design.
+
+==================================================
+PRODUCT COUNT
+==================================================
+
+Display the number of products belonging to each brand.
+
+Use an efficient Supabase query.
+
+Do not load every product into the browser just to calculate counts.
+
+==================================================
+LOGO STORAGE
+==================================================
+
+If the existing UI supports brand logos:
+
+Use Supabase Storage.
+
+Create/use an appropriate storage bucket.
+
+Store the storage path/URL in the brands table.
+
+Restrict access so businesses cannot access another business's brand assets.
+
+==================================================
+STATUS
+==================================================
+
+Support:
+
+Active
+
+Inactive
+
+Inactive brands should not appear as selectable brands for new products.
+
+Existing products can continue to reference an inactive brand.
+
+==================================================
+LOADING
+==================================================
+
+Use professional loading skeletons already present in the project.
+
+Do not create a new visual design.
+
+==================================================
+EMPTY STATE
+==================================================
+
+If the business has no brands:
+
+Use the existing empty-state component.
+
+Provide an action to create the first brand.
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+• Validation errors
+• Duplicate brand names
+• Database errors
+• Permission errors
+• Network errors
+• Storage/upload errors
+• Brand deletion conflicts
+
+Show clear user-friendly error messages.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+• React Query
+• Caching
+• Optimistic Updates where safe
+• Reusable hooks
+• Pagination
+• Efficient Supabase queries
+• Database-level filtering
+• Database-level sorting
+
+Do not fetch the entire brands table when pagination is available.
+
+==================================================
+SECURITY
+==================================================
+
+Never trust business_id supplied by the client.
+
+Determine the authenticated user's business using the existing authentication/business architecture.
+
+Ensure Supabase RLS prevents cross-business access.
+
+==================================================
+IMPORTANT
+==================================================
+
+Do NOT redesign anything.
+
+Do NOT create a separate product database.
+
+Brands are master data used by Products.
+
+The final relationship should be:
+
+Business
+   ↓
+Brands
+   ↓
+Products
+
+Replace all dummy brand data with real Supabase data.
+
+Make the Brands module production-ready without breaking the existing Inventory or Products module.

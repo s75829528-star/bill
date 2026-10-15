@@ -1,0 +1,254 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Billing → Recurring module fully production-ready using Supabase.
+
+Replace all mock data with real database operations.
+
+Use the existing UI only.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+DATABASE
+==================================================
+
+Create tables if they do not exist.
+
+recurring_invoices
+
+recurring_invoice_items
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every recurring invoice belongs only to the logged-in business.
+
+Businesses must never access another business's recurring invoices.
+
+Implement proper Row Level Security compatibility.
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+• Create Recurring Invoice
+• Edit
+• Delete
+• Duplicate
+• Pause
+• Resume
+• Cancel
+• Activate
+• Deactivate
+• Preview
+• Search
+• Filters
+• Pagination
+
+==================================================
+RECURRING DETAILS
+==================================================
+
+Each recurring invoice should contain:
+
+• Auto-generated Series Number
+• Customer
+• Products
+• Quantity
+• Unit Price
+• Tax
+• Discount
+• Billing Frequency
+• Start Date
+• End Date
+• Next Billing Date
+• Last Generated Date
+• Currency
+• Notes
+• Terms & Conditions
+• Status
+
+==================================================
+FREQUENCIES
+==================================================
+
+Support:
+
+• Daily
+• Weekly
+• Monthly
+• Quarterly
+• Half-Yearly
+• Yearly
+• Custom
+
+==================================================
+CUSTOMERS
+==================================================
+
+Load customers from the CRM module.
+
+Allow searching customers.
+
+==================================================
+PRODUCTS
+==================================================
+
+Load products from the Inventory module.
+
+Automatically populate:
+
+• Selling Price
+• Tax
+• Unit
+
+==================================================
+AUTOMATIC GENERATION
+==================================================
+
+Prepare backend logic for automatic invoice generation.
+
+When the Next Billing Date arrives:
+
+• Create a new invoice
+• Copy all recurring items
+• Link the invoice to the recurring schedule
+• Update Last Generated Date
+• Calculate the next billing date
+
+Do not implement cron jobs yet.
+
+Create reusable backend functions that can later be triggered by scheduled jobs.
+
+==================================================
+STATUS
+==================================================
+
+Support:
+
+• Active
+• Paused
+• Completed
+• Cancelled
+• Expired
+
+==================================================
+SEARCH
+==================================================
+
+Search by:
+
+• Series Number
+• Customer
+• Status
+
+==================================================
+FILTERS
+==================================================
+
+Support:
+
+• Status
+• Frequency
+• Customer
+• Date Range
+
+==================================================
+TABLE
+==================================================
+
+Replace mock data.
+
+Display:
+
+• Series Number
+• Customer
+• Frequency
+• Next Billing Date
+• Last Generated
+• Amount
+• Status
+• Actions
+
+==================================================
+VALIDATION
+==================================================
+
+Validate:
+
+• Customer selected
+• At least one product
+• Positive quantity
+• Positive prices
+• Valid billing frequency
+• Valid start/end dates
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+• React Query
+• Optimistic Updates
+• Caching
+• Reusable Hooks
+• Loading Skeletons
+• TypeScript Best Practices
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+• Validation Errors
+• Database Errors
+• Permission Errors
+• Network Errors
+
+==================================================
+IMPORTANT
+==================================================
+
+Do NOT redesign anything.
+
+Keep the existing Recurring UI exactly the same.
+
+Replace all dummy data with Supabase.
+
+Every existing button should perform real database operations.
+
+Integrate with:
+
+• Inventory
+• CRM
+• Billing
+• Finance
+
+The module should be production-ready and ready for future automatic invoice scheduling.

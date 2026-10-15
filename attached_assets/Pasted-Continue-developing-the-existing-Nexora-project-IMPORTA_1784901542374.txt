@@ -1,0 +1,246 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Make the existing Billing → Quotations tab fully production-ready using Supabase.
+
+Replace all mock data.
+
+Use the existing UI only.
+
+==================================================
+SUPABASE
+==================================================
+
+Use the existing Supabase project.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+==================================================
+DATABASE
+==================================================
+
+Create tables if they do not exist:
+
+quotations
+
+quotation_items
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every quotation belongs only to the logged-in business.
+
+Businesses must never access another business's quotations.
+
+Implement proper Row Level Security.
+
+==================================================
+FUNCTIONALITY
+==================================================
+
+Make every existing button work.
+
+Support:
+
+• Create Quotation
+• Edit Quotation
+• Delete Quotation
+• Duplicate Quotation
+• Preview
+• Print
+• Download PDF
+• Email Quotation
+• Share Quotation
+• Save Draft
+• Send
+• Approve
+• Reject
+• Mark Expired
+• Convert to Invoice
+
+==================================================
+QUOTATION DETAILS
+==================================================
+
+Each quotation should contain:
+
+• Auto-generated Quotation Number
+• Quotation Date
+• Expiry Date
+• Customer
+• Billing Address
+• Products
+• Quantity
+• Unit Price
+• Discount
+• Tax
+• Subtotal
+• Grand Total
+• Terms & Conditions
+• Internal Notes
+• Status
+• Created By
+• Created At
+• Updated At
+
+==================================================
+CUSTOMERS
+==================================================
+
+Load customers from the CRM module.
+
+Allow searching customers.
+
+==================================================
+PRODUCTS
+==================================================
+
+Load products from the Inventory module.
+
+Support search by:
+
+• Product Name
+• SKU
+• Barcode
+
+Automatically populate:
+
+• Selling Price
+• Tax Rate
+• Unit
+
+==================================================
+STATUS
+==================================================
+
+Support:
+
+• Draft
+• Sent
+• Approved
+• Rejected
+• Expired
+• Converted
+
+==================================================
+CONVERT TO INVOICE
+==================================================
+
+When the user clicks "Convert to Invoice":
+
+• Create a new invoice
+• Copy all quotation items
+• Preserve prices and taxes
+• Link the quotation to the invoice
+• Update quotation status to "Converted"
+• Redirect to the Invoice page
+
+==================================================
+SEARCH
+==================================================
+
+Support instant search by:
+
+• Quotation Number
+• Customer Name
+• Product Name
+
+==================================================
+FILTERS
+==================================================
+
+Support filters for:
+
+• Status
+• Customer
+• Date Range
+• Amount Range
+
+==================================================
+TABLE
+==================================================
+
+Replace mock data.
+
+Display:
+
+• Quotation Number
+• Customer
+• Date
+• Expiry Date
+• Amount
+• Status
+• Actions
+
+==================================================
+VALIDATION
+==================================================
+
+Validate:
+
+• Required fields
+• Customer selected
+• At least one product
+• Positive quantity
+• Positive prices
+• Valid expiry date
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+• React Query
+• Optimistic Updates
+• Caching
+• Reusable Hooks
+• Pagination
+• Loading Skeletons
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+• Validation Errors
+• Database Errors
+• Permission Errors
+• Network Errors
+
+==================================================
+IMPORTANT
+==================================================
+
+Do NOT redesign anything.
+
+Keep the existing Billing UI exactly the same.
+
+Replace all dummy data with Supabase.
+
+Every existing button should perform real database operations.
+
+The Quotations tab must be fully integrated with:
+
+• Inventory
+• CRM
+• Billing
+• Dashboard
+• Reports
+
+The module should behave like a production-grade ERP quotation system.

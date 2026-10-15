@@ -1,0 +1,128 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Do NOT modify the landing page.
+- Do NOT modify authentication.
+- Do NOT modify the Business Setup Wizard.
+- Continue using the existing GitHub repository.
+- Maintain the existing design system.
+
+OBJECTIVE
+
+Build the main Business Dashboard after onboarding.
+
+This is the foundation of the entire application.
+
+LAYOUT
+
+Create a professional enterprise application layout.
+
+Desktop Layout
+
+------------------------------------------------------------
+Top Navigation
+------------------------------------------------------------
+Sidebar | Dashboard Content
+------------------------------------------------------------
+
+SIDEBAR
+
+Dashboard
+
+Billing
+
+Inventory
+
+CRM
+
+Finance
+
+Reports
+
+AI Assistant
+
+Settings
+
+Help
+
+Logout
+
+The sidebar should support:
+- Collapse/Expand
+- Active route highlighting
+- Icons
+- Responsive mobile drawer
+
+TOP BAR
+
+Display:
+- Business Name
+- Global Search
+- Notifications
+- User Profile
+- Business Switcher (prepare for future multi-business support)
+
+DASHBOARD CONTENT
+
+Create production-ready widgets using placeholder/demo data for now.
+
+Cards:
+- Today's Revenue
+- Today's Orders
+- Outstanding Invoices
+- Pending Payments
+- Low Stock Alerts
+- Total Customers
+- Total Products
+- Monthly Profit
+
+Charts:
+- Revenue Overview
+- Sales Trend
+- Top Products
+- Recent Activity Timeline
+
+Business Health Card:
+- Revenue Growth
+- Inventory Status
+- Customer Growth
+- AI Insight Placeholder
+
+Quick Actions:
+- Create Invoice
+- Add Customer
+- Add Product
+- View Reports
+- Open AI Assistant
+
+DESIGN
+
+Enterprise SaaS quality.
+
+Premium white theme.
+
+Beautiful cards.
+
+Excellent spacing.
+
+Responsive.
+
+Professional typography.
+
+Smooth animations.
+
+Reusable components.
+
+TECHNICAL
+
+- React
+- TypeScript
+- Tailwind CSS
+- Reusable components
+- Route structure ready for future modules
+- Placeholder data only
+
+Do NOT build Billing, Inventory, CRM, Finance, Reports, or AI functionality yet.
+
+Only build the Dashboard shell and application layout that future modules will plug into.

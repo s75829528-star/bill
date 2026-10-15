@@ -1,0 +1,232 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue from the existing GitHub repository.
+- Do NOT redesign any UI.
+- Do NOT modify colors, typography, spacing, sidebar, navigation, animations or layout.
+- Preserve the existing premium enterprise SaaS design.
+- Implement backend functionality only.
+
+==================================================
+AI EXECUTION MODE
+==================================================
+
+Optimize for minimal AI credit usage.
+
+- Only analyze files related to Billing → Reports.
+- Do NOT scan the entire project.
+- Do NOT modify unrelated modules.
+- Reuse existing services, hooks, queries and utilities.
+- Make the smallest possible code changes.
+- Do not regenerate existing working code.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Convert the existing Billing → Reports module into a fully functional reporting system using Supabase.
+
+Keep the existing UI exactly the same.
+
+Replace all mock values, charts and statistics with live business data.
+
+==================================================
+DATA SOURCE
+==================================================
+
+DO NOT create separate report tables.
+
+Generate reports using existing tables including:
+
+- invoices
+- invoice_items
+- payments
+- customers
+- products
+- recurring_invoices
+- credit_notes
+
+Only create database objects if absolutely necessary (views or SQL functions for performance).
+
+==================================================
+MULTI TENANCY
+==================================================
+
+Every report must display only data belonging to the logged-in business.
+
+Filter every query using business_id.
+
+Ensure compatibility with Supabase Row Level Security.
+
+==================================================
+REPORTS
+==================================================
+
+Implement the existing report tabs:
+
+1. Invoice Analytics
+2. Payment Analytics
+3. Customer Sales
+4. GST Summary
+5. Top Products
+6. Monthly Revenue
+7. Outstanding
+
+==================================================
+INVOICE ANALYTICS
+==================================================
+
+Calculate:
+
+- Total Invoiced
+- Paid Amount
+- Outstanding Amount
+- Average Invoice Value
+- Invoice Count
+- Paid vs Unpaid
+- Monthly Invoice Trend
+
+==================================================
+PAYMENT ANALYTICS
+==================================================
+
+Calculate:
+
+- Total Payments
+- Payment Methods
+- Collection Trend
+- Average Collection Time
+- Daily Collections
+- Monthly Collections
+
+==================================================
+CUSTOMER SALES
+==================================================
+
+Display:
+
+- Top Customers
+- Revenue per Customer
+- Invoice Count
+- Outstanding Balance
+- Last Purchase Date
+
+==================================================
+GST SUMMARY
+==================================================
+
+Calculate:
+
+- CGST
+- SGST
+- IGST
+- Taxable Amount
+- GST Collected
+- GST by Tax Slab
+- Monthly GST Summary
+
+==================================================
+TOP PRODUCTS
+==================================================
+
+Calculate:
+
+- Best Selling Products
+- Quantity Sold
+- Revenue Generated
+- Average Selling Price
+
+==================================================
+MONTHLY REVENUE
+==================================================
+
+Generate monthly revenue trends.
+
+Support:
+
+- Last 30 Days
+- Last 3 Months
+- Last 6 Months
+- Last Year
+
+==================================================
+OUTSTANDING REPORT
+==================================================
+
+Display:
+
+- Unpaid Invoices
+- Partially Paid Invoices
+- Overdue Invoices
+- Customer Outstanding
+- Total Outstanding
+
+==================================================
+FILTERS
+==================================================
+
+Support:
+
+- Date Range
+- Customer
+- Product
+- Invoice Status
+- Payment Status
+- GST Type
+
+==================================================
+EXPORT
+==================================================
+
+Connect existing buttons:
+
+- PDF
+- Excel
+- CSV
+- JSON
+- Print
+
+Export the currently filtered report.
+
+==================================================
+CHARTS
+==================================================
+
+Replace dummy charts using live Supabase data.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Use:
+
+- React Query
+- Server-side aggregation where possible
+- Pagination
+- Caching
+- Loading Skeletons
+- Reusable Hooks
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle:
+
+- Network Errors
+- Database Errors
+- Permission Errors
+- Empty States
+
+==================================================
+IMPORTANT
+==================================================
+
+Keep the UI exactly the same.
+
+Replace every dummy value with live Supabase data.
+
+Do not redesign any component.
+
+Use efficient aggregate SQL queries instead of loading all records into the client whenever possible.

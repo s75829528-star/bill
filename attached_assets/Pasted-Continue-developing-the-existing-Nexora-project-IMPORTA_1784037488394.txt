@@ -1,0 +1,359 @@
+Continue developing the existing Nexora project.
+
+IMPORTANT
+
+- Continue using the existing GitHub repository.
+- DO NOT modify the Landing Page.
+- DO NOT modify Authentication.
+- DO NOT modify Business Setup Wizard.
+- DO NOT modify Dashboard.
+- DO NOT modify Billing.
+- DO NOT modify Inventory.
+- DO NOT modify CRM.
+- Maintain the existing premium white SaaS design system.
+- Preserve the current sidebar, typography, spacing, animations, cards, tables, and reusable components.
+
+==================================================
+OBJECTIVE
+==================================================
+
+Build a complete Finance & Accounting Module for the Nexora MVP.
+
+The module should feel similar to Zoho Books, QuickBooks, Xero, and FreshBooks while remaining simple for small and medium businesses.
+
+Use realistic mock data only.
+
+No backend.
+
+No Supabase.
+
+No APIs.
+
+==================================================
+FINANCE NAVIGATION
+==================================================
+
+Finance
+
+├── Overview
+├── Income
+├── Expenses
+├── Cashbook
+├── Bank Accounts
+├── Transactions
+├── GST Summary
+├── Profit & Loss
+├── Receivables
+├── Payables
+├── Finance Reports
+└── Finance Settings
+
+==================================================
+FINANCE DASHBOARD
+==================================================
+
+Create KPI cards:
+
+Today's Revenue
+
+Today's Expenses
+
+Net Profit
+
+Cash Balance
+
+Bank Balance
+
+Outstanding Receivables
+
+Outstanding Payables
+
+GST Collected
+
+GST Payable
+
+Charts
+
+Revenue Trend
+
+Expense Breakdown
+
+Cash Flow
+
+Monthly Profit
+
+Quick Actions
+
+Add Expense
+
+Record Income
+
+Transfer Money
+
+View Reports
+
+==================================================
+INCOME
+==================================================
+
+Professional income management.
+
+Fields
+
+Income Source
+
+Customer
+
+Reference
+
+Amount
+
+Date
+
+Category
+
+Payment Method
+
+Notes
+
+Features
+
+Search
+
+Filter
+
+Sort
+
+Export
+
+==================================================
+EXPENSES
+==================================================
+
+Professional expense management.
+
+Categories
+
+Rent
+
+Electricity
+
+Salary
+
+Fuel
+
+Office Supplies
+
+Marketing
+
+Internet
+
+Software
+
+Travel
+
+Maintenance
+
+Features
+
+Search
+
+Filter
+
+Export
+
+Receipt Placeholder
+
+==================================================
+CASHBOOK
+==================================================
+
+Daily cashbook.
+
+Opening Balance
+
+Cash In
+
+Cash Out
+
+Closing Balance
+
+Daily Summary
+
+==================================================
+BANK ACCOUNTS
+==================================================
+
+Account List
+
+Bank Name
+
+Account Number (masked)
+
+Current Balance
+
+Recent Transactions
+
+==================================================
+TRANSACTIONS
+==================================================
+
+Professional transaction table.
+
+Date
+
+Reference
+
+Type
+
+Amount
+
+Status
+
+Category
+
+Payment Method
+
+==================================================
+GST SUMMARY
+==================================================
+
+Show
+
+CGST
+
+SGST
+
+IGST
+
+Collected GST
+
+Payable GST
+
+Monthly GST Summary
+
+==================================================
+PROFIT & LOSS
+==================================================
+
+Revenue
+
+Expenses
+
+Gross Profit
+
+Net Profit
+
+Monthly Comparison
+
+==================================================
+RECEIVABLES
+==================================================
+
+Pending Customer Payments
+
+Due Dates
+
+Outstanding Amount
+
+==================================================
+PAYABLES
+==================================================
+
+Supplier Payments
+
+Upcoming Payments
+
+Outstanding Bills
+
+==================================================
+FINANCE REPORTS
+==================================================
+
+Income Report
+
+Expense Report
+
+Cash Flow Report
+
+Profit & Loss
+
+GST Report
+
+Receivables Report
+
+Payables Report
+
+==================================================
+SETTINGS
+==================================================
+
+Default Currency
+
+Financial Year
+
+Tax Preferences
+
+Invoice Number Format
+
+==================================================
+MOCK DATA
+==================================================
+
+Use realistic Indian business data.
+
+Generate realistic income, expenses, transactions, GST values, and balances.
+
+==================================================
+DESIGN
+==================================================
+
+Maintain the existing Nexora design.
+
+Premium white enterprise SaaS.
+
+Professional cards.
+
+Modern charts.
+
+Responsive.
+
+Beautiful tables.
+
+Smooth animations.
+
+Reusable React + TypeScript components.
+
+==================================================
+DO NOT BUILD
+==================================================
+
+Do NOT include
+
+Payroll
+
+Employee Salary Management
+
+AI
+
+Bank API Integration
+
+UPI Integration
+
+Payment Gateway
+
+Automation
+
+Backend
+
+Supabase
+
+==================================================
+IMPORTANT
+==================================================
+
+Everything should use mock data.
+
+The Finance module should integrate visually with Billing, Inventory, and CRM.
+
+It should feel like a production-ready commercial accounting system.
