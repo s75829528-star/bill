@@ -113,120 +113,140 @@ export async function getAuthorizedBusinessContext(
   const overdueScope = /\b(overdue|past due|late payment)\b/.test(query);
   const debtorScope = /\b(owe|owes|owed|debtor|receivable)\b/.test(query);
 
+  const dataRequests: Promise<void>[] = [];
+
   if (invoiceIntent) {
-    let invoiceQuery = supabase
-      .from("invoices")
-      .select(
-        "invoice_number,invoice_date,due_date,status,payment_status,amount_paid,currency,customer_id,invoice_items(quantity,unit_price,discount_percent,gst_percent)",
-        { count: "exact" },
-      )
-      .eq("business_id", profile.id)
-      .order("invoice_date", { ascending: false })
-      .limit(MAX_ROWS);
+    dataRequests.push(
+      (async () => {
+        let invoiceQuery = supabase
+          .from("invoices")
+          .select(
+            "invoice_number,invoice_date,due_date,status,payment_status,amount_paid,currency,customer_id,invoice_items(quantity,unit_price,discount_percent,gst_percent)",
+            { count: "exact" },
+          )
+          .eq("business_id", profile.id)
+          .order("invoice_date", { ascending: false })
+          .limit(MAX_ROWS);
 
-    if (dateScope) {
-      invoiceQuery = invoiceQuery.gte("invoice_date", `${currentDate.slice(0, 7)}-01`);
-    }
-    if (overdueScope) {
-      invoiceQuery = invoiceQuery
-        .lt("due_date", currentDate)
-        .neq("payment_status", "paid")
-        .neq("status", "cancelled");
-    }
+        if (dateScope) {
+          invoiceQuery = invoiceQuery.gte("invoice_date", `${currentDate.slice(0, 7)}-01`);
+        }
+        if (overdueScope) {
+          invoiceQuery = invoiceQuery
+            .lt("due_date", currentDate)
+            .neq("payment_status", "paid")
+            .neq("status", "cancelled");
+        }
 
-    const { data, error, count } = await invoiceQuery;
-    if (error) throw dataQueryError("invoices", error);
-    const invoices = ((data ?? []) as InvoiceRow[]).map((invoice) => {
-      const total = invoice.invoice_items.reduce((sum, item) => {
-        const gross = Number(item.quantity) * Number(item.unit_price);
-        const taxable = gross - gross * (Number(item.discount_percent) / 100);
-        return sum + taxable + taxable * (Number(item.gst_percent) / 100);
-      }, 0);
-      const totalRounded = Math.round(total);
-      return {
-        invoiceNumber: invoice.invoice_number,
-        invoiceDate: invoice.invoice_date,
-        dueDate: invoice.due_date,
-        status: invoice.status,
-        paymentStatus: invoice.payment_status,
-        total: totalRounded,
-        amountPaid: Number(invoice.amount_paid),
-        balanceDue: Math.max(0, totalRounded - Number(invoice.amount_paid)),
-        currency: invoice.currency || profile.currency,
-        customerId: debtorScope ? invoice.customer_id : undefined,
-      };
-    });
-    dataSources.invoices = {
-      matchedRecordCount: count ?? invoices.length,
-      recordsReturned: invoices.length,
-      truncated: (count ?? invoices.length) > invoices.length,
-      dateFilter: dateScope ? "month to date" : overdueScope ? "overdue only" : "all dates",
-      records: invoices,
-    };
+        const { data, error, count } = await invoiceQuery;
+        if (error) throw dataQueryError("invoices", error);
+        const invoices = ((data ?? []) as InvoiceRow[]).map((invoice) => {
+          const total = invoice.invoice_items.reduce((sum, item) => {
+            const gross = Number(item.quantity) * Number(item.unit_price);
+            const taxable = gross - gross * (Number(item.discount_percent) / 100);
+            return sum + taxable + taxable * (Number(item.gst_percent) / 100);
+          }, 0);
+          const totalRounded = Math.round(total);
+          return {
+            invoiceNumber: invoice.invoice_number,
+            invoiceDate: invoice.invoice_date,
+            dueDate: invoice.due_date,
+            status: invoice.status,
+            paymentStatus: invoice.payment_status,
+            total: totalRounded,
+            amountPaid: Number(invoice.amount_paid),
+            balanceDue: Math.max(0, totalRounded - Number(invoice.amount_paid)),
+            currency: invoice.currency || profile.currency,
+            customerId: debtorScope ? invoice.customer_id : undefined,
+          };
+        });
+        dataSources.invoices = {
+          matchedRecordCount: count ?? invoices.length,
+          recordsReturned: invoices.length,
+          truncated: (count ?? invoices.length) > invoices.length,
+          dateFilter: dateScope ? "month to date" : overdueScope ? "overdue only" : "all dates",
+          records: invoices,
+        };
+      })(),
+    );
   }
 
   if (productIntent) {
-    const { data, error, count } = await supabase
-      .from("products")
-      .select("name,sku,current_stock,minimum_stock,purchase_price,selling_price,unit,status", {
-        count: "exact",
-      })
-      .eq("business_id", profile.id)
-      .order("name")
-      .limit(MAX_ROWS);
-    if (error) throw dataQueryError("products", error);
-    const products = data ?? [];
-    const valuation = products.reduce(
-      (sum, row) => sum + Number(row.current_stock) * Number(row.purchase_price),
-      0,
+    dataRequests.push(
+      (async () => {
+        const { data, error, count } = await supabase
+          .from("products")
+          .select("name,sku,current_stock,minimum_stock,purchase_price,selling_price,unit,status", {
+            count: "exact",
+          })
+          .eq("business_id", profile.id)
+          .order("name")
+          .limit(MAX_ROWS);
+        if (error) throw dataQueryError("products", error);
+        const products = data ?? [];
+        const valuation = products.reduce(
+          (sum, row) => sum + Number(row.current_stock) * Number(row.purchase_price),
+          0,
+        );
+        dataSources.inventory = {
+          matchedProductCount: count ?? products.length,
+          recordsReturned: products.length,
+          truncated: (count ?? products.length) > products.length,
+          valuationOfReturnedProducts: valuation,
+          valuationIsPartial: (count ?? products.length) > products.length,
+          products,
+        };
+      })(),
     );
-    dataSources.inventory = {
-      matchedProductCount: count ?? products.length,
-      recordsReturned: products.length,
-      truncated: (count ?? products.length) > products.length,
-      valuationOfReturnedProducts: valuation,
-      valuationIsPartial: (count ?? products.length) > products.length,
-      products,
-    };
   }
 
   if (customerIntent) {
-    const customerQuery = debtorScope
-      ? supabase
-          .from("customers")
-          .select("id,name,opening_balance,status", { count: "exact" })
-          .eq("business_id", profile.id)
-          .order("name")
-          .limit(MAX_ROWS)
-      : supabase
-          .from("customers")
-          .select("id", { count: "exact", head: true })
-          .eq("business_id", profile.id);
-    const { data, error, count } = await customerQuery;
-    if (error) throw dataQueryError("customers", error);
-    dataSources.customers = {
-      matchedCustomerCount: count ?? data?.length ?? 0,
-      ...(debtorScope
-        ? {
-            recordsReturned: data?.length ?? 0,
-            truncated: (count ?? data?.length ?? 0) > (data?.length ?? 0),
-            records: data ?? [],
-          }
-        : {}),
-    };
+    dataRequests.push(
+      (async () => {
+        const customerQuery = debtorScope
+          ? supabase
+              .from("customers")
+              .select("id,name,opening_balance,status", { count: "exact" })
+              .eq("business_id", profile.id)
+              .order("name")
+              .limit(MAX_ROWS)
+          : supabase
+              .from("customers")
+              .select("id", { count: "exact", head: true })
+              .eq("business_id", profile.id);
+        const { data, error, count } = await customerQuery;
+        if (error) throw dataQueryError("customers", error);
+        dataSources.customers = {
+          matchedCustomerCount: count ?? data?.length ?? 0,
+          ...(debtorScope
+            ? {
+                recordsReturned: data?.length ?? 0,
+                truncated: (count ?? data?.length ?? 0) > (data?.length ?? 0),
+                records: data ?? [],
+              }
+            : {}),
+        };
+      })(),
+    );
   }
 
   if (movementIntent && productIntent) {
-    const { data, error } = await supabase
-      .from("inventory_movements")
-      .select("movement_type,quantity,created_at,reason")
-      .eq("business_id", profile.id)
-      .gte("created_at", `${currentDate}T00:00:00`)
-      .order("created_at", { ascending: false })
-      .limit(MAX_ROWS);
-    if (error) throw dataQueryError("inventory activity", error);
-    dataSources.inventoryActivityToday = data ?? [];
+    dataRequests.push(
+      (async () => {
+        const { data, error } = await supabase
+          .from("inventory_movements")
+          .select("movement_type,quantity,created_at,reason")
+          .eq("business_id", profile.id)
+          .gte("created_at", `${currentDate}T00:00:00`)
+          .order("created_at", { ascending: false })
+          .limit(MAX_ROWS);
+        if (error) throw dataQueryError("inventory activity", error);
+        dataSources.inventoryActivityToday = data ?? [];
+      })(),
+    );
   }
+
+  await Promise.all(dataRequests);
 
   if (Object.keys(dataSources).length === 0) {
     dataSources.note = "No supported business data category matched this request.";

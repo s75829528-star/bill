@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -14,17 +14,63 @@ import {
   Settings,
 } from "lucide-react";
 
-import { ExecutiveDashboardTab } from "../../../components/reports/tabs/ExecutiveDashboardTab";
-import { SalesReportsTab } from "../../../components/reports/tabs/SalesReportsTab";
-import { BillingReportsTab } from "../../../components/reports/tabs/BillingReportsTab";
-import { InventoryReportsTab } from "../../../components/reports/tabs/InventoryReportsTab";
-import { CrmReportsTab } from "../../../components/reports/tabs/CrmReportsTab";
-import { FinanceReportsTab } from "../../../components/reports/tabs/FinanceReportsTab";
-import { GstReportsTab } from "../../../components/reports/tabs/GstReportsTab";
-import { CustomerReportsTab } from "../../../components/reports/tabs/CustomerReportsTab";
-import { ProductReportsTab } from "../../../components/reports/tabs/ProductReportsTab";
-import { ExportCenterTab } from "../../../components/reports/tabs/ExportCenterTab";
-import { ReportSettingsTab } from "../../../components/reports/tabs/ReportSettingsTab";
+import { ModuleTabFallback } from "../../../components/ModuleTabFallback";
+
+const ExecutiveDashboardTab = lazy(() =>
+  import("../../../components/reports/tabs/ExecutiveDashboardTab").then((module) => ({
+    default: module.ExecutiveDashboardTab,
+  })),
+);
+const SalesReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/SalesReportsTab").then((module) => ({
+    default: module.SalesReportsTab,
+  })),
+);
+const BillingReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/BillingReportsTab").then((module) => ({
+    default: module.BillingReportsTab,
+  })),
+);
+const InventoryReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/InventoryReportsTab").then((module) => ({
+    default: module.InventoryReportsTab,
+  })),
+);
+const CrmReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/CrmReportsTab").then((module) => ({
+    default: module.CrmReportsTab,
+  })),
+);
+const FinanceReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/FinanceReportsTab").then((module) => ({
+    default: module.FinanceReportsTab,
+  })),
+);
+const GstReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/GstReportsTab").then((module) => ({
+    default: module.GstReportsTab,
+  })),
+);
+const CustomerReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/CustomerReportsTab").then((module) => ({
+    default: module.CustomerReportsTab,
+  })),
+);
+const ProductReportsTab = lazy(() =>
+  import("../../../components/reports/tabs/ProductReportsTab").then((module) => ({
+    default: module.ProductReportsTab,
+  })),
+);
+const ExportCenterTab = lazy(() =>
+  import("../../../components/reports/tabs/ExportCenterTab").then((module) => ({
+    default: module.ExportCenterTab,
+  })),
+);
+const ReportSettingsTab = lazy(() =>
+  import("../../../components/reports/tabs/ReportSettingsTab").then((module) => ({
+    default: module.ReportSettingsTab,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated/_app/reports")({
   component: ReportsPage,
@@ -105,19 +151,21 @@ function ReportsPage() {
         </div>
 
         {/* Active tab content */}
-        <div>
-          {activeTab === "executive" && <ExecutiveDashboardTab />}
-          {activeTab === "sales" && <SalesReportsTab />}
-          {activeTab === "billing" && <BillingReportsTab />}
-          {activeTab === "inventory" && <InventoryReportsTab />}
-          {activeTab === "crm" && <CrmReportsTab />}
-          {activeTab === "finance" && <FinanceReportsTab />}
-          {activeTab === "gst" && <GstReportsTab />}
-          {activeTab === "customer" && <CustomerReportsTab />}
-          {activeTab === "product" && <ProductReportsTab />}
-          {activeTab === "export" && <ExportCenterTab />}
-          {activeTab === "settings" && <ReportSettingsTab />}
-        </div>
+        <Suspense fallback={<ModuleTabFallback />}>
+          <div>
+            {activeTab === "executive" && <ExecutiveDashboardTab />}
+            {activeTab === "sales" && <SalesReportsTab />}
+            {activeTab === "billing" && <BillingReportsTab />}
+            {activeTab === "inventory" && <InventoryReportsTab />}
+            {activeTab === "crm" && <CrmReportsTab />}
+            {activeTab === "finance" && <FinanceReportsTab />}
+            {activeTab === "gst" && <GstReportsTab />}
+            {activeTab === "customer" && <CustomerReportsTab />}
+            {activeTab === "product" && <ProductReportsTab />}
+            {activeTab === "export" && <ExportCenterTab />}
+            {activeTab === "settings" && <ReportSettingsTab />}
+          </div>
+        </Suspense>
       </div>
     </div>
   );

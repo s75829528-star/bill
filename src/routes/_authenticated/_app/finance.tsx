@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   LayoutGrid,
   TrendingUp,
@@ -15,18 +15,68 @@ import {
   Receipt,
 } from "lucide-react";
 
-import { OverviewTab }      from "../../../components/finance/tabs/OverviewTab";
-import { IncomeTab }        from "../../../components/finance/tabs/IncomeTab";
-import { ExpensesTab }      from "../../../components/finance/tabs/ExpensesTab";
-import { CashbookTab }      from "../../../components/finance/tabs/CashbookTab";
-import { BankAccountsTab }  from "../../../components/finance/tabs/BankAccountsTab";
-import { TransactionsTab }  from "../../../components/finance/tabs/TransactionsTab";
-import { GSTSummaryTab }    from "../../../components/finance/tabs/GSTSummaryTab";
-import { ProfitLossTab }    from "../../../components/finance/tabs/ProfitLossTab";
-import { ReceivablesTab }   from "../../../components/finance/tabs/ReceivablesTab";
-import { PayablesTab }      from "../../../components/finance/tabs/PayablesTab";
-import { ReportsTab }       from "../../../components/finance/tabs/ReportsTab";
-import { FinanceSettingsTab } from "../../../components/finance/tabs/FinanceSettingsTab";
+import { ModuleTabFallback } from "../../../components/ModuleTabFallback";
+
+const OverviewTab = lazy(() =>
+  import("../../../components/finance/tabs/OverviewTab").then((module) => ({
+    default: module.OverviewTab,
+  })),
+);
+const IncomeTab = lazy(() =>
+  import("../../../components/finance/tabs/IncomeTab").then((module) => ({
+    default: module.IncomeTab,
+  })),
+);
+const ExpensesTab = lazy(() =>
+  import("../../../components/finance/tabs/ExpensesTab").then((module) => ({
+    default: module.ExpensesTab,
+  })),
+);
+const CashbookTab = lazy(() =>
+  import("../../../components/finance/tabs/CashbookTab").then((module) => ({
+    default: module.CashbookTab,
+  })),
+);
+const BankAccountsTab = lazy(() =>
+  import("../../../components/finance/tabs/BankAccountsTab").then((module) => ({
+    default: module.BankAccountsTab,
+  })),
+);
+const TransactionsTab = lazy(() =>
+  import("../../../components/finance/tabs/TransactionsTab").then((module) => ({
+    default: module.TransactionsTab,
+  })),
+);
+const GSTSummaryTab = lazy(() =>
+  import("../../../components/finance/tabs/GSTSummaryTab").then((module) => ({
+    default: module.GSTSummaryTab,
+  })),
+);
+const ProfitLossTab = lazy(() =>
+  import("../../../components/finance/tabs/ProfitLossTab").then((module) => ({
+    default: module.ProfitLossTab,
+  })),
+);
+const ReceivablesTab = lazy(() =>
+  import("../../../components/finance/tabs/ReceivablesTab").then((module) => ({
+    default: module.ReceivablesTab,
+  })),
+);
+const PayablesTab = lazy(() =>
+  import("../../../components/finance/tabs/PayablesTab").then((module) => ({
+    default: module.PayablesTab,
+  })),
+);
+const ReportsTab = lazy(() =>
+  import("../../../components/finance/tabs/ReportsTab").then((module) => ({
+    default: module.ReportsTab,
+  })),
+);
+const FinanceSettingsTab = lazy(() =>
+  import("../../../components/finance/tabs/FinanceSettingsTab").then((module) => ({
+    default: module.FinanceSettingsTab,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated/_app/finance")({
   component: FinancePage,
@@ -120,20 +170,24 @@ function FinancePage() {
         </div>
 
         {/* Active tab content */}
-        <div>
-          {activeTab === "overview"      && <OverviewTab onNavigate={(id) => setActiveTab(id as TabId)} />}
-          {activeTab === "income"        && <IncomeTab />}
-          {activeTab === "expenses"      && <ExpensesTab />}
-          {activeTab === "cashbook"      && <CashbookTab />}
-          {activeTab === "bank-accounts" && <BankAccountsTab />}
-          {activeTab === "transactions"  && <TransactionsTab />}
-          {activeTab === "gst-summary"   && <GSTSummaryTab />}
-          {activeTab === "profit-loss"   && <ProfitLossTab />}
-          {activeTab === "receivables"   && <ReceivablesTab />}
-          {activeTab === "payables"      && <PayablesTab />}
-          {activeTab === "reports"       && <ReportsTab />}
-          {activeTab === "settings"      && <FinanceSettingsTab />}
-        </div>
+        <Suspense fallback={<ModuleTabFallback />}>
+          <div>
+            {activeTab === "overview" && (
+              <OverviewTab onNavigate={(id) => setActiveTab(id as TabId)} />
+            )}
+            {activeTab === "income" && <IncomeTab />}
+            {activeTab === "expenses" && <ExpensesTab />}
+            {activeTab === "cashbook" && <CashbookTab />}
+            {activeTab === "bank-accounts" && <BankAccountsTab />}
+            {activeTab === "transactions" && <TransactionsTab />}
+            {activeTab === "gst-summary" && <GSTSummaryTab />}
+            {activeTab === "profit-loss" && <ProfitLossTab />}
+            {activeTab === "receivables" && <ReceivablesTab />}
+            {activeTab === "payables" && <PayablesTab />}
+            {activeTab === "reports" && <ReportsTab />}
+            {activeTab === "settings" && <FinanceSettingsTab />}
+          </div>
+        </Suspense>
       </div>
     </div>
   );

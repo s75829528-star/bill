@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import {
   LayoutGrid,
   FileText,
@@ -14,16 +14,58 @@ import {
   Keyboard,
 } from "lucide-react";
 
-import { OverviewTab } from "../../../components/billing/tabs/OverviewTab";
-import { InvoicesTab } from "../../../components/billing/tabs/InvoicesTab";
-import { QuotationsTab } from "../../../components/billing/tabs/QuotationsTab";
-import { CreditNotesTab } from "../../../components/billing/tabs/CreditNotesTab";
-import { RecurringTab } from "../../../components/billing/tabs/RecurringTab";
-import { PaymentsTab } from "../../../components/billing/tabs/PaymentsTab";
-import { TemplatesTab } from "../../../components/billing/tabs/TemplatesTab";
-import { SettingsTab } from "../../../components/billing/tabs/SettingsTab";
-import { ReportsTab } from "../../../components/billing/tabs/ReportsTab";
-import { DocumentsTab } from "../../../components/billing/tabs/DocumentsTab";
+import { ModuleTabFallback } from "../../../components/ModuleTabFallback";
+
+const OverviewTab = lazy(() =>
+  import("../../../components/billing/tabs/OverviewTab").then((module) => ({
+    default: module.OverviewTab,
+  })),
+);
+const InvoicesTab = lazy(() =>
+  import("../../../components/billing/tabs/InvoicesTab").then((module) => ({
+    default: module.InvoicesTab,
+  })),
+);
+const QuotationsTab = lazy(() =>
+  import("../../../components/billing/tabs/QuotationsTab").then((module) => ({
+    default: module.QuotationsTab,
+  })),
+);
+const CreditNotesTab = lazy(() =>
+  import("../../../components/billing/tabs/CreditNotesTab").then((module) => ({
+    default: module.CreditNotesTab,
+  })),
+);
+const RecurringTab = lazy(() =>
+  import("../../../components/billing/tabs/RecurringTab").then((module) => ({
+    default: module.RecurringTab,
+  })),
+);
+const PaymentsTab = lazy(() =>
+  import("../../../components/billing/tabs/PaymentsTab").then((module) => ({
+    default: module.PaymentsTab,
+  })),
+);
+const TemplatesTab = lazy(() =>
+  import("../../../components/billing/tabs/TemplatesTab").then((module) => ({
+    default: module.TemplatesTab,
+  })),
+);
+const SettingsTab = lazy(() =>
+  import("../../../components/billing/tabs/SettingsTab").then((module) => ({
+    default: module.SettingsTab,
+  })),
+);
+const ReportsTab = lazy(() =>
+  import("../../../components/billing/tabs/ReportsTab").then((module) => ({
+    default: module.ReportsTab,
+  })),
+);
+const DocumentsTab = lazy(() =>
+  import("../../../components/billing/tabs/DocumentsTab").then((module) => ({
+    default: module.DocumentsTab,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated/_app/billing")({
   component: BillingPage,
@@ -150,22 +192,24 @@ function BillingPage() {
         </div>
 
         {/* Active tab content */}
-        <div>
-          {activeTab === "overview" && (
-            <OverviewTab onNavigate={(id) => setActiveTab(id as TabId)} />
-          )}
-          {activeTab === "invoices" && <InvoicesTab />}
-          {activeTab === "quotations" && <QuotationsTab />}
-          {activeTab === "credit-notes" && <CreditNotesTab />}
-          {activeTab === "recurring" && <RecurringTab />}
-          {activeTab === "payments" && <PaymentsTab />}
-          {activeTab === "reports" && <ReportsTab />}
-          {activeTab === "documents" && (
-            <DocumentsTab onNavigate={(id) => setActiveTab(id as TabId)} />
-          )}
-          {activeTab === "templates" && <TemplatesTab />}
-          {activeTab === "settings" && <SettingsTab />}
-        </div>
+        <Suspense fallback={<ModuleTabFallback />}>
+          <div>
+            {activeTab === "overview" && (
+              <OverviewTab onNavigate={(id) => setActiveTab(id as TabId)} />
+            )}
+            {activeTab === "invoices" && <InvoicesTab />}
+            {activeTab === "quotations" && <QuotationsTab />}
+            {activeTab === "credit-notes" && <CreditNotesTab />}
+            {activeTab === "recurring" && <RecurringTab />}
+            {activeTab === "payments" && <PaymentsTab />}
+            {activeTab === "reports" && <ReportsTab />}
+            {activeTab === "documents" && (
+              <DocumentsTab onNavigate={(id) => setActiveTab(id as TabId)} />
+            )}
+            {activeTab === "templates" && <TemplatesTab />}
+            {activeTab === "settings" && <SettingsTab />}
+          </div>
+        </Suspense>
       </div>
     </div>
   );

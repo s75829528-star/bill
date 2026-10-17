@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -21,7 +21,10 @@ import {
 import { toast } from "sonner";
 import type { ChatMessage } from "../../services/aiConversations";
 import type { CopilotAction, KeyMetric, SupportingRecord } from "../../services/ai-assistant";
-import { AssistantChart } from "./AssistantChart";
+
+const AssistantChart = lazy(() =>
+  import("./AssistantChart").then((module) => ({ default: module.AssistantChart })),
+);
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -199,7 +202,19 @@ export function ChatMessageItem({
           )}
 
           {/* Interactive Recharts Visual */}
-          {structured?.chart && <AssistantChart chart={structured.chart} />}
+          {structured?.chart && (
+            <Suspense
+              fallback={
+                <div
+                  aria-label="Loading chart"
+                  aria-busy="true"
+                  className="h-72 animate-pulse rounded-xl bg-slate-100"
+                />
+              }
+            >
+              <AssistantChart chart={structured.chart} />
+            </Suspense>
+          )}
 
           {/* Derivation Details (Accordion / Expandable) */}
           {structured?.derivation && (

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { lazy, Suspense, useState, useRef, useEffect, useMemo } from "react";
 import {
   LayoutGrid,
   Package,
@@ -27,21 +27,83 @@ import {
 } from "@/hooks/useProductsQuery";
 import type { DbProduct, DbCategory, DbSupplier } from "@/services/products";
 
-import { OverviewTab } from "../../../components/inventory/tabs/OverviewTab";
-import { ProductsTab } from "../../../components/inventory/tabs/ProductsTab";
-import { CategoriesTab } from "../../../components/inventory/tabs/CategoriesTab";
-import { BrandsTab } from "../../../components/inventory/tabs/BrandsTab";
-import { UnitsTab } from "../../../components/inventory/tabs/UnitsTab";
-import { SuppliersTab } from "../../../components/inventory/tabs/SuppliersTab";
-import { PurchaseOrdersTab } from "../../../components/inventory/tabs/PurchaseOrdersTab";
-import { PurchaseBillsTab } from "../../../components/inventory/tabs/PurchaseBillsTab";
-import { StockInTab } from "../../../components/inventory/tabs/StockInTab";
-import { StockOutTab } from "../../../components/inventory/tabs/StockOutTab";
-import { StockAdjustmentsTab } from "../../../components/inventory/tabs/StockAdjustmentsTab";
-import { LowStockTab } from "../../../components/inventory/tabs/LowStockTab";
-import { BarcodeTab } from "../../../components/inventory/tabs/BarcodeTab";
-import { ReportsTab } from "../../../components/inventory/tabs/ReportsTab";
-import { SettingsTab } from "../../../components/inventory/tabs/SettingsTab";
+import { ModuleTabFallback } from "../../../components/ModuleTabFallback";
+
+const OverviewTab = lazy(() =>
+  import("../../../components/inventory/tabs/OverviewTab").then((module) => ({
+    default: module.OverviewTab,
+  })),
+);
+const ProductsTab = lazy(() =>
+  import("../../../components/inventory/tabs/ProductsTab").then((module) => ({
+    default: module.ProductsTab,
+  })),
+);
+const CategoriesTab = lazy(() =>
+  import("../../../components/inventory/tabs/CategoriesTab").then((module) => ({
+    default: module.CategoriesTab,
+  })),
+);
+const BrandsTab = lazy(() =>
+  import("../../../components/inventory/tabs/BrandsTab").then((module) => ({
+    default: module.BrandsTab,
+  })),
+);
+const UnitsTab = lazy(() =>
+  import("../../../components/inventory/tabs/UnitsTab").then((module) => ({
+    default: module.UnitsTab,
+  })),
+);
+const SuppliersTab = lazy(() =>
+  import("../../../components/inventory/tabs/SuppliersTab").then((module) => ({
+    default: module.SuppliersTab,
+  })),
+);
+const PurchaseOrdersTab = lazy(() =>
+  import("../../../components/inventory/tabs/PurchaseOrdersTab").then((module) => ({
+    default: module.PurchaseOrdersTab,
+  })),
+);
+const PurchaseBillsTab = lazy(() =>
+  import("../../../components/inventory/tabs/PurchaseBillsTab").then((module) => ({
+    default: module.PurchaseBillsTab,
+  })),
+);
+const StockInTab = lazy(() =>
+  import("../../../components/inventory/tabs/StockInTab").then((module) => ({
+    default: module.StockInTab,
+  })),
+);
+const StockOutTab = lazy(() =>
+  import("../../../components/inventory/tabs/StockOutTab").then((module) => ({
+    default: module.StockOutTab,
+  })),
+);
+const StockAdjustmentsTab = lazy(() =>
+  import("../../../components/inventory/tabs/StockAdjustmentsTab").then((module) => ({
+    default: module.StockAdjustmentsTab,
+  })),
+);
+const LowStockTab = lazy(() =>
+  import("../../../components/inventory/tabs/LowStockTab").then((module) => ({
+    default: module.LowStockTab,
+  })),
+);
+const BarcodeTab = lazy(() =>
+  import("../../../components/inventory/tabs/BarcodeTab").then((module) => ({
+    default: module.BarcodeTab,
+  })),
+);
+const ReportsTab = lazy(() =>
+  import("../../../components/inventory/tabs/ReportsTab").then((module) => ({
+    default: module.ReportsTab,
+  })),
+);
+const SettingsTab = lazy(() =>
+  import("../../../components/inventory/tabs/SettingsTab").then((module) => ({
+    default: module.SettingsTab,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated/_app/inventory")({
   component: InventoryPage,
@@ -290,23 +352,29 @@ function InventoryPage() {
         </div>
 
         {/* Active tab content */}
-        <div>
-          {activeTab === "overview" && <OverviewTab onNavigate={(id) => setActiveTab(id as TabId)} />}
-          {activeTab === "products" && <ProductsTab />}
-          {activeTab === "categories" && <CategoriesTab />}
-          {activeTab === "brands" && <BrandsTab />}
-          {activeTab === "units" && <UnitsTab />}
-          {activeTab === "suppliers" && <SuppliersTab />}
-          {activeTab === "purchase-orders" && <PurchaseOrdersTab />}
-          {activeTab === "purchase-bills" && <PurchaseBillsTab />}
-          {activeTab === "stock-in" && <StockInTab />}
-          {activeTab === "stock-out" && <StockOutTab />}
-          {activeTab === "stock-adjustments" && <StockAdjustmentsTab />}
-          {activeTab === "low-stock" && <LowStockTab onCreatePO={() => setActiveTab("purchase-orders")} />}
-          {activeTab === "barcode" && <BarcodeTab />}
-          {activeTab === "reports" && <ReportsTab />}
-          {activeTab === "settings" && <SettingsTab />}
-        </div>
+        <Suspense fallback={<ModuleTabFallback />}>
+          <div>
+            {activeTab === "overview" && (
+              <OverviewTab onNavigate={(id) => setActiveTab(id as TabId)} />
+            )}
+            {activeTab === "products" && <ProductsTab />}
+            {activeTab === "categories" && <CategoriesTab />}
+            {activeTab === "brands" && <BrandsTab />}
+            {activeTab === "units" && <UnitsTab />}
+            {activeTab === "suppliers" && <SuppliersTab />}
+            {activeTab === "purchase-orders" && <PurchaseOrdersTab />}
+            {activeTab === "purchase-bills" && <PurchaseBillsTab />}
+            {activeTab === "stock-in" && <StockInTab />}
+            {activeTab === "stock-out" && <StockOutTab />}
+            {activeTab === "stock-adjustments" && <StockAdjustmentsTab />}
+            {activeTab === "low-stock" && (
+              <LowStockTab onCreatePO={() => setActiveTab("purchase-orders")} />
+            )}
+            {activeTab === "barcode" && <BarcodeTab />}
+            {activeTab === "reports" && <ReportsTab />}
+            {activeTab === "settings" && <SettingsTab />}
+          </div>
+        </Suspense>
       </div>
     </div>
   );

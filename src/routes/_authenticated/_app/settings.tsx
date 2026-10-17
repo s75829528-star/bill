@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   Building2,
   Palette,
@@ -17,20 +17,78 @@ import {
   Info,
 } from "lucide-react";
 
-import { BusinessProfileTab } from "../../../components/settings/tabs/BusinessProfileTab";
-import { BrandingTab } from "../../../components/settings/tabs/BrandingTab";
-import { UsersTab } from "../../../components/settings/tabs/UsersTab";
-import { RolesPermissionsTab } from "../../../components/settings/tabs/RolesPermissionsTab";
-import { TaxGSTTab } from "../../../components/settings/tabs/TaxGSTTab";
-import { InvoiceSettingsTab } from "../../../components/settings/tabs/InvoiceSettingsTab";
-import { ProductSettingsTab } from "../../../components/settings/tabs/ProductSettingsTab";
-import { CustomerSettingsTab } from "../../../components/settings/tabs/CustomerSettingsTab";
-import { FinancialSettingsTab } from "../../../components/settings/tabs/FinancialSettingsTab";
-import { NotificationsTab } from "../../../components/settings/tabs/NotificationsTab";
-import { SecurityTab } from "../../../components/settings/tabs/SecurityTab";
-import { BackupRestoreTab } from "../../../components/settings/tabs/BackupRestoreTab";
-import { PreferencesTab } from "../../../components/settings/tabs/PreferencesTab";
-import { AboutTab } from "../../../components/settings/tabs/AboutTab";
+import { ModuleTabFallback } from "../../../components/ModuleTabFallback";
+
+const BusinessProfileTab = lazy(() =>
+  import("../../../components/settings/tabs/BusinessProfileTab").then((module) => ({
+    default: module.BusinessProfileTab,
+  })),
+);
+const BrandingTab = lazy(() =>
+  import("../../../components/settings/tabs/BrandingTab").then((module) => ({
+    default: module.BrandingTab,
+  })),
+);
+const UsersTab = lazy(() =>
+  import("../../../components/settings/tabs/UsersTab").then((module) => ({
+    default: module.UsersTab,
+  })),
+);
+const RolesPermissionsTab = lazy(() =>
+  import("../../../components/settings/tabs/RolesPermissionsTab").then((module) => ({
+    default: module.RolesPermissionsTab,
+  })),
+);
+const TaxGSTTab = lazy(() =>
+  import("../../../components/settings/tabs/TaxGSTTab").then((module) => ({
+    default: module.TaxGSTTab,
+  })),
+);
+const InvoiceSettingsTab = lazy(() =>
+  import("../../../components/settings/tabs/InvoiceSettingsTab").then((module) => ({
+    default: module.InvoiceSettingsTab,
+  })),
+);
+const ProductSettingsTab = lazy(() =>
+  import("../../../components/settings/tabs/ProductSettingsTab").then((module) => ({
+    default: module.ProductSettingsTab,
+  })),
+);
+const CustomerSettingsTab = lazy(() =>
+  import("../../../components/settings/tabs/CustomerSettingsTab").then((module) => ({
+    default: module.CustomerSettingsTab,
+  })),
+);
+const FinancialSettingsTab = lazy(() =>
+  import("../../../components/settings/tabs/FinancialSettingsTab").then((module) => ({
+    default: module.FinancialSettingsTab,
+  })),
+);
+const NotificationsTab = lazy(() =>
+  import("../../../components/settings/tabs/NotificationsTab").then((module) => ({
+    default: module.NotificationsTab,
+  })),
+);
+const SecurityTab = lazy(() =>
+  import("../../../components/settings/tabs/SecurityTab").then((module) => ({
+    default: module.SecurityTab,
+  })),
+);
+const BackupRestoreTab = lazy(() =>
+  import("../../../components/settings/tabs/BackupRestoreTab").then((module) => ({
+    default: module.BackupRestoreTab,
+  })),
+);
+const PreferencesTab = lazy(() =>
+  import("../../../components/settings/tabs/PreferencesTab").then((module) => ({
+    default: module.PreferencesTab,
+  })),
+);
+const AboutTab = lazy(() =>
+  import("../../../components/settings/tabs/AboutTab").then((module) => ({
+    default: module.AboutTab,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated/_app/settings")({
   component: SettingsPage,
@@ -139,20 +197,22 @@ function SettingsPage() {
               <activeItem.icon className="h-4 w-4 text-muted-foreground" />
               <p className="text-sm font-semibold text-foreground">{activeItem.label}</p>
             </div>
-            {activeTab === "business-profile" && <BusinessProfileTab />}
-            {activeTab === "branding" && <BrandingTab />}
-            {activeTab === "users" && <UsersTab />}
-            {activeTab === "roles-permissions" && <RolesPermissionsTab />}
-            {activeTab === "tax-gst" && <TaxGSTTab />}
-            {activeTab === "invoice-settings" && <InvoiceSettingsTab />}
-            {activeTab === "product-settings" && <ProductSettingsTab />}
-            {activeTab === "customer-settings" && <CustomerSettingsTab />}
-            {activeTab === "financial-settings" && <FinancialSettingsTab />}
-            {activeTab === "notifications" && <NotificationsTab />}
-            {activeTab === "security" && <SecurityTab />}
-            {activeTab === "backup-restore" && <BackupRestoreTab />}
-            {activeTab === "preferences" && <PreferencesTab />}
-            {activeTab === "about" && <AboutTab />}
+            <Suspense fallback={<ModuleTabFallback />}>
+              {activeTab === "business-profile" && <BusinessProfileTab />}
+              {activeTab === "branding" && <BrandingTab />}
+              {activeTab === "users" && <UsersTab />}
+              {activeTab === "roles-permissions" && <RolesPermissionsTab />}
+              {activeTab === "tax-gst" && <TaxGSTTab />}
+              {activeTab === "invoice-settings" && <InvoiceSettingsTab />}
+              {activeTab === "product-settings" && <ProductSettingsTab />}
+              {activeTab === "customer-settings" && <CustomerSettingsTab />}
+              {activeTab === "financial-settings" && <FinancialSettingsTab />}
+              {activeTab === "notifications" && <NotificationsTab />}
+              {activeTab === "security" && <SecurityTab />}
+              {activeTab === "backup-restore" && <BackupRestoreTab />}
+              {activeTab === "preferences" && <PreferencesTab />}
+              {activeTab === "about" && <AboutTab />}
+            </Suspense>
           </div>
         </div>
       </div>

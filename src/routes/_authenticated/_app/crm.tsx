@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   LayoutGrid,
   Users,
@@ -12,15 +12,53 @@ import {
   Settings,
 } from "lucide-react";
 
-import { OverviewTab } from "../../../components/crm/tabs/OverviewTab";
-import { CustomersTab } from "../../../components/crm/tabs/CustomersTab";
-import { CustomerProfile } from "../../../components/crm/tabs/CustomerProfile";
-import { CustomerGroupsTab } from "../../../components/crm/tabs/CustomerGroupsTab";
-import { LeadsTab } from "../../../components/crm/tabs/LeadsTab";
-import { FollowUpsTab } from "../../../components/crm/tabs/FollowUpsTab";
-import { ActivitiesTab } from "../../../components/crm/tabs/ActivitiesTab";
-import { CustomerReportsTab } from "../../../components/crm/tabs/CustomerReportsTab";
-import { CrmSettingsTab } from "../../../components/crm/tabs/CrmSettingsTab";
+import { ModuleTabFallback } from "../../../components/ModuleTabFallback";
+
+const OverviewTab = lazy(() =>
+  import("../../../components/crm/tabs/OverviewTab").then((module) => ({
+    default: module.OverviewTab,
+  })),
+);
+const CustomersTab = lazy(() =>
+  import("../../../components/crm/tabs/CustomersTab").then((module) => ({
+    default: module.CustomersTab,
+  })),
+);
+const CustomerProfile = lazy(() =>
+  import("../../../components/crm/tabs/CustomerProfile").then((module) => ({
+    default: module.CustomerProfile,
+  })),
+);
+const CustomerGroupsTab = lazy(() =>
+  import("../../../components/crm/tabs/CustomerGroupsTab").then((module) => ({
+    default: module.CustomerGroupsTab,
+  })),
+);
+const LeadsTab = lazy(() =>
+  import("../../../components/crm/tabs/LeadsTab").then((module) => ({
+    default: module.LeadsTab,
+  })),
+);
+const FollowUpsTab = lazy(() =>
+  import("../../../components/crm/tabs/FollowUpsTab").then((module) => ({
+    default: module.FollowUpsTab,
+  })),
+);
+const ActivitiesTab = lazy(() =>
+  import("../../../components/crm/tabs/ActivitiesTab").then((module) => ({
+    default: module.ActivitiesTab,
+  })),
+);
+const CustomerReportsTab = lazy(() =>
+  import("../../../components/crm/tabs/CustomerReportsTab").then((module) => ({
+    default: module.CustomerReportsTab,
+  })),
+);
+const CrmSettingsTab = lazy(() =>
+  import("../../../components/crm/tabs/CrmSettingsTab").then((module) => ({
+    default: module.CrmSettingsTab,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated/_app/crm")({
   component: CrmPage,
@@ -128,26 +166,24 @@ function CrmPage() {
         </div>
 
         {/* Active tab content */}
-        <div>
-          {activeTab === "overview" && (
-            <OverviewTab onNavigate={handleNavigate} />
-          )}
-          {activeTab === "customers" && (
-            <CustomersTab onViewCustomer={handleViewCustomer} />
-          )}
-          {activeTab === "customer-profile" && selectedCustomerId && (
-            <CustomerProfile
-              customerId={selectedCustomerId}
-              onBack={handleBackFromProfile}
-            />
-          )}
-          {activeTab === "groups" && <CustomerGroupsTab />}
-          {activeTab === "leads" && <LeadsTab />}
-          {activeTab === "follow-ups" && <FollowUpsTab />}
-          {activeTab === "activities" && <ActivitiesTab />}
-          {activeTab === "reports" && <CustomerReportsTab />}
-          {activeTab === "settings" && <CrmSettingsTab />}
-        </div>
+        <Suspense fallback={<ModuleTabFallback />}>
+          <div>
+            {activeTab === "overview" && <OverviewTab onNavigate={handleNavigate} />}
+            {activeTab === "customers" && <CustomersTab onViewCustomer={handleViewCustomer} />}
+            {activeTab === "customer-profile" && selectedCustomerId && (
+              <CustomerProfile
+                customerId={selectedCustomerId}
+                onBack={handleBackFromProfile}
+              />
+            )}
+            {activeTab === "groups" && <CustomerGroupsTab />}
+            {activeTab === "leads" && <LeadsTab />}
+            {activeTab === "follow-ups" && <FollowUpsTab />}
+            {activeTab === "activities" && <ActivitiesTab />}
+            {activeTab === "reports" && <CustomerReportsTab />}
+            {activeTab === "settings" && <CrmSettingsTab />}
+          </div>
+        </Suspense>
       </div>
     </div>
   );
