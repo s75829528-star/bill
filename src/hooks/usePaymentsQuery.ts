@@ -23,6 +23,8 @@ export function usePayments(businessId: string | null) {
     queryFn: () => paymentsService.getAll(businessId!),
     enabled: !!businessId,
     staleTime: 1000 * 30,
+    refetchInterval: 1000 * 30,
+    refetchIntervalInBackground: false,
   });
 }
 

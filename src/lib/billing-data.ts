@@ -5,6 +5,8 @@
 // so invoice line items can be built from the same catalog.
 
 import { products, type Product } from "@/lib/inventory-data";
+import { computeDocumentTotals } from "./invoice-math";
+export { computeLineItem, computeDocumentTotals, invoiceGrandTotal, invoiceBalance } from "./invoice-math";
 
 export type InvoiceStatus = "draft" | "sent" | "paid" | "partial" | "overdue" | "cancelled";
 export type PaymentMode = "cash" | "upi" | "card" | "bank-transfer" | "neft" | "rtgs" | "credit" | "wallet" | "cheque";
@@ -1185,46 +1187,6 @@ export function fmtDate(d: string) {
     month: "short",
     year: "numeric",
   });
-}
-
-/** Line-item computed amounts: taxable value, discount, gst amount, line total. */
-export function computeLineItem(item: InvoiceItem) {
-  const gross = item.quantity * item.unitPrice;
-  const discountAmount = gross * (item.discountPercent / 100);
-  const taxable = gross - discountAmount;
-  const gstAmount = taxable * (item.gstPercent / 100);
-  const total = taxable + gstAmount;
-  return { gross, discountAmount, taxable, gstAmount, total };
-}
-
-/** Full document totals for an invoice/quotation, splitting GST into CGST/SGST or IGST. */
-export function computeDocumentTotals(items: InvoiceItem[], isInterState: boolean) {
-  let subtotal = 0;
-  let totalDiscount = 0;
-  let totalGst = 0;
-  for (const item of items) {
-    const { gross, discountAmount, gstAmount } = computeLineItem(item);
-    subtotal += gross;
-    totalDiscount += discountAmount;
-    totalGst += gstAmount;
-  }
-  const taxableValue = subtotal - totalDiscount;
-  const cgst = isInterState ? 0 : totalGst / 2;
-  const sgst = isInterState ? 0 : totalGst / 2;
-  const igst = isInterState ? totalGst : 0;
-  const cess = 0;
-  const preRoundTotal = taxableValue + totalGst + cess;
-  const grandTotal = Math.round(preRoundTotal);
-  const roundOff = grandTotal - preRoundTotal;
-  return { subtotal, totalDiscount, taxableValue, cgst, sgst, igst, cess, roundOff, grandTotal };
-}
-
-export function invoiceGrandTotal(invoice: Invoice) {
-  return computeDocumentTotals(invoice.items, invoice.isInterState).grandTotal;
-}
-
-export function invoiceBalance(invoice: Invoice) {
-  return invoiceGrandTotal(invoice) - invoice.amountPaid;
 }
 
 export function quotationTotal(quotation: Quotation) {

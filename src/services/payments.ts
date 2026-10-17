@@ -44,6 +44,8 @@ export type DbPaymentUpdate = Partial<
   Omit<DbPayment, "id" | "business_id" | "created_at" | "updated_at">
 >;
 
+const QUERY_PAGE_SIZE = 500;
+
 // ── Invoice balance helper ─────────────────────────────────────────
 
 async function getInvoiceBalance(
@@ -141,17 +143,25 @@ function dbToPayment(row: DbPaymentJoined): PaymentTxn {
 export const paymentsService = {
   /** Fetch all payments for a business (most recent first). */
   async getAll(businessId: string): Promise<PaymentTxn[]> {
-    const { data, error } = await supabase
-      .from("payments")
-      .select(`
-        *,
-        invoices(invoice_number),
-        customers(name, city)
-      `)
-      .eq("business_id", businessId)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return ((data ?? []) as DbPaymentJoined[]).map(dbToPayment);
+    const rows: DbPaymentJoined[] = [];
+    for (let from = 0; ; from += QUERY_PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from("payments")
+        .select(`
+          *,
+          invoices(invoice_number),
+          customers(name, city)
+        `)
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: true })
+        .range(from, from + QUERY_PAGE_SIZE - 1);
+      if (error) throw error;
+      const page = (data ?? []) as DbPaymentJoined[];
+      rows.push(...page);
+      if (page.length < QUERY_PAGE_SIZE) break;
+    }
+    return rows.map(dbToPayment);
   },
 
   /** Record a new payment and update the linked invoice balance. */

@@ -24,6 +24,8 @@ export function useInvoices(businessId: string | null) {
     queryFn: () => invoicesService.getAll(businessId!),
     enabled: !!businessId,
     staleTime: 1000 * 30, // 30 s
+    refetchInterval: 1000 * 30,
+    refetchIntervalInBackground: false,
   });
 }
 

@@ -1,6 +1,8 @@
 import { lazy, Suspense, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import ReactMarkdown, { type Components } from "react-markdown";
 import { motion, useReducedMotion } from "framer-motion";
+import remarkGfm from "remark-gfm";
 import {
   Sparkles,
   Copy,
@@ -21,6 +23,177 @@ import {
 import { toast } from "sonner";
 import type { ChatMessage } from "../../services/aiConversations";
 import type { CopilotAction, KeyMetric, SupportingRecord } from "../../services/ai-assistant";
+
+const markdownComponents: Components = {
+  h1: ({ children }) => (
+    <h2 className="mb-2 mt-4 text-base font-semibold leading-snug first:mt-0">{children}</h2>
+  ),
+  h2: ({ children }) => (
+    <h3 className="mb-2 mt-4 text-sm font-semibold leading-snug first:mt-0">{children}</h3>
+  ),
+  h3: ({ children }) => (
+    <h4 className="mb-1.5 mt-3 text-sm font-semibold leading-snug first:mt-0">{children}</h4>
+  ),
+  h4: ({ children }) => (
+    <h5 className="mb-1.5 mt-3 text-sm font-semibold leading-snug first:mt-0">{children}</h5>
+  ),
+  h5: ({ children }) => (
+    <h6 className="mb-1.5 mt-3 text-sm font-semibold leading-snug first:mt-0">{children}</h6>
+  ),
+  h6: ({ children }) => (
+    <h6 className="mb-1.5 mt-3 text-xs font-semibold leading-snug first:mt-0">{children}</h6>
+  ),
+  p: ({ children }) => <p className="my-2 leading-6 first:mt-0 last:mb-0">{children}</p>,
+  ul: ({ children }) => (
+    <ul className="my-2 list-disc space-y-1 pl-5 marker:text-[#6D5EF7]">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="my-2 list-decimal space-y-1 pl-5 marker:font-semibold">{children}</ol>
+  ),
+  li: ({ children }) => <li className="pl-0.5 leading-6">{children}</li>,
+  strong: ({ children }) => <strong className="font-semibold text-[#19172A]">{children}</strong>,
+  blockquote: ({ children }) => (
+    <blockquote className="my-3 border-l-2 border-[#6D5EF7]/40 pl-3 text-[#6B6880]">
+      {children}
+    </blockquote>
+  ),
+  hr: () => <hr className="my-4 border-0 border-t border-[#E7E2F3]" />,
+  a: ({ href, children }) => {
+    const safeHref = isSafeMarkdownHref(href) ? href : undefined;
+    if (!safeHref) return <span>{children}</span>;
+
+    const isExternal = /^https?:\/\//i.test(safeHref);
+    return (
+      <a
+        href={safeHref}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        className="font-medium text-[#5B4BE8] underline decoration-[#6D5EF7]/40 underline-offset-2 hover:decoration-[#6D5EF7]"
+      >
+        {children}
+      </a>
+    );
+  },
+  code: ({ children, className }) => (
+    <code
+      className={`${className || ""} rounded bg-[#F0ECFF] px-1 py-0.5 font-mono text-[0.9em] text-[#40358F]`}
+    >
+      {children}
+    </code>
+  ),
+  pre: ({ children }) => (
+    <pre className="my-3 max-w-full overflow-x-auto rounded-lg border border-[#E7E2F3] bg-[#F7F5FF] p-3 text-[0.85em] leading-5">
+      {children}
+    </pre>
+  ),
+  table: ({ children }) => (
+    <div className="my-3 max-w-full overflow-x-auto rounded-lg border border-[#E7E2F3]">
+      <table className="w-full min-w-[480px] border-collapse text-left text-xs">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="bg-[#F0ECFF] text-[#19172A]">{children}</thead>,
+  th: ({ children }) => (
+    <th scope="col" className="border-b border-[#E7E2F3] px-3 py-2 font-semibold">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="border-t border-[#E7E2F3]/70 px-3 py-2 align-top">{children}</td>
+  ),
+};
+
+function isSafeMarkdownHref(href?: string): boolean {
+  if (!href) return false;
+  const scheme = href.match(/^([a-z][a-z\d+.-]*):/i)?.[1]?.toLowerCase();
+  return !scheme || scheme === "http" || scheme === "https" || scheme === "mailto";
+}
+
+function normalizeEscapedEmphasis(text: string): string {
+  return text
+    .replace(/\\\*\\\*(.+?)\\\*\\\*/g, "**$1**")
+    .replace(/\\_\\_(.+?)\\_\\_/g, "__$1__")
+    .replace(/\\\*(.+?)\\\*/g, "*$1*");
+}
+
+function findClosingBacktickRun(line: string, start: number, length: number): number {
+  let index = line.indexOf("`", start);
+  while (index !== -1) {
+    let runEnd = index;
+    while (line[runEnd] === "`") runEnd += 1;
+    if (runEnd - index === length) return index;
+    index = line.indexOf("`", runEnd);
+  }
+  return -1;
+}
+
+function normalizeEscapedMarkdown(text: string): string {
+  let fenceCharacter = "";
+  let fenceLength = 0;
+  let inlineCodeLength = 0;
+
+  return text
+    .split("\n")
+    .map((line) => {
+      const fence = line.match(/^ {0,3}(`{3,}|~{3,})/);
+      if (fenceCharacter) {
+        if (
+          fence &&
+          fence[1][0] === fenceCharacter &&
+          fence[1].length >= fenceLength &&
+          /^[ \t]*$/.test(line.slice(fence[0].length))
+        ) {
+          fenceCharacter = "";
+          fenceLength = 0;
+        }
+        return line;
+      }
+      if (fence) {
+        fenceCharacter = fence[1][0];
+        fenceLength = fence[1].length;
+        inlineCodeLength = 0;
+        return line;
+      }
+
+      let normalizedLine = "";
+      let cursor = 0;
+      while (cursor < line.length) {
+        if (inlineCodeLength) {
+          const closingIndex = findClosingBacktickRun(line, cursor, inlineCodeLength);
+          if (closingIndex === -1) {
+            normalizedLine += line.slice(cursor);
+            break;
+          }
+          const closingEnd = closingIndex + inlineCodeLength;
+          normalizedLine += line.slice(cursor, closingEnd);
+          cursor = closingEnd;
+          inlineCodeLength = 0;
+          continue;
+        }
+
+        const openingIndex = line.indexOf("`", cursor);
+        if (openingIndex === -1) {
+          normalizedLine += normalizeEscapedEmphasis(line.slice(cursor));
+          break;
+        }
+        normalizedLine += normalizeEscapedEmphasis(line.slice(cursor, openingIndex));
+        let openingEnd = openingIndex;
+        while (line[openingEnd] === "`") openingEnd += 1;
+        inlineCodeLength = openingEnd - openingIndex;
+        normalizedLine += line.slice(openingIndex, openingEnd);
+        cursor = openingEnd;
+      }
+      return normalizedLine;
+    })
+    .join("\n");
+}
+
+function ChatMarkdown({ content }: { content: string }) {
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      {normalizeEscapedMarkdown(content)}
+    </ReactMarkdown>
+  );
+}
 
 const AssistantChart = lazy(() =>
   import("./AssistantChart").then((module) => ({ default: module.AssistantChart })),
@@ -80,21 +253,6 @@ export function ChatMessageItem({
   const handleShare = () => {
     handleCopy();
     toast.info("Insight ready to share");
-  };
-
-  // Safe formatting for markdown bold tokens
-  const renderFormattedText = (text: string) => {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, index) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
-        return (
-          <strong key={index} className="font-semibold text-[#19172A]">
-            {part.slice(2, -2)}
-          </strong>
-        );
-      }
-      return part;
-    });
   };
 
   if (isUser) {
@@ -161,8 +319,8 @@ export function ChatMessageItem({
           </div>
 
           {/* Concise Direct Answer Card */}
-          <div className="rounded-xl border border-[#E7E2F3] bg-[#FFFFFF] p-4 text-xs sm:text-sm leading-relaxed text-[#19172A]">
-            {structured ? renderFormattedText(structured.conciseAnswer) : message.content}
+          <div className="rounded-xl border border-[#E7E2F3] bg-[#FFFFFF] p-4 text-xs text-[#19172A] sm:text-sm">
+            <ChatMarkdown content={structured ? structured.conciseAnswer : message.content} />
           </div>
 
           {/* Key Metrics Bento Grid */}
@@ -359,7 +517,9 @@ export function ChatMessageItem({
                     className="flex items-start gap-2 text-xs text-[#19172A] leading-relaxed"
                   >
                     <span className="text-[#6D5EF7] font-bold">•</span>
-                    <span>{renderFormattedText(rec)}</span>
+                    <div className="min-w-0 flex-1">
+                      <ChatMarkdown content={rec} />
+                    </div>
                   </div>
                 ))}
               </div>

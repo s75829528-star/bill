@@ -69,6 +69,8 @@ export type DbInvoiceInsert = Omit<DbInvoice, "id" | "created_at" | "updated_at"
 export type DbInvoiceUpdate = Partial<Omit<DbInvoice, "id" | "business_id" | "created_at" | "updated_at">>;
 export type DbInvoiceItemInsert = Omit<DbInvoiceItem, "id" | "created_at">;
 
+const QUERY_PAGE_SIZE = 500;
+
 // ── Adapters ──────────────────────────────────────────────────────
 
 /** Map a DB invoice row (with embedded items) to the UI Invoice type. */
@@ -145,13 +147,21 @@ export const invoicesService = {
    * with their invoice_items embedded.
    */
   async getAll(businessId: string): Promise<Invoice[]> {
-    const { data, error } = await supabase
-      .from("invoices")
-      .select("*, invoice_items(*)")
-      .eq("business_id", businessId)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return ((data ?? []) as DbInvoiceWithItems[]).map(dbToInvoice);
+    const rows: DbInvoiceWithItems[] = [];
+    for (let from = 0; ; from += QUERY_PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("*, invoice_items(*)")
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: true })
+        .range(from, from + QUERY_PAGE_SIZE - 1);
+      if (error) throw error;
+      const page = (data ?? []) as DbInvoiceWithItems[];
+      rows.push(...page);
+      if (page.length < QUERY_PAGE_SIZE) break;
+    }
+    return rows.map(dbToInvoice);
   },
 
   /**

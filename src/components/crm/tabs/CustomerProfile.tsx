@@ -26,7 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fmtINR, fmtDate } from "@/lib/crm-data";
 import {
   SectionCard,
   CrmStatusPill,
@@ -35,7 +34,12 @@ import {
   SecondaryButton,
 } from "@/components/crm/shared";
 import { useCustomerById, useCustomerNotes, useAddCustomerNote } from "@/hooks/useCustomersQuery";
+import { useInvoices } from "@/hooks/useInvoicesQuery";
+import { usePayments } from "@/hooks/usePaymentsQuery";
 import { useBusiness } from "@/contexts/BusinessContext";
+import { invoiceBalance, invoiceGrandTotal } from "@/lib/billing-data";
+import { buildCustomerAnalytics, formatCrmCurrency, formatCrmDate } from "@/lib/crm-analytics";
+import { toast } from "sonner";
 
 // ── Field display helper ──────────────────────────────────────────
 
@@ -91,11 +95,22 @@ export function CustomerProfile({
   customerId: string;
   onBack: () => void;
 }) {
-  const { business } = useBusiness();
+  const { business, businessLoading, businessError } = useBusiness();
+  const businessId = business?.id ?? null;
 
-  const { data: customer, isLoading, error } = useCustomerById(customerId);
-  const { data: dbNotes = [], isLoading: notesLoading } = useCustomerNotes(customerId);
+  const { data: customer, isLoading: customerLoading, error: customerError } = useCustomerById(customerId);
+  const {
+    data: dbNotes = [],
+    isLoading: notesLoading,
+    error: notesError,
+    refetch: refetchNotes,
+  } = useCustomerNotes(customerId);
+  const invoicesQuery = useInvoices(businessId);
+  const paymentsQuery = usePayments(businessId);
   const addNoteMutation = useAddCustomerNote(customerId);
+  const isLoading = businessLoading || customerLoading || invoicesQuery.isLoading || paymentsQuery.isLoading;
+  const error = businessError || customerError || invoicesQuery.error || paymentsQuery.error;
+  const currency = business?.currency ?? "INR";
 
   const [tab, setTab] = useState<ProfileTab>("overview");
   const [noteInput, setNoteInput] = useState("");
@@ -117,7 +132,7 @@ export function CustomerProfile({
         </button>
         <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          Failed to load customer: {(error as Error).message}
+          Failed to load customer: {error instanceof Error ? error.message : error}
         </div>
       </div>
     );
@@ -152,15 +167,52 @@ export function CustomerProfile({
     date: n.created_at.slice(0, 10),
   }));
 
-  const totalOutstanding = customer.opening_balance;
-  const creditRemaining = Math.max(0, customer.credit_limit - customer.opening_balance);
+  const customerInvoices = (invoicesQuery.data ?? []).filter((invoice) => invoice.customerId === customer.id);
+  const customerPayments = (paymentsQuery.data ?? []).filter((payment) => payment.customerId === customer.id);
+  const customerMetrics = buildCustomerAnalytics([customer], invoicesQuery.data ?? [])[0];
+  const totalOutstanding = customerMetrics.outstandingAmount;
+  const creditRemaining = Math.max(0, customer.credit_limit - totalOutstanding);
+  const invoiceOutstanding = customerInvoices.reduce(
+    (sum, invoice) => sum + Math.max(0, invoiceBalance(invoice)),
+    0,
+  );
+  const pendingInvoices = customerInvoices.filter((invoice) => invoiceBalance(invoice) > 0);
+  const activityItems = [
+    { id: `customer-created-${customer.id}`, title: "Customer profile created", detail: customer.customer_code, date: customer.created_at },
+    ...(customer.updated_at > customer.created_at
+      ? [{ id: `customer-updated-${customer.id}`, title: "Customer profile updated", detail: customer.customer_code, date: customer.updated_at }]
+      : []),
+    ...customerInvoices.map((invoice) => ({
+      id: `invoice-${invoice.id}`,
+      title: `Invoice ${invoice.invoiceNumber}`,
+      detail: `${invoice.status} · ${formatCrmCurrency(invoiceGrandTotal(invoice), currency)}`,
+      date: invoice.createdDate,
+    })),
+    ...customerPayments.map((payment) => ({
+      id: `payment-${payment.id}`,
+      title: `Payment ${payment.paymentNumber}`,
+      detail: `${payment.status} · ${formatCrmCurrency(payment.amount, currency)}`,
+      date: payment.date,
+    })),
+    ...displayNotes.map((note) => ({
+      id: `note-${note.id}`,
+      title: "Customer note added",
+      detail: note.text,
+      date: note.date,
+    })),
+  ].sort((a, b) => b.date.localeCompare(a.date));
 
   async function addNote() {
     const text = noteInput.trim();
     if (!text) return;
     const authorName = business?.owner_name ?? "You";
-    await addNoteMutation.mutateAsync({ text, author: authorName });
-    setNoteInput("");
+    try {
+      await addNoteMutation.mutateAsync({ text, author: authorName });
+      setNoteInput("");
+      toast.success("Customer note added");
+    } catch (noteError) {
+      toast.error(noteError instanceof Error ? noteError.message : "Failed to add customer note.");
+    }
   }
 
   const tabs: { key: ProfileTab; label: string }[] = [
@@ -228,7 +280,9 @@ export function CustomerProfile({
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 text-center">
             <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
               <p className="text-xs text-muted-foreground">Total Revenue</p>
-              <p className="mt-0.5 text-sm font-bold text-foreground">—</p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">
+                {formatCrmCurrency(customerMetrics.totalRevenue, currency)}
+              </p>
             </div>
             <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
               <p className="text-xs text-muted-foreground">Outstanding</p>
@@ -237,13 +291,13 @@ export function CustomerProfile({
                   customer.opening_balance > 0 ? "text-red-600" : "text-emerald-600"
                 }`}
               >
-                {customer.opening_balance > 0 ? fmtINR(customer.opening_balance) : "Nil"}
+                {totalOutstanding > 0 ? formatCrmCurrency(totalOutstanding, currency) : "Nil"}
               </p>
             </div>
             <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
               <p className="text-xs text-muted-foreground">Credit Limit</p>
               <p className="mt-0.5 text-sm font-bold text-foreground">
-                {fmtINR(customer.credit_limit)}
+                {formatCrmCurrency(customer.credit_limit, currency)}
               </p>
             </div>
             <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
@@ -283,8 +337,8 @@ export function CustomerProfile({
               <Field label="Contact Person" value={customer.contact_person} />
               <Field label="Customer Code" value={customer.customer_code} />
               <Field label="Group" value={customer.customer_group} />
-              <Field label="Created Date" value={fmtDate(customer.created_at.slice(0, 10))} />
-              <Field label="Last Updated" value={fmtDate(customer.updated_at.slice(0, 10))} />
+              <Field label="Created Date" value={formatCrmDate(customer.created_at)} />
+              <Field label="Last Updated" value={formatCrmDate(customer.updated_at)} />
             </div>
           </SectionCard>
 
@@ -315,10 +369,10 @@ export function CustomerProfile({
             action={<CreditCard className="h-4 w-4 text-muted-foreground" />}
           >
             <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-              <Field label="Credit Limit" value={fmtINR(customer.credit_limit)} />
+              <Field label="Credit Limit" value={formatCrmCurrency(customer.credit_limit, currency)} />
               <Field label="Credit Days" value={`${customer.credit_days} days`} />
-              <Field label="Opening Balance" value={fmtINR(customer.opening_balance)} />
-              <Field label="Credit Available" value={fmtINR(creditRemaining)} />
+              <Field label="Opening Balance" value={formatCrmCurrency(customer.opening_balance, currency)} />
+              <Field label="Credit Available" value={formatCrmCurrency(creditRemaining, currency)} />
             </div>
           </SectionCard>
 
@@ -344,46 +398,90 @@ export function CustomerProfile({
       {tab === "purchases" && (
         <SectionCard
           title="Purchase History"
-          subtitle="Invoice history will appear here once the Billing module is connected"
+          subtitle={`${customerInvoices.length} linked invoice${customerInvoices.length === 1 ? "" : "s"}`}
           action={<FileText className="h-4 w-4 text-muted-foreground" />}
         >
-          <EmptyState
-            icon={FileText}
-            title="No purchases yet"
-            subtitle="Purchase history from the Billing module will appear here."
-          />
+          {customerInvoices.length === 0 ? (
+            <EmptyState icon={FileText} title="No linked invoices" subtitle="Invoices appear here when their customer_id matches this customer." />
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice</TableHead>
+                    <TableHead>Invoice Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
+                    <TableHead className="text-right">Paid</TableHead>
+                    <TableHead className="text-right">Balance</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {customerInvoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
+                      <TableCell>{formatCrmDate(invoice.createdDate)}</TableCell>
+                      <TableCell><CrmStatusPill status={invoice.paymentStatus} /></TableCell>
+                      <TableCell className="text-right">{formatCrmCurrency(invoiceGrandTotal(invoice), currency)}</TableCell>
+                      <TableCell className="text-right">{formatCrmCurrency(invoice.amountPaid, currency)}</TableCell>
+                      <TableCell className="text-right">{formatCrmCurrency(Math.max(0, invoiceBalance(invoice)), currency)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </SectionCard>
       )}
 
       {/* ── Outstanding ── */}
       {tab === "outstanding" && (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-2xl border border-red-100 bg-red-50 p-5">
               <p className="text-xs text-red-600 font-semibold">Opening Balance</p>
-              <p className="mt-1 text-2xl font-bold text-red-700">
-                {fmtINR(totalOutstanding)}
-              </p>
+              <p className="mt-1 text-xl font-bold text-red-700">{formatCrmCurrency(customer.opening_balance, currency)}</p>
             </div>
             <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
-              <p className="text-xs text-amber-600 font-semibold">Credit Limit</p>
-              <p className="mt-1 text-2xl font-bold text-amber-700">
-                {fmtINR(customer.credit_limit)}
-              </p>
+              <p className="text-xs text-amber-600 font-semibold">Unpaid Invoices</p>
+              <p className="mt-1 text-xl font-bold text-amber-700">{formatCrmCurrency(invoiceOutstanding, currency)}</p>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
-              <p className="text-xs text-slate-600 font-semibold">Credit Remaining</p>
-              <p className="mt-1 text-2xl font-bold text-slate-700">
-                {fmtINR(creditRemaining)}
-              </p>
+              <p className="text-xs text-slate-600 font-semibold">Total Outstanding</p>
+              <p className="mt-1 text-xl font-bold text-slate-700">{formatCrmCurrency(totalOutstanding, currency)}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-100 bg-white p-5">
+              <p className="text-xs text-muted-foreground font-semibold">Credit Remaining</p>
+              <p className="mt-1 text-xl font-bold text-foreground">{formatCrmCurrency(creditRemaining, currency)}</p>
             </div>
           </div>
-          <SectionCard title="Pending / Overdue Payments" subtitle="Will populate once Billing is connected">
-            <EmptyState
-              icon={AlertCircle}
-              title="No outstanding payments"
-              subtitle="Invoice-level outstanding will appear here once the Billing module is connected."
-            />
+          <SectionCard title="Unpaid invoices" subtitle={`${pendingInvoices.length} invoice${pendingInvoices.length === 1 ? "" : "s"} with a remaining balance`}>
+            {pendingInvoices.length === 0 ? (
+              <EmptyState icon={AlertCircle} title="No unpaid invoices" subtitle="No linked invoices have an outstanding balance." />
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Invoice</TableHead>
+                      <TableHead>Due Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Remaining</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingInvoices.map((invoice) => (
+                      <TableRow key={invoice.id}>
+                        <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
+                        <TableCell>{formatCrmDate(invoice.dueDate)}</TableCell>
+                        <TableCell><CrmStatusPill status={invoice.paymentStatus} /></TableCell>
+                        <TableCell className="text-right font-semibold">{formatCrmCurrency(Math.max(0, invoiceBalance(invoice)), currency)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </SectionCard>
         </div>
       )}
@@ -419,6 +517,15 @@ export function CustomerProfile({
             </button>
           </div>
 
+          {notesError && (
+            <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              <span>{notesError instanceof Error ? notesError.message : "Customer notes could not be loaded."}</span>
+              <button onClick={() => void refetchNotes()} className="shrink-0 font-semibold underline">
+                Retry
+              </button>
+            </div>
+          )}
+
           {notesLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -446,7 +553,7 @@ export function CustomerProfile({
                 >
                   <p className="text-sm text-foreground">{note.text}</p>
                   <p className="mt-1.5 text-[11px] text-muted-foreground">
-                    {note.author} · {fmtDate(note.date)}
+                    {note.author} · {formatCrmDate(note.date)}
                   </p>
                 </motion.div>
               ))}
@@ -459,14 +566,29 @@ export function CustomerProfile({
       {tab === "activity" && (
         <SectionCard
           title="Activity Timeline"
-          subtitle="CRM events for this customer will appear here"
+          subtitle={`${activityItems.length} event${activityItems.length === 1 ? "" : "s"} derived from saved records`}
           action={<Activity className="h-4 w-4 text-muted-foreground" />}
         >
-          <EmptyState
-            icon={Activity}
-            title="No activity recorded"
-            subtitle="CRM events (invoices, payments, notes) for this customer will appear here as the platform grows."
-          />
+          {activityItems.length === 0 ? (
+            <EmptyState icon={Activity} title="No activity recorded" subtitle="Saved customer activity will appear here." />
+          ) : (
+            <div className="space-y-3">
+              {activityItems.map((item) => (
+                <div key={item.id} className="flex items-start gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                    <Activity className="h-4 w-4 text-slate-600" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                    <p className="truncate text-xs text-muted-foreground">{item.detail}</p>
+                  </div>
+                  <time className="shrink-0 text-[10px] text-muted-foreground">
+                    {formatCrmDate(item.date)}
+                  </time>
+                </div>
+              ))}
+            </div>
+          )}
         </SectionCard>
       )}
     </motion.div>

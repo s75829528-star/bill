@@ -17,6 +17,7 @@ export const customerKeys = {
   byBusiness: (businessId: string) => ["customers", businessId] as const,
   detail: (id: string) => ["customers", "detail", id] as const,
   notes: (customerId: string) => ["customer_notes", customerId] as const,
+  businessNotes: (businessId: string) => ["customer_notes", "business", businessId] as const,
 };
 
 // ── Fetch hooks ────────────────────────────────────────────────────
@@ -27,6 +28,8 @@ export function useCustomers(businessId: string | null) {
     queryFn: () => customersService.getAll(businessId!),
     enabled: !!businessId,
     staleTime: 1000 * 30, // 30 s
+    refetchInterval: 1000 * 30,
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -36,6 +39,8 @@ export function useCustomerById(customerId: string | null) {
     queryFn: () => customersService.getById(customerId!),
     enabled: !!customerId,
     staleTime: 1000 * 60, // 1 min
+    refetchInterval: 1000 * 30,
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -45,6 +50,19 @@ export function useCustomerNotes(customerId: string | null) {
     queryFn: () => customersService.getNotes(customerId!),
     enabled: !!customerId,
     staleTime: 1000 * 30,
+    refetchInterval: 1000 * 30,
+    refetchIntervalInBackground: false,
+  });
+}
+
+export function useCustomerNotesForBusiness(businessId: string | null) {
+  return useQuery({
+    queryKey: businessId ? customerKeys.businessNotes(businessId) : ["customer_notes", "business", "_none"],
+    queryFn: () => customersService.getAllNotesForBusiness(businessId!),
+    enabled: !!businessId,
+    staleTime: 1000 * 30,
+    refetchInterval: 1000 * 30,
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -112,6 +130,7 @@ export function useAddCustomerNote(customerId: string | null) {
       customersService.addNote(customerId!, text, author),
     onSuccess: () => {
       if (customerId) qc.invalidateQueries({ queryKey: customerKeys.notes(customerId) });
+      qc.invalidateQueries({ queryKey: ["customer_notes", "business"] });
     },
   });
 }

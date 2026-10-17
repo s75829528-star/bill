@@ -127,7 +127,7 @@ function CrmPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">CRM</h1>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              Customers, leads, follow-ups, and relationship management — built for Indian businesses.
+              Customer accounts, invoices, notes, and customer-linked activity for your business.
             </p>
           </div>
           {activeTab === "customer-profile" && selectedCustomerId && (

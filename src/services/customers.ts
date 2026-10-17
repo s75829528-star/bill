@@ -45,10 +45,16 @@ export interface DbCustomerNote {
   created_at: string;
 }
 
+export interface DbBusinessCustomerNote extends DbCustomerNote {
+  customer_name: string;
+}
+
 export type CustomerInsert = Omit<Customer, "id" | "created_at" | "updated_at">;
 export type CustomerUpdate = Partial<
   Omit<Customer, "id" | "business_id" | "created_at" | "updated_at">
 >;
+
+const QUERY_PAGE_SIZE = 500;
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -65,13 +71,21 @@ export const customersService = {
   // ── Customers ─────────────────────────────────────────────────
 
   async getAll(businessId: string): Promise<Customer[]> {
-    const { data, error } = await supabase
-      .from("customers")
-      .select("*")
-      .eq("business_id", businessId)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return (data ?? []) as Customer[];
+    const customers: Customer[] = [];
+    for (let from = 0; ; from += QUERY_PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: true })
+        .range(from, from + QUERY_PAGE_SIZE - 1);
+      if (error) throw error;
+      const page = (data ?? []) as Customer[];
+      customers.push(...page);
+      if (page.length < QUERY_PAGE_SIZE) break;
+    }
+    return customers;
   },
 
   async getById(id: string): Promise<Customer | null> {
@@ -87,12 +101,13 @@ export const customersService = {
   async create(payload: CustomerInsert): Promise<Customer> {
     // Duplicate email guard (within same business)
     if (payload.email) {
-      const { data: existing } = await supabase
+      const { data: existing, error: duplicateCheckError } = await supabase
         .from("customers")
         .select("id")
         .eq("business_id", payload.business_id)
         .eq("email", payload.email)
         .maybeSingle();
+      if (duplicateCheckError) throw duplicateCheckError;
       if (existing) throw new Error("A customer with this email already exists.");
     }
 
@@ -149,6 +164,32 @@ export const customersService = {
       .order("created_at", { ascending: false });
     if (error) throw error;
     return (data ?? []) as DbCustomerNote[];
+  },
+
+  async getAllNotesForBusiness(businessId: string): Promise<DbBusinessCustomerNote[]> {
+    const notes: DbBusinessCustomerNote[] = [];
+    for (let from = 0; ; from += QUERY_PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from("customer_notes")
+        .select("id, customer_id, text, author, created_at, customer:customers!inner(name, business_id)")
+        .eq("customer.business_id", businessId)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: true })
+        .range(from, from + QUERY_PAGE_SIZE - 1);
+      if (error) throw error;
+
+      const page = (data ?? []) as unknown as {
+        id: string;
+        customer_id: string;
+        text: string;
+        author: string;
+        created_at: string;
+        customer: { name: string };
+      }[];
+      notes.push(...page.map(({ customer, ...note }) => ({ ...note, customer_name: customer.name })));
+      if (page.length < QUERY_PAGE_SIZE) break;
+    }
+    return notes;
   },
 
   async addNote(

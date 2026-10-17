@@ -2,18 +2,22 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  TrendingUp, Users, AlertTriangle, Clock, Download, FileText, Printer, Search,
+  TrendingUp, Users, AlertTriangle, Download, FileText, Printer, Search, Target,
 } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, LineChart, Line, Legend,
 } from "recharts";
+import { useBusiness } from "@/contexts/BusinessContext";
+import { useCustomers } from "@/hooks/useCustomersQuery";
+import { useInvoices } from "@/hooks/useInvoicesQuery";
 import {
-  crmCustomers, leads,
-  fmtINR, fmtDate,
-  revenueByCustomer, monthlyAcquisition, leadConversionFunnel,
-  LEAD_STATUS_LABELS,
-} from "@/lib/crm-data";
+  buildCustomerAnalytics,
+  customerAcquisitionByMonth,
+  formatCompactCrmCurrency,
+  formatCrmCurrency,
+  formatCrmDate,
+} from "@/lib/crm-analytics";
 import {
   SectionCard, StatTile, EmptyState,
 } from "@/components/crm/shared";
@@ -82,14 +86,14 @@ function Td({ children, right, className = "" }: { children: React.ReactNode; ri
 }
 
 // ── Custom chart tooltips ──────────────────────────────────────────
-function ChartTip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string }) {
+function ChartTip({ active, payload, label, currency = "INR" }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string; currency?: string }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
       <p className="mb-1 text-xs font-semibold text-slate-500">{label}</p>
       {payload.map((p, i) => (
         <p key={i} className="text-sm font-bold text-foreground">
-          {typeof p.value === "number" && p.name.toLowerCase().includes("rev") ? fmtINR(p.value) : p.value}
+          {typeof p.value === "number" && p.name.toLowerCase().includes("rev") ? formatCrmCurrency(p.value, currency) : p.value}
           {" "}<span className="text-xs font-normal text-muted-foreground">{p.name}</span>
         </p>
       ))}
@@ -97,41 +101,91 @@ function ChartTip({ active, payload, label }: { active?: boolean; payload?: { va
   );
 }
 
-// ── Derived data (computed once at module level) ───────────────────
-const topCustomers = [...crmCustomers]
-  .sort((a, b) => b.totalRevenue - a.totalRevenue)
-  .slice(0, 10);
-
-const outstandingCustomers = [...crmCustomers]
-  .filter((c) => c.outstandingAmount > 0)
-  .sort((a, b) => b.outstandingAmount - a.outstandingAmount)
-  .slice(0, 10);
-
-const inactiveCustomers = [...crmCustomers]
-  .filter((c) => c.status === "inactive" || c.status === "at-risk")
-  .sort((a, b) => a.lastPurchase.localeCompare(b.lastPurchase))
-  .slice(0, 10);
-
-const revenueChartData = revenueByCustomer(15).map((r) => ({
-  name: r.name.length > 16 ? r.name.slice(0, 14) + "…" : r.name,
-  Revenue: r.revenue,
-}));
-
-const growthData = monthlyAcquisition();
-const funnelData = leadConversionFunnel();
+const EMPTY_RECORDS: never[] = [];
 
 // ── Main Component ─────────────────────────────────────────────────
 export function CustomerReportsTab() {
-  // Summary stats
-  const totalRevenue = crmCustomers.reduce((s, c) => s + c.totalRevenue, 0);
-  const totalOutstanding = crmCustomers.reduce((s, c) => s + c.outstandingAmount, 0);
-  const activeCount = crmCustomers.filter((c) => c.status === "active").length;
-  const wonLeads = leads.filter((l) => l.status === "won").length;
+  const { business, businessLoading, businessError } = useBusiness();
+  const businessId = business?.id ?? null;
+  const currency = business?.currency ?? "INR";
+  const customerQuery = useCustomers(businessId);
+  const invoiceQuery = useInvoices(businessId);
+  const customers = customerQuery.data ?? EMPTY_RECORDS;
+  const invoices = invoiceQuery.data ?? EMPTY_RECORDS;
+  const customerAnalytics = useMemo(
+    () => buildCustomerAnalytics(customers, invoices),
+    [customers, invoices],
+  );
+  const totalRevenue = customerAnalytics.reduce((sum, customer) => sum + customer.totalRevenue, 0);
+  const totalOutstanding = customerAnalytics.reduce((sum, customer) => sum + customer.outstandingAmount, 0);
+  const activeCount = customers.filter((customer) => customer.status === "active").length;
+  const billedCount = customerAnalytics.filter((customer) => customer.invoiceCount > 0).length;
+  const topCustomers = [...customerAnalytics]
+    .filter((customer) => customer.totalRevenue > 0)
+    .sort((a, b) => b.totalRevenue - a.totalRevenue)
+    .slice(0, 10);
+  const outstandingCustomers = [...customerAnalytics]
+    .filter((customer) => customer.outstandingAmount > 0)
+    .sort((a, b) => b.outstandingAmount - a.outstandingAmount)
+    .slice(0, 10);
+  const inactiveCustomers = [...customerAnalytics]
+    .filter((customer) => customer.status === "inactive" || customer.status === "at-risk")
+    .sort((a, b) => (a.lastPurchaseDate ?? "").localeCompare(b.lastPurchaseDate ?? ""))
+    .slice(0, 10);
+  const revenueChartData = customerAnalytics
+    .filter((customer) => customer.totalRevenue > 0)
+    .sort((a, b) => b.totalRevenue - a.totalRevenue)
+    .slice(0, 15)
+    .map((customer) => ({
+      name: (customer.company_name || customer.name).slice(0, 16),
+      Revenue: customer.totalRevenue,
+    }));
+  const growthData = useMemo(() => customerAcquisitionByMonth(customers), [customers]);
+  const isLoading = businessLoading || customerQuery.isLoading || invoiceQuery.isLoading;
+  const loadError = businessError || customerQuery.error || invoiceQuery.error;
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="h-24 animate-pulse rounded-xl border border-slate-200 bg-white" />
+        ))}
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <SectionCard title="Customer reports unavailable">
+        <p className="mb-3 text-sm text-muted-foreground">
+          {loadError instanceof Error ? loadError.message : loadError || "Customer report data could not be loaded."}
+        </p>
+        <button
+          onClick={() => void Promise.all([customerQuery.refetch(), invoiceQuery.refetch()])}
+          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium hover:bg-slate-50"
+        >
+          Retry
+        </button>
+      </SectionCard>
+    );
+  }
+
+  if (!businessId || customers.length === 0) {
+    return (
+      <SectionCard title="Customer reports">
+        <EmptyState
+          icon={Users}
+          title={businessId ? "No customer records yet" : "Business profile unavailable"}
+          subtitle={businessId ? "Reports will populate from customer-linked invoices as records are added." : "Complete business setup to load tenant-scoped records."}
+        />
+      </SectionCard>
+    );
+  }
 
   function exportTopCustomersCSV() {
     const csv = toCSV(
       ["Rank", "Customer", "Company", "City", "Group", "Status", "Total Revenue", "Outstanding"],
-      topCustomers.map((c, i) => [i + 1, c.name, c.company, c.city, c.group, c.status, c.totalRevenue, c.outstandingAmount])
+      topCustomers.map((c, i) => [i + 1, c.name, c.company_name ?? "", c.city ?? "", c.customer_group, c.status, c.totalRevenue, c.outstandingAmount])
     );
     downloadFile(csv, "top-customers.csv", "text/csv");
   }
@@ -139,7 +193,7 @@ export function CustomerReportsTab() {
   function exportOutstandingCSV() {
     const csv = toCSV(
       ["Customer", "Company", "City", "Status", "Outstanding Amount", "Credit Limit", "Last Purchase"],
-      outstandingCustomers.map((c) => [c.name, c.company, c.city, c.status, c.outstandingAmount, c.creditLimit, c.lastPurchase])
+      outstandingCustomers.map((c) => [c.name, c.company_name ?? "", c.city ?? "", c.status, c.outstandingAmount, c.credit_limit, c.lastPurchaseDate ?? ""])
     );
     downloadFile(csv, "outstanding-customers.csv", "text/csv");
   }
@@ -147,7 +201,7 @@ export function CustomerReportsTab() {
   function exportInactiveCSV() {
     const csv = toCSV(
       ["Customer", "Company", "City", "Status", "Last Purchase", "Total Revenue"],
-      inactiveCustomers.map((c) => [c.name, c.company, c.city, c.status, c.lastPurchase, c.totalRevenue])
+      inactiveCustomers.map((c) => [c.name, c.company_name ?? "", c.city ?? "", c.status, c.lastPurchaseDate ?? "", c.totalRevenue]),
     );
     downloadFile(csv, "inactive-customers.csv", "text/csv");
   }
@@ -156,10 +210,10 @@ export function CustomerReportsTab() {
     <div className="space-y-6">
       {/* Summary stat tiles */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatTile label="Total Revenue" value={fmtINR(totalRevenue)} icon={TrendingUp} bg="bg-blue-50" iconColor="text-blue-600" index={0} />
+        <StatTile label="Total Revenue" value={formatCrmCurrency(totalRevenue, currency)} icon={TrendingUp} bg="bg-blue-50" iconColor="text-blue-600" index={0} />
         <StatTile label="Active Customers" value={String(activeCount)} icon={Users} bg="bg-emerald-50" iconColor="text-emerald-600" index={1} />
-        <StatTile label="Outstanding" value={fmtINR(totalOutstanding)} icon={AlertTriangle} bg="bg-amber-50" iconColor="text-amber-600" index={2} />
-        <StatTile label="Leads Converted" value={String(wonLeads)} icon={Clock} bg="bg-violet-50" iconColor="text-violet-600" index={3} />
+        <StatTile label="Outstanding" value={formatCrmCurrency(totalOutstanding, currency)} icon={AlertTriangle} bg="bg-amber-50" iconColor="text-amber-600" index={2} />
+        <StatTile label="Customers with invoices" value={String(billedCount)} icon={TrendingUp} bg="bg-cyan-50" iconColor="text-cyan-600" index={3} />
       </div>
 
       {/* Revenue by Customer Bar Chart */}
@@ -168,22 +222,26 @@ export function CustomerReportsTab() {
         subtitle="Top 15 customers by total revenue"
         action={
           <button
-            onClick={() => downloadFile(toCSV(["Company", "Revenue"], revenueByCustomer(15).map((r) => [r.name, r.revenue])), "revenue-by-customer.csv", "text/csv")}
+            onClick={() => downloadFile(toCSV(["Customer", "Revenue"], revenueChartData.map((row) => [row.name, row.Revenue])), "revenue-by-customer.csv", "text/csv")}
             className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition-colors"
           >
             <Download className="h-3.5 w-3.5" /> CSV
           </button>
         }
       >
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={revenueChartData} margin={{ top: 4, right: 4, left: 0, bottom: 60 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} angle={-35} textAnchor="end" interval={0} />
-            <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v: number) => "₹" + (v / 100000).toFixed(0) + "L"} />
-            <Tooltip content={<ChartTip />} cursor={{ fill: "rgba(241,245,249,0.6)", radius: 6 }} />
-            <Bar dataKey="Revenue" fill="#6366f1" radius={[5, 5, 0, 0]} maxBarSize={32} />
-          </BarChart>
-        </ResponsiveContainer>
+        {revenueChartData.length ? (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={revenueChartData} margin={{ top: 4, right: 4, left: 0, bottom: 60 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} angle={-35} textAnchor="end" interval={0} />
+              <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v: number) => formatCompactCrmCurrency(v, currency)} />
+              <Tooltip content={<ChartTip currency={currency} />} cursor={{ fill: "rgba(241,245,249,0.6)", radius: 6 }} />
+              <Bar dataKey="Revenue" fill="#6366f1" radius={[5, 5, 0, 0]} maxBarSize={32} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyState icon={TrendingUp} title="No customer-linked invoices" subtitle="Revenue charts populate from invoices assigned to customers." />
+        )}
       </SectionCard>
 
       {/* Top Customers Table */}
@@ -208,6 +266,9 @@ export function CustomerReportsTab() {
               </tr>
             </thead>
             <tbody>
+              {topCustomers.length === 0 && (
+                <tr><td colSpan={7}><EmptyState icon={Search} title="No invoiced customers" subtitle="Customer revenue rankings require linked invoices." /></td></tr>
+              )}
               {topCustomers.map((c, i) => (
                 <motion.tr
                   key={c.id}
@@ -222,15 +283,15 @@ export function CustomerReportsTab() {
                     </span>
                   </Td>
                   <Td><span className="font-medium text-foreground whitespace-nowrap">{c.name}</span></Td>
-                  <Td><span className="text-xs text-muted-foreground">{c.company}</span></Td>
-                  <Td><span className="text-xs">{c.group}</span></Td>
+                  <Td><span className="text-xs text-muted-foreground">{c.company_name || "—"}</span></Td>
+                  <Td><span className="text-xs">{c.customer_group}</span></Td>
                   <Td>
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${c.status === "active" ? "bg-emerald-50 text-emerald-700" : c.status === "at-risk" ? "bg-red-50 text-red-700" : "bg-slate-100 text-slate-600"}`}>
                       {c.status}
                     </span>
                   </Td>
-                  <Td right className="text-emerald-700">{fmtINR(c.totalRevenue)}</Td>
-                  <Td right className={c.outstandingAmount > 0 ? "text-amber-700" : "text-slate-400"}>{fmtINR(c.outstandingAmount)}</Td>
+                  <Td right className="text-emerald-700">{formatCrmCurrency(c.totalRevenue, currency)}</Td>
+                  <Td right className={c.outstandingAmount > 0 ? "text-amber-700" : "text-slate-400"}>{formatCrmCurrency(c.outstandingAmount, currency)}</Td>
                 </motion.tr>
               ))}
             </tbody>
@@ -266,11 +327,11 @@ export function CustomerReportsTab() {
                   <motion.tr key={c.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="border-b border-slate-100 hover:bg-slate-50/60">
                     <Td>
                       <p className="font-medium text-foreground text-sm">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">{c.company}</p>
+                      <p className="text-xs text-muted-foreground">{c.company_name || "—"}</p>
                     </Td>
                     <Td><span className="text-xs text-muted-foreground">{c.city}</span></Td>
-                    <Td right className="text-amber-700">{fmtINR(c.outstandingAmount)}</Td>
-                    <Td right className="text-slate-500">{fmtINR(c.creditLimit)}</Td>
+                    <Td right className="text-amber-700">{formatCrmCurrency(c.outstandingAmount, currency)}</Td>
+                    <Td right className="text-slate-500">{formatCrmCurrency(c.credit_limit, currency)}</Td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -304,15 +365,15 @@ export function CustomerReportsTab() {
                   <motion.tr key={c.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="border-b border-slate-100 hover:bg-slate-50/60">
                     <Td>
                       <p className="font-medium text-foreground text-sm">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">{c.company}</p>
+                      <p className="text-xs text-muted-foreground">{c.company_name || "—"}</p>
                     </Td>
                     <Td>
                       <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${c.status === "at-risk" ? "bg-red-50 text-red-700" : "bg-slate-100 text-slate-600"}`}>
                         {c.status}
                       </span>
                     </Td>
-                    <Td><span className="text-xs text-muted-foreground">{fmtDate(c.lastPurchase)}</span></Td>
-                    <Td right className="text-foreground">{fmtINR(c.totalRevenue)}</Td>
+                    <Td><span className="text-xs text-muted-foreground">{formatCrmDate(c.lastPurchaseDate)}</span></Td>
+                    <Td right className="text-foreground">{formatCrmCurrency(c.totalRevenue, currency)}</Td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -341,50 +402,18 @@ export function CustomerReportsTab() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip content={<ChartTip />} />
+              <Tooltip content={<ChartTip currency={currency} />} />
               <Line type="monotone" dataKey="customers" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4, fill: "#6366f1", strokeWidth: 0 }} activeDot={{ r: 6, fill: "#6366f1", strokeWidth: 0 }} name="Customers" />
             </LineChart>
           </ResponsiveContainer>
         </SectionCard>
 
-        {/* Lead Conversion Funnel */}
-        <SectionCard
-          title="Lead Conversion Funnel"
-          subtitle="Lead count at each pipeline stage"
-          action={
-            <button
-              onClick={() => downloadFile(toCSV(["Stage", "Count"], funnelData.map((d) => [LEAD_STATUS_LABELS[d.stage], d.count])), "lead-funnel.csv", "text/csv")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition-colors"
-            >
-              <Download className="h-3.5 w-3.5" /> CSV
-            </button>
-          }
-        >
-          <div className="mt-2 space-y-3">
-            {funnelData.map((stage, i) => {
-              const maxCount = Math.max(...funnelData.map((s) => s.count), 1);
-              const pct = Math.round((stage.count / maxCount) * 100);
-              const colors = ["#6366f1", "#3b82f6", "#06b6d4", "#8b5cf6", "#f59e0b", "#10b981"];
-              const color = colors[i % colors.length];
-              return (
-                <div key={stage.stage} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-foreground">{LEAD_STATUS_LABELS[stage.stage]}</span>
-                    <span className="font-semibold text-foreground">{stage.count} leads</span>
-                  </div>
-                  <div className="h-2 w-full rounded-full bg-slate-100">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.5, delay: i * 0.08 }}
-                      className="h-2 rounded-full"
-                      style={{ backgroundColor: color }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <SectionCard title="Lead conversion" subtitle="Not available in the current database">
+          <EmptyState
+            icon={Target}
+            title="Lead records are not configured"
+            subtitle="No leads table exists in the current schema, so conversion totals are not shown."
+          />
         </SectionCard>
       </div>
     </div>

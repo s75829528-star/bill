@@ -1,6 +1,7 @@
 // ── Customers Tab — Supabase-backed ───────────────────────────────
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   Plus,
   Download,
@@ -30,7 +31,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { fmtINR, fmtDate, type CustomerStatus, type CustomerGroupName } from "@/lib/crm-data";
+import {
+  buildCustomerAnalytics,
+  formatCrmCurrency,
+  formatCrmDate,
+  type CustomerGroupName,
+  type CustomerStatus,
+  type CustomerAnalytics,
+} from "@/lib/crm-analytics";
 import {
   SectionCard,
   SearchInput,
@@ -53,6 +61,7 @@ import {
   useDeleteManyCustomers,
   useBulkUpdateCustomers,
 } from "@/hooks/useCustomersQuery";
+import { useInvoices } from "@/hooks/useInvoicesQuery";
 import {
   generateCustomerCode,
   type Customer,
@@ -91,7 +100,7 @@ interface UiCustomer {
 
 // ── DB ↔ UI adapters ──────────────────────────────────────────────
 
-function dbToUi(c: Customer): UiCustomer {
+function dbToUi(c: CustomerAnalytics): UiCustomer {
   return {
     id: c.id,
     customerCode: c.customer_code,
@@ -108,11 +117,11 @@ function dbToUi(c: Customer): UiCustomer {
     shippingAddress: c.shipping_address ?? "",
     group: (c.customer_group as CustomerGroupName) ?? "Retail",
     status: (c.status as CustomerStatus) ?? "active",
-    outstandingAmount: c.opening_balance,
+    outstandingAmount: c.outstandingAmount,
     creditLimit: c.credit_limit,
     creditDays: c.credit_days,
-    totalRevenue: 0,
-    lastPurchase: c.updated_at?.slice(0, 10) ?? c.created_at?.slice(0, 10) ?? "",
+    totalRevenue: c.totalRevenue,
+    lastPurchase: c.lastPurchaseDate ?? "",
     createdDate: c.created_at?.slice(0, 10) ?? "",
     rating: c.rating ?? 3,
   };
@@ -201,9 +210,6 @@ function downloadFile(content: string, filename: string, mime: string) {
 
 // ── Form types ────────────────────────────────────────────────────
 
-const GROUPS: CustomerGroupName[] = ["Retail", "Wholesale", "Corporate", "VIP", "Distributor", "Dealer"];
-const STATUSES: CustomerStatus[] = ["active", "inactive", "new", "at-risk"];
-
 type CustomerFormData = {
   name: string;
   company: string;
@@ -225,7 +231,7 @@ type CustomerFormData = {
 const EMPTY_FORM: CustomerFormData = {
   name: "", company: "", contactPerson: "", gstin: "", pan: "",
   phone: "", email: "", city: "", state: "", billingAddress: "", shippingAddress: "",
-  group: "Retail", creditLimit: 50000, creditDays: 30, status: "new",
+  group: "Retail", creditLimit: 0, creditDays: 30, status: "active",
 };
 
 // ── CustomerForm ──────────────────────────────────────────────────
@@ -235,6 +241,8 @@ type FormTab = "basic" | "address" | "business";
 function CustomerForm({
   initial,
   isEdit,
+  groups,
+  statuses,
   saving,
   serverError,
   onSave,
@@ -242,6 +250,8 @@ function CustomerForm({
 }: {
   initial: CustomerFormData;
   isEdit: boolean;
+  groups: CustomerGroupName[];
+  statuses: CustomerStatus[];
   saving: boolean;
   serverError: string;
   onSave: (data: CustomerFormData) => void;
@@ -389,8 +399,10 @@ function CustomerForm({
                 className={sel}
                 disabled={saving}
               >
-                {GROUPS.map((g) => (
-                  <option key={g} value={g}>{g}</option>
+                {groups.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
                 ))}
               </select>
             </div>
@@ -402,8 +414,10 @@ function CustomerForm({
                 className={sel}
                 disabled={saving}
               >
-                {STATUSES.map((s) => (
-                  <option key={s} value={s}>{s.replace(/-/g, " ")}</option>
+                {statuses.map((s) => (
+                  <option key={s} value={s}>
+                    {s.replace(/-/g, " ")}
+                  </option>
                 ))}
               </select>
             </div>
@@ -542,11 +556,15 @@ function BulkEditModal({
   open,
   onClose,
   count,
+  groups,
+  statuses,
   onApply,
 }: {
   open: boolean;
   onClose: () => void;
   count: number;
+  groups: CustomerGroupName[];
+  statuses: CustomerStatus[];
   onApply: (group: CustomerGroupName | "", status: CustomerStatus | "") => void;
 }) {
   const [group, setGroup] = useState<CustomerGroupName | "">("");
@@ -570,8 +588,10 @@ function BulkEditModal({
             className={sel}
           >
             <option value="">— No change —</option>
-            {GROUPS.map((g) => (
-              <option key={g} value={g}>{g}</option>
+            {groups.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
             ))}
           </select>
         </div>
@@ -585,8 +605,10 @@ function BulkEditModal({
             className={sel}
           >
             <option value="">— No change —</option>
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>{s.replace(/-/g, " ")}</option>
+            {statuses.map((s) => (
+              <option key={s} value={s}>
+                {s.replace(/-/g, " ")}
+              </option>
             ))}
           </select>
         </div>
@@ -648,12 +670,29 @@ function SkeletonRow() {
 // ── CustomersTab ──────────────────────────────────────────────────
 
 export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) => void }) {
-  const { business } = useBusiness();
+  const { business, businessLoading, businessError, refetchBusiness } = useBusiness();
   const businessId = business?.id ?? null;
+  const currency = business?.currency ?? "INR";
 
   // ── Server state ──────────────────────────────────────────────
-  const { data: dbCustomers = [], isLoading, error: loadError } = useCustomers(businessId);
-  const customers = useMemo(() => dbCustomers.map(dbToUi), [dbCustomers]);
+  const customersQuery = useCustomers(businessId);
+  const {
+    data: dbCustomers = [],
+    isLoading: customersLoading,
+    error: customersError,
+  } = customersQuery;
+  const invoicesQuery = useInvoices(businessId);
+  const {
+    data: invoices = [],
+    isLoading: invoicesLoading,
+    error: invoicesError,
+  } = invoicesQuery;
+  const isLoading = businessLoading || customersLoading || invoicesLoading;
+  const loadError = businessError ?? customersError ?? invoicesError;
+  const customers = useMemo(
+    () => buildCustomerAnalytics(dbCustomers, invoices).map(dbToUi),
+    [dbCustomers, invoices],
+  );
 
   const createMutation = useCreateCustomer(businessId);
   const updateMutation = useUpdateCustomer(businessId);
@@ -756,8 +795,10 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
     try {
       if (formMode === "create") {
         await createMutation.mutateAsync(formToInsert(businessId, data));
+        toast.success("Customer created");
       } else if (editingId) {
         await updateMutation.mutateAsync({ id: editingId, payload: formToUpdate(data) });
+        toast.success("Customer updated");
       }
       setFormOpen(false);
       setEditingId(null);
@@ -793,19 +834,29 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
   }
 
   async function handleDelete(id: string) {
-    await deleteMutation.mutateAsync(id);
-    setSelectedIds((prev) => {
-      const s = new Set(prev);
-      s.delete(id);
-      return s;
-    });
-    setDeleteId(null);
+    try {
+      await deleteMutation.mutateAsync(id);
+      setSelectedIds((prev) => {
+        const s = new Set(prev);
+        s.delete(id);
+        return s;
+      });
+      setDeleteId(null);
+      toast.success("Customer deleted");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete customer.");
+    }
   }
 
   async function handleBulkDelete() {
     const ids = [...selectedIds];
-    await deleteManyMutation.mutateAsync(ids);
-    setSelectedIds(new Set());
+    try {
+      await deleteManyMutation.mutateAsync(ids);
+      setSelectedIds(new Set());
+      toast.success(`${ids.length} customer${ids.length === 1 ? "" : "s"} deleted`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete customers.");
+    }
   }
 
   async function handleBulkEdit(group: CustomerGroupName | "", status: CustomerStatus | "") {
@@ -814,7 +865,13 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
     if (group) payload.customer_group = group;
     if (status) payload.status = status;
     if (Object.keys(payload).length > 0) {
-      await bulkUpdateMutation.mutateAsync({ ids, payload });
+      try {
+        await bulkUpdateMutation.mutateAsync({ ids, payload });
+        toast.success(`${ids.length} customer${ids.length === 1 ? "" : "s"} updated`);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to update customers.");
+        return;
+      }
     }
     setSelectedIds(new Set());
   }
@@ -831,16 +888,25 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
     downloadFile(buildCSV(rows), "customers.xls", "application/vnd.ms-excel");
   }
 
+  const groups = useMemo(
+    () => [...new Set(["Retail", ...dbCustomers.map((customer) => customer.customer_group)])]
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b)),
+    [dbCustomers],
+  );
+  const statuses = useMemo(
+    () => [...new Set(["active", ...dbCustomers.map((customer) => customer.status)])]
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b)),
+    [dbCustomers],
+  );
   const groupOptions = [
     { value: "all", label: "All Groups" },
-    ...GROUPS.map((g) => ({ value: g, label: g })),
+    ...groups.map((g) => ({ value: g, label: g })),
   ];
   const statusOptions = [
     { value: "all", label: "All Status" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-    { value: "new", label: "New" },
-    { value: "at-risk", label: "At Risk" },
+    ...statuses.map((status) => ({ value: status, label: status.replace(/-/g, " ") })),
   ];
 
   const SortTh = ({ col, label }: { col: typeof sortKey; label: string }) => (
@@ -860,19 +926,39 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
     deleteManyMutation.isPending ||
     bulkUpdateMutation.isPending;
 
+  if (loadError) {
+    return (
+      <SectionCard title="Customer data unavailable">
+        <p className="mb-3 text-sm text-muted-foreground">
+          {String(loadError)}
+        </p>
+        <button
+          onClick={() => void Promise.all([refetchBusiness(), customersQuery.refetch(), invoicesQuery.refetch()])}
+          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium hover:bg-slate-50"
+        >
+          Retry
+        </button>
+      </SectionCard>
+    );
+  }
+
+  if (!businessId && !isLoading && !loadError) {
+    return (
+      <div className="space-y-3 text-center">
+        <EmptyState
+          icon={Users}
+          title="Business profile unavailable"
+          subtitle="Customer records are scoped to a business profile. Complete setup before managing CRM data."
+        />
+        <button onClick={() => void refetchBusiness()} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium">
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {/* Load error banner */}
-      {loadError && (
-        <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>
-            <strong>Failed to load customers.</strong>{" "}
-            {(loadError as Error).message}
-          </span>
-        </div>
-      )}
-
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
         <SearchInput
@@ -973,25 +1059,25 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
                 <TableRow>
                   <TableCell colSpan={10}>
                     {customers.length === 0 ? (
-                      <EmptyState
-                        icon={Users}
-                        title="No customers yet"
-                        subtitle="Create your first customer."
-                        action={
-                          <button
-                            onClick={() => {
-                              setFormInitial(EMPTY_FORM);
-                              setFormMode("create");
-                              setEditingId(null);
-                              setFormError("");
-                              setFormOpen(true);
-                            }}
-                            className="mt-2 inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-brand)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
-                          >
-                            <Plus className="h-4 w-4" /> Add Customer
-                          </button>
-                        }
-                      />
+                      <div className="space-y-2 py-3 text-center">
+                        <EmptyState
+                          icon={Users}
+                          title="No customers yet"
+                          subtitle="Create your first customer."
+                        />
+                        <button
+                          onClick={() => {
+                            setFormInitial(EMPTY_FORM);
+                            setFormMode("create");
+                            setEditingId(null);
+                            setFormError("");
+                            setFormOpen(true);
+                          }}
+                          className="inline-flex items-center gap-2 rounded-xl bg-[image:var(--gradient-brand)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
+                        >
+                          <Plus className="h-4 w-4" /> Add Customer
+                        </button>
+                      </div>
                     ) : (
                       <EmptyState
                         icon={Users}
@@ -1017,7 +1103,8 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
                         onChange={(v) => {
                           setSelectedIds((prev) => {
                             const s = new Set(prev);
-                            v ? s.add(c.id) : s.delete(c.id);
+                            if (v) s.add(c.id);
+                            else s.delete(c.id);
                             return s;
                           });
                         }}
@@ -1045,14 +1132,14 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
                     <TableCell>
                       {c.outstandingAmount > 0 ? (
                         <span className="text-xs font-semibold text-red-600">
-                          {fmtINR(c.outstandingAmount)}
+                          {formatCrmCurrency(c.outstandingAmount, currency)}
                         </span>
                       ) : (
                         <span className="text-xs text-emerald-600 font-medium">Nil</span>
                       )}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {fmtDate(c.lastPurchase)}
+                      {formatCrmDate(c.lastPurchase)}
                     </TableCell>
                     <TableCell>
                       <CrmStatusPill status={c.status} />
@@ -1105,6 +1192,8 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
         <CustomerForm
           initial={formInitial}
           isEdit={formMode === "edit"}
+          groups={groups}
+          statuses={statuses}
           saving={saving}
           serverError={formError}
           onSave={handleSave}
@@ -1117,6 +1206,8 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
         open={bulkEditOpen}
         onClose={() => setBulkEditOpen(false)}
         count={selectedIds.size}
+        groups={groups}
+        statuses={statuses}
         onApply={handleBulkEdit}
       />
 

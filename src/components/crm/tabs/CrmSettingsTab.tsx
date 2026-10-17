@@ -1,78 +1,19 @@
-// ── CRM Settings Tab ──────────────────────────────────────────────
-import { useState, useEffect } from "react";
-import { Check, Hash, Globe, CreditCard, Tag, Plus, X, ShieldCheck } from "lucide-react";
-import { crmSettings } from "@/lib/crm-data";
-import { SectionCard, PrimaryButton, Select } from "@/components/crm/shared";
+import { useEffect, useState } from "react";
+import { Globe, Hash, Info, Loader2, Save, Tag } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { useBusiness } from "@/contexts/BusinessContext";
+import { useCustomers } from "@/hooks/useCustomersQuery";
+import { useUpsertBusiness } from "@/hooks/useBusinessQuery";
+import { EmptyState, SectionCard } from "@/components/crm/shared";
 
-// ── Saved Banner ──────────────────────────────────────────────────
-function SavedBanner({ visible }: { visible: boolean }) {
-  if (!visible) return null;
-  return (
-    <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">
-      <Check className="h-4 w-4" />
-      Settings saved successfully.
-    </div>
-  );
-}
-
-// ── Field wrapper ─────────────────────────────────────────────────
-function Field({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <label className="text-sm font-medium text-foreground">{label}</label>
-      {description && <p className="text-xs text-muted-foreground">{description}</p>}
-      {children}
-    </div>
-  );
-}
-
-// ── Text input ─────────────────────────────────────────────────────
-function TextInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
-  return (
-    <input
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none transition-colors focus:border-[color:var(--brand-electric)] focus:ring-1 focus:ring-[color:var(--brand-electric)]"
-    />
-  );
-}
-
-// ── Number input ───────────────────────────────────────────────────
-function NumberInput({ value, onChange, min = 0 }: { value: number; onChange: (v: number) => void; min?: number }) {
-  return (
-    <input
-      type="number"
-      min={min}
-      value={value}
-      onChange={(e) => onChange(parseInt(e.target.value) || 0)}
-      className="h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none transition-colors focus:border-[color:var(--brand-electric)] focus:ring-1 focus:ring-[color:var(--brand-electric)]"
-    />
-  );
-}
-
-// ── Category chip ──────────────────────────────────────────────────
-function CategoryChip({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700">
-      {label}
-      <button
-        type="button"
-        onClick={onRemove}
-        className="rounded-full p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
-      >
-        <X className="h-3 w-3" />
-      </button>
-    </span>
-  );
-}
+const EMPTY_RECORDS: never[] = [];
 
 const CURRENCY_OPTIONS = [
-  { value: "INR", label: "INR — Indian Rupee (₹)" },
-  { value: "USD", label: "USD — US Dollar ($)" },
-  { value: "EUR", label: "EUR — Euro (€)" },
-  { value: "GBP", label: "GBP — British Pound (£)" },
+  { value: "INR", label: "INR — Indian Rupee" },
+  { value: "USD", label: "USD — US Dollar" },
+  { value: "EUR", label: "EUR — Euro" },
+  { value: "GBP", label: "GBP — British Pound" },
   { value: "AED", label: "AED — UAE Dirham" },
 ];
 
@@ -84,190 +25,170 @@ const COUNTRY_OPTIONS = [
   { value: "Singapore", label: "Singapore" },
 ];
 
-const CREDIT_DAYS_OPTIONS = [
-  { value: "0", label: "0 days (Immediate)" },
-  { value: "15", label: "15 days" },
-  { value: "30", label: "30 days" },
-  { value: "45", label: "45 days" },
-  { value: "60", label: "60 days" },
-  { value: "90", label: "90 days" },
-];
-
-// ── Main Tab ──────────────────────────────────────────────────────
 export function CrmSettingsTab() {
-  // Seeded from crmSettings (local state only, not persisted)
-  const [prefix, setPrefix] = useState(crmSettings.customerNumberPrefix);
-  const [nextValue, setNextValue] = useState(crmSettings.customerNumberNextValue);
-  const [creditDays, setCreditDays] = useState(String(crmSettings.defaultCreditDays));
-  const [currency, setCurrency] = useState(crmSettings.defaultCurrency);
-  const [country, setCountry] = useState(crmSettings.defaultCountry);
-  const [categories, setCategories] = useState<string[]>([...crmSettings.customerCategories]);
-  const [newCategory, setNewCategory] = useState("");
-
-  // Save state
-  const [saved, setSaved] = useState(false);
-  const [timerId, setTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const { user } = useAuth();
+  const { business, businessLoading, businessError, refetchBusiness } = useBusiness();
+  const businessId = business?.id ?? null;
+  const customerQuery = useCustomers(businessId);
+  const upsertBusiness = useUpsertBusiness(user?.id ?? null);
+  const customers = customerQuery.data ?? EMPTY_RECORDS;
+  const persistedCurrency = business?.currency ?? "INR";
+  const persistedCountry = business?.country ?? "India";
+  const [currency, setCurrency] = useState(persistedCurrency);
+  const [country, setCountry] = useState(persistedCountry);
+  const isLoading = businessLoading || customerQuery.isLoading;
+  const loadError = businessError || customerQuery.error;
 
   useEffect(() => {
-    return () => { if (timerId) clearTimeout(timerId); };
-  }, [timerId]);
+    setCurrency(persistedCurrency);
+    setCountry(persistedCountry);
+  }, [persistedCurrency, persistedCountry]);
 
-  function handleSave() {
-    if (timerId) clearTimeout(timerId);
-    setSaved(true);
-    const id = setTimeout(() => setSaved(false), 2500);
-    setTimerId(id);
+  const groups = [
+    ...new Set(customers.map((customer) => customer.customer_group).filter(Boolean)),
+  ].sort((a, b) => a.localeCompare(b));
+  const currencyOptions =
+    business?.currency && !CURRENCY_OPTIONS.some((option) => option.value === business.currency)
+      ? [{ value: business.currency, label: business.currency }, ...CURRENCY_OPTIONS]
+      : CURRENCY_OPTIONS;
+  const countryOptions =
+    business?.country && !COUNTRY_OPTIONS.some((option) => option.value === business.country)
+      ? [{ value: business.country, label: business.country }, ...COUNTRY_OPTIONS]
+      : COUNTRY_OPTIONS;
+
+  async function saveBusinessPreferences() {
+    if (!business || !user) return;
+    const { id, created_at, updated_at, ...payload } = business;
+    try {
+      await upsertBusiness.mutateAsync({ ...payload, currency, country });
+      await refetchBusiness();
+      toast.success("Business preferences saved");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save business preferences.");
+    }
   }
 
-  function addCategory() {
-    const trimmed = newCategory.trim();
-    if (!trimmed || categories.includes(trimmed)) return;
-    setCategories((prev) => [...prev, trimmed]);
-    setNewCategory("");
+  if (isLoading) {
+    return <div className="h-48 animate-pulse rounded-xl border border-slate-200 bg-white" />;
   }
 
-  function removeCategory(cat: string) {
-    setCategories((prev) => prev.filter((c) => c !== cat));
+  if (loadError || !businessId || !business) {
+    return (
+      <SectionCard title="CRM settings unavailable">
+        <div className="space-y-3 text-sm text-muted-foreground">
+          <p>
+            {loadError instanceof Error
+              ? loadError.message
+              : loadError || "A business profile is required to view persisted preferences."}
+          </p>
+          <button
+            onClick={() => void Promise.all([customerQuery.refetch(), refetchBusiness()])}
+            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium hover:bg-slate-50"
+          >
+            Retry
+          </button>
+        </div>
+      </SectionCard>
+    );
   }
 
-  const preview = `${prefix}-${String(nextValue).padStart(4, "0")}`;
+  const selectClass =
+    "h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-foreground";
 
   return (
-    <div className="space-y-6">
-      {/* 1. Customer Number Format */}
+    <div className="space-y-5">
       <SectionCard
-        title="Customer Number Format"
-        subtitle="Configure the auto-generated customer code format"
-        action={
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50">
-            <Hash className="h-4 w-4 text-violet-600" />
-          </div>
-        }
+        title="Business preferences"
+        subtitle="These values are stored on your authorized business profile."
+        action={<Globe className="h-4 w-4 text-muted-foreground" />}
       >
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-          <Field label="Prefix" description="Added before the customer sequence number.">
-            <TextInput value={prefix} onChange={setPrefix} placeholder="e.g. CUS" />
-          </Field>
-          <Field label="Next Number" description="The next customer will use this sequence number.">
-            <NumberInput value={nextValue} onChange={setNextValue} min={1} />
-          </Field>
-          <Field label="Preview" description="What the next customer code will look like.">
-            <div className="flex h-9 items-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold font-mono text-foreground">
-              {preview}
-            </div>
-          </Field>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="space-y-1.5 text-sm font-medium text-foreground">
+            Currency
+            <select
+              value={currency}
+              onChange={(event) => setCurrency(event.target.value)}
+              className={selectClass}
+            >
+              {currencyOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1.5 text-sm font-medium text-foreground">
+            Country
+            <select
+              value={country}
+              onChange={(event) => setCountry(event.target.value)}
+              className={selectClass}
+            >
+              {countryOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex justify-end">
           <button
-            onClick={() => setNextValue(1)}
-            className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100"
+            onClick={saveBusinessPreferences}
+            disabled={upsertBusiness.isPending || !user}
+            className="inline-flex items-center gap-2 rounded-lg bg-[image:var(--gradient-brand)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            Reset to 1
+            {upsertBusiness.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
+            Save preferences
           </button>
-          <p className="text-xs text-muted-foreground">Customer codes must be unique — reset with caution.</p>
         </div>
       </SectionCard>
 
-      {/* 2. Credit & Payment Defaults */}
       <SectionCard
-        title="Credit &amp; Payment Defaults"
-        subtitle="Default credit terms applied to new customers"
-        action={
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50">
-            <CreditCard className="h-4 w-4 text-amber-600" />
-          </div>
-        }
+        title="Customer groups"
+        subtitle="Group values present on saved customer records."
+        action={<Tag className="h-4 w-4 text-muted-foreground" />}
       >
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <Field label="Default Credit Days" description="Applied to all new customers unless overridden.">
-            <Select
-              value={creditDays}
-              onChange={setCreditDays}
-              options={CREDIT_DAYS_OPTIONS}
-            />
-          </Field>
-          <Field label="Preview" description="Credit term that will appear on new customer records.">
-            <div className="flex h-9 items-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-foreground">
-              {creditDays === "0" ? "Immediate payment" : `Net ${creditDays} days`}
-            </div>
-          </Field>
-        </div>
-      </SectionCard>
-
-      {/* 3. Customer Categories */}
-      <SectionCard
-        title="Customer Categories"
-        subtitle="Manage the customer group/category list available across the CRM"
-        action={
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
-            <Tag className="h-4 w-4 text-blue-600" />
-          </div>
-        }
-      >
-        <div className="flex flex-wrap gap-2 mb-4">
-          {categories.map((cat) => (
-            <CategoryChip key={cat} label={cat} onRemove={() => removeCategory(cat)} />
-          ))}
-          {categories.length === 0 && (
-            <p className="text-xs text-muted-foreground italic">No categories defined. Add one below.</p>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCategory(); } }}
-            placeholder="New category name…"
-            className="h-9 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none transition-colors focus:border-[color:var(--brand-electric)] focus:ring-1 focus:ring-[color:var(--brand-electric)] placeholder:text-slate-400"
+        {groups.length === 0 ? (
+          <EmptyState
+            icon={Tag}
+            title="No customer groups"
+            subtitle="Group choices appear after customers are assigned a group."
           />
-          <button
-            type="button"
-            onClick={addCategory}
-            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-foreground hover:bg-slate-50 transition-colors"
-          >
-            <Plus className="h-4 w-4" /> Add
-          </button>
-        </div>
-        <p className="mt-2 text-xs text-muted-foreground">Press Enter or click Add to create a new category. Click × to remove one.</p>
-      </SectionCard>
-
-      {/* 4. Regional Defaults */}
-      <SectionCard
-        title="Regional Defaults"
-        subtitle="Default currency and country for new customer records"
-        action={
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50">
-            <Globe className="h-4 w-4 text-emerald-600" />
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {groups.map((group) => (
+              <span
+                key={group}
+                className="rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700"
+              >
+                {group}
+              </span>
+            ))}
           </div>
-        }
-      >
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <Field label="Default Currency" description="Currency used for pricing and invoicing.">
-            <Select value={currency} onChange={setCurrency} options={CURRENCY_OPTIONS} />
-          </Field>
-          <Field label="Default Country" description="Pre-filled country for new customer addresses.">
-            <Select value={country} onChange={setCountry} options={COUNTRY_OPTIONS} />
-          </Field>
-        </div>
+        )}
       </SectionCard>
 
-      {/* Save bar */}
-      <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
-        <div>
-          <SavedBanner visible={saved} />
-          {!saved && (
-            <p className="text-xs text-muted-foreground">
-              Changes are stored for this session only and reset on page reload.
-            </p>
-          )}
+      <SectionCard
+        title="Unavailable CRM preferences"
+        action={<Info className="h-4 w-4 text-muted-foreground" />}
+      >
+        <div className="space-y-3 text-sm text-muted-foreground">
+          <p className="flex items-start gap-2">
+            <Hash className="mt-0.5 h-4 w-4 shrink-0" /> Customer code prefix and next-number
+            sequence are not stored in the current schema.
+          </p>
+          <p>
+            Default credit days are stored per customer, not as a business-level setting. Group
+            names are stored directly on customer rows; there is no separate category configuration
+            table.
+          </p>
         </div>
-        <div className="ml-auto shrink-0">
-          <PrimaryButton icon={ShieldCheck} onClick={handleSave}>
-            Save Settings
-          </PrimaryButton>
-        </div>
-      </div>
+      </SectionCard>
     </div>
   );
 }

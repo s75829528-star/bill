@@ -1,4 +1,5 @@
 // ── CRM Overview Tab ──────────────────────────────────────────────
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -11,8 +12,6 @@ import {
   BarChart2,
   Activity,
   Calendar,
-  ArrowUpRight,
-  Clock,
   AlertCircle,
   Star,
   Zap,
@@ -32,66 +31,31 @@ import {
   Line,
   Legend,
 } from "recharts";
+import { useBusiness } from "@/contexts/BusinessContext";
+import { useCustomerNotesForBusiness, useCustomers } from "@/hooks/useCustomersQuery";
+import { useInvoices } from "@/hooks/useInvoicesQuery";
+import { usePayments } from "@/hooks/usePaymentsQuery";
 import {
-  crmCustomers,
-  followUps,
-  crmActivity,
-  crmSummary,
-  monthlyAcquisition,
-  revenueByCustomer,
-  customerDistribution,
-  leadConversionFunnel,
-  fmtINR,
-  fmtDate,
-} from "@/lib/crm-data";
+  buildCustomerAnalytics,
+  customerAcquisitionByMonth,
+  formatCompactCrmCurrency,
+  formatCrmCurrency,
+  formatCrmDate,
+} from "@/lib/crm-analytics";
 import {
   SectionCard,
   StatTile,
   CrmStatusPill,
   Avatar,
+  EmptyState,
 } from "@/components/crm/shared";
-
-// ── Derived data (computed once at module level) ───────────────────
-const summary = crmSummary();
-const acqData = monthlyAcquisition();
-const revData = revenueByCustomer(8);
-const distData = customerDistribution();
-const funnelData = leadConversionFunnel();
-
-const topCustomers = [...crmCustomers]
-  .sort((a, b) => b.totalRevenue - a.totalRevenue)
-  .slice(0, 6);
-
-const recentCustomers = [...crmCustomers]
-  .sort((a, b) => (a.createdDate < b.createdDate ? 1 : -1))
-  .slice(0, 6);
-
-const recentActivities = crmActivity.slice(0, 8);
-
-const upcomingFollowUps = [...followUps]
-  .filter((f) => f.status === "pending")
-  .sort((a, b) => (a.date < b.date ? -1 : 1))
-  .slice(0, 6);
-
-const outstandingCustomers = [...crmCustomers]
-  .filter((c) => c.outstandingAmount > 0)
-  .sort((a, b) => b.outstandingAmount - a.outstandingAmount)
-  .slice(0, 6);
 
 // ── Pie colours ───────────────────────────────────────────────────
 const PIE_COLORS = ["#3b82f6", "#8b5cf6", "#06b6d4", "#f59e0b", "#10b981", "#f97316"];
-
-const FUNNEL_COLORS: Record<string, string> = {
-  new: "#94a3b8",
-  contacted: "#3b82f6",
-  qualified: "#06b6d4",
-  proposal: "#8b5cf6",
-  negotiation: "#f59e0b",
-  won: "#10b981",
-};
+const EMPTY_RECORDS: never[] = [];
 
 // ── Tooltip helpers ───────────────────────────────────────────────
-function ChartTip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string }) {
+function ChartTip({ active, payload, label, currency = "INR" }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string; currency?: string }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
@@ -99,7 +63,7 @@ function ChartTip({ active, payload, label }: { active?: boolean; payload?: { va
       {payload.map((p, i) => (
         <p key={i} className="text-sm font-bold text-foreground">
           {typeof p.value === "number" && p.name.toLowerCase().includes("revenue")
-            ? fmtINR(p.value)
+            ? formatCrmCurrency(p.value, currency)
             : p.value}{" "}
           <span className="text-xs font-normal text-muted-foreground">{p.name}</span>
         </p>
@@ -108,12 +72,12 @@ function ChartTip({ active, payload, label }: { active?: boolean; payload?: { va
   );
 }
 
-function RevTip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string }) {
+function RevTip({ active, payload, label, currency = "INR" }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string; currency?: string }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
       <p className="mb-1 text-xs font-semibold text-slate-500 truncate max-w-[140px]">{label}</p>
-      <p className="text-sm font-bold text-foreground">{fmtINR(payload[0].value)}</p>
+      <p className="text-sm font-bold text-foreground">{formatCrmCurrency(payload[0].value, currency)}</p>
     </div>
   );
 }
@@ -147,29 +111,184 @@ function activityIcon(type: string) {
 // ── Quick Actions ─────────────────────────────────────────────────
 const quickActions = [
   { label: "Add Customer", desc: "Create a new customer profile", color: "bg-blue-600 hover:bg-blue-700", icon: UserPlus, tabId: "customers" },
-  { label: "Create Lead", desc: "Add a lead to the pipeline", color: "bg-violet-600 hover:bg-violet-700", icon: Target, tabId: "leads" },
-  { label: "Schedule Follow-up", desc: "Book a follow-up call or meeting", color: "bg-cyan-600 hover:bg-cyan-700", icon: Calendar, tabId: "follow-ups" },
   { label: "View Reports", desc: "Analyse CRM performance data", color: "bg-[image:var(--gradient-brand)]", icon: BarChart2, tabId: "reports" },
 ];
 
 // ── Main Component ────────────────────────────────────────────────
 export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }) {
+  const { business, businessLoading, businessError } = useBusiness();
+  const businessId = business?.id ?? null;
+  const currency = business?.currency ?? "INR";
+  const customerQuery = useCustomers(businessId);
+  const notesQuery = useCustomerNotesForBusiness(businessId);
+  const invoiceQuery = useInvoices(businessId);
+  const paymentQuery = usePayments(businessId);
+  const customers = customerQuery.data ?? EMPTY_RECORDS;
+  const notes = notesQuery.data ?? EMPTY_RECORDS;
+  const invoices = invoiceQuery.data ?? EMPTY_RECORDS;
+  const payments = paymentQuery.data ?? EMPTY_RECORDS;
+  const customerAnalytics = useMemo(
+    () => buildCustomerAnalytics(customers, invoices),
+    [customers, invoices],
+  );
+  const totalRevenue = customerAnalytics.reduce((sum, customer) => sum + customer.totalRevenue, 0);
+  const outstandingReceivables = customerAnalytics.reduce(
+    (sum, customer) => sum + customer.outstandingAmount,
+    0,
+  );
+  const summary = {
+    totalCustomers: customers.length,
+    activeCustomers: customers.filter((customer) => customer.status === "active").length,
+    newCustomers: customers.filter((customer) => customer.status === "new").length,
+    returningCustomers: customerAnalytics.filter((customer) => customer.invoiceCount > 1).length,
+    outstandingReceivables,
+    avgCustomerValue: customers.length ? Math.round(totalRevenue / customers.length) : 0,
+  };
+  const acqData = useMemo(() => customerAcquisitionByMonth(customers), [customers]);
+  const revData = customerAnalytics
+    .filter((customer) => customer.totalRevenue > 0)
+    .sort((a, b) => b.totalRevenue - a.totalRevenue)
+    .slice(0, 8)
+    .map((customer) => ({ name: customer.company_name || customer.name, revenue: customer.totalRevenue }));
+  const distData = [...new Set(customers.map((customer) => customer.customer_group).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b))
+    .map((name) => ({
+      name,
+      value: customers.filter((customer) => customer.customer_group === name).length,
+    }));
+  const topCustomers = customerAnalytics
+    .filter((customer) => customer.totalRevenue > 0)
+    .sort((a, b) => b.totalRevenue - a.totalRevenue)
+    .slice(0, 6);
+  const recentCustomers = [...customers]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 6);
+  const outstandingCustomers = customerAnalytics
+    .filter((customer) => customer.outstandingAmount > 0)
+    .sort((a, b) => b.outstandingAmount - a.outstandingAmount)
+    .slice(0, 6);
+  const customerNames = new Map(customers.map((customer) => [customer.id, customer.name]));
+  const recentActivities = [
+    ...customers.flatMap((customer) => {
+      const events = [{
+        id: `customer-created-${customer.id}`,
+        type: "customer-created",
+        title: `Customer added: ${customer.name}`,
+        subtitle: "Customer record created",
+        timestamp: customer.created_at,
+      }];
+      if (customer.updated_at > customer.created_at) {
+        events.push({
+          id: `customer-updated-${customer.id}`,
+          type: "customer-updated",
+          title: `Customer updated: ${customer.name}`,
+          subtitle: "Customer record changed",
+          timestamp: customer.updated_at,
+        });
+      }
+      return events;
+    }),
+    ...notes.map((note) => ({
+      id: `note-${note.id}`,
+      type: "note-added",
+      title: `Note added for ${note.customer_name}`,
+      subtitle: `${note.author}: ${note.text}`,
+      timestamp: note.created_at,
+    })),
+    ...invoices.filter((invoice) => invoice.customerId).map((invoice) => ({
+      id: `invoice-${invoice.id}`,
+      type: "invoice-generated",
+      title: `Invoice ${invoice.invoiceNumber}${invoice.customerId ? ` · ${customerNames.get(invoice.customerId) ?? "Customer"}` : ""}`,
+      subtitle: `Invoice date · ${invoice.status}`,
+      timestamp: invoice.createdDate,
+    })),
+    ...payments.filter((payment) => payment.customerId).map((payment) => ({
+      id: `payment-${payment.id}`,
+      type: "payment-received",
+      title: `Payment recorded${payment.customerName ? ` from ${payment.customerName}` : ""}`,
+      subtitle: `${formatCrmCurrency(payment.amount, currency)} · ${payment.status}`,
+      timestamp: payment.date,
+    })),
+  ]
+    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+    .slice(0, 8);
+  const loading =
+    businessLoading || customerQuery.isLoading || notesQuery.isLoading || invoiceQuery.isLoading || paymentQuery.isLoading;
+  const loadError = businessError || customerQuery.error || notesQuery.error || invoiceQuery.error || paymentQuery.error;
+  const lastUpdated = Math.max(
+    customerQuery.dataUpdatedAt,
+    notesQuery.dataUpdatedAt,
+    invoiceQuery.dataUpdatedAt,
+    paymentQuery.dataUpdatedAt,
+  );
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div key={index} className="h-24 animate-pulse rounded-xl border border-slate-200 bg-white" />
+        ))}
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <SectionCard title="CRM data unavailable">
+        <div className="space-y-3 text-sm text-muted-foreground">
+          <p>{loadError instanceof Error ? loadError.message : "The CRM records could not be loaded."}</p>
+          <button
+            onClick={() => void Promise.all([customerQuery.refetch(), notesQuery.refetch(), invoiceQuery.refetch(), paymentQuery.refetch()])}
+            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-slate-50"
+          >
+            Retry
+          </button>
+        </div>
+      </SectionCard>
+    );
+  }
+
+  if (!businessId || customers.length === 0) {
+    return (
+      <SectionCard title="Customer overview">
+        <div className="space-y-2 text-center">
+          <EmptyState
+            icon={Users}
+            title={businessId ? "No customer records yet" : "Business profile unavailable"}
+            subtitle={businessId ? "Create a customer to see CRM metrics and reports." : "Complete business setup to load tenant-scoped CRM records."}
+          />
+          {businessId && (
+            <button
+              onClick={() => onNavigate("customers")}
+              className="mt-2 rounded-lg bg-[image:var(--gradient-brand)] px-3 py-2 text-xs font-semibold text-white"
+            >
+              Open Customers
+            </button>
+          )}
+        </div>
+      </SectionCard>
+    );
+  }
+
   const statTiles = [
     { label: "Total Customers", value: String(summary.totalCustomers), sub: "All time", icon: Users, bg: "bg-blue-50", iconColor: "text-blue-600" },
     { label: "Active Customers", value: String(summary.activeCustomers), sub: "Currently active", icon: UserCheck, bg: "bg-emerald-50", iconColor: "text-emerald-600" },
     { label: "New Customers", value: String(summary.newCustomers), sub: "Recently onboarded", icon: UserPlus, bg: "bg-cyan-50", iconColor: "text-cyan-600" },
     { label: "Returning", value: String(summary.returningCustomers), sub: "Multiple purchases", icon: RefreshCw, bg: "bg-violet-50", iconColor: "text-violet-600" },
-    { label: "Total Leads", value: String(summary.totalLeads), sub: "In pipeline", icon: Target, bg: "bg-amber-50", iconColor: "text-amber-600" },
-    { label: "Converted Leads", value: String(summary.convertedLeads), sub: "Leads won", icon: TrendingUp, bg: "bg-emerald-50", iconColor: "text-emerald-600" },
-    { label: "Outstanding", value: fmtINR(summary.outstandingReceivables), sub: "Receivables", icon: IndianRupee, bg: "bg-red-50", iconColor: "text-red-600" },
-    { label: "Avg Customer Value", value: fmtINR(summary.avgCustomerValue), sub: "Per customer", icon: BarChart2, bg: "bg-indigo-50", iconColor: "text-indigo-600" },
-    { label: "Growth Rate", value: `${summary.growthRate}%`, sub: "Last 90 days", icon: ArrowUpRight, bg: "bg-pink-50", iconColor: "text-pink-600" },
+    { label: "Revenue", value: formatCrmCurrency(totalRevenue, currency), sub: "Customer-linked invoices", icon: TrendingUp, bg: "bg-emerald-50", iconColor: "text-emerald-600" },
+    { label: "Outstanding", value: formatCrmCurrency(summary.outstandingReceivables, currency), sub: "Opening balances + unpaid invoices", icon: IndianRupee, bg: "bg-red-50", iconColor: "text-red-600" },
+    { label: "Avg Customer Value", value: formatCrmCurrency(summary.avgCustomerValue, currency), sub: "Invoice revenue per customer", icon: BarChart2, bg: "bg-indigo-50", iconColor: "text-indigo-600" },
   ];
 
   return (
     <div className="space-y-6">
+      {lastUpdated > 0 && (
+        <p className="text-right text-[11px] text-muted-foreground">
+          Last refreshed {new Date(lastUpdated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        </p>
+      )}
       {/* Stat Tiles */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         {statTiles.map((tile, i) => (
           <StatTile
             key={tile.label}
@@ -186,7 +305,7 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
 
       {/* Quick Actions */}
       <SectionCard title="Quick Actions" subtitle="Jump to common CRM tasks" action={<Zap className="h-4 w-4 text-[color:var(--brand-electric)]" />}>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
@@ -217,7 +336,7 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip cursor={{ stroke: "#e2e8f0" }} content={<ChartTip />} />
+              <Tooltip cursor={{ stroke: "#e2e8f0" }} content={<ChartTip currency={currency} />} />
               <Line type="monotone" dataKey="customers" name="Customers" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4, fill: "#3b82f6", strokeWidth: 0 }} activeDot={{ r: 6, fill: "#3b82f6", strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
@@ -230,7 +349,7 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip cursor={{ fill: "rgba(241,245,249,0.6)", radius: 6 }} content={<ChartTip />} />
+              <Tooltip cursor={{ fill: "rgba(241,245,249,0.6)", radius: 6 }} content={<ChartTip currency={currency} />} />
               <Bar dataKey="customers" name="Customers" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={36} />
             </BarChart>
           </ResponsiveContainer>
@@ -244,9 +363,9 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={revData} layout="vertical" margin={{ top: 0, right: 8, left: 8, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v: number) => "₹" + (v / 100000).toFixed(1) + "L"} />
+              <XAxis type="number" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(value: number) => formatCompactCrmCurrency(value, currency)} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} width={90} />
-              <Tooltip content={<RevTip />} />
+              <Tooltip content={<RevTip currency={currency} />} />
               <Bar dataKey="revenue" name="Revenue" fill="#10b981" radius={[0, 5, 5, 0]} maxBarSize={18} />
             </BarChart>
           </ResponsiveContainer>
@@ -257,16 +376,14 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
           {/* Pie */}
           <SectionCard title="Distribution" subtitle="By customer group">
             <div className="flex flex-col items-center gap-3">
-              <ResponsiveContainer width={160} height={160}>
-                <PieChart>
+              <PieChart width={160} height={160}>
                   <Pie data={distData} dataKey="value" cx="50%" cy="50%" innerRadius={42} outerRadius={68} paddingAngle={2}>
                     {distData.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="none" />
                     ))}
                   </Pie>
                   <Tooltip content={<PieTip />} />
-                </PieChart>
-              </ResponsiveContainer>
+              </PieChart>
               <div className="flex flex-col gap-1.5 w-full">
                 {distData.map((d, i) => (
                   <div key={d.name} className="flex items-center gap-2">
@@ -279,26 +396,12 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
             </div>
           </SectionCard>
 
-          {/* Lead Funnel */}
-          <SectionCard title="Lead Funnel" subtitle="Conversion stages">
-            <div className="flex flex-col gap-2">
-              {funnelData.map((item) => {
-                const maxCount = Math.max(...funnelData.map((f) => f.count), 1);
-                const pct = Math.round((item.count / maxCount) * 100);
-                const color = FUNNEL_COLORS[item.stage] ?? "#94a3b8";
-                return (
-                  <div key={item.stage} className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-medium text-foreground capitalize">{item.stage}</span>
-                      <span className="text-[11px] font-bold text-foreground">{item.count}</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-slate-100">
-                      <div className="h-1.5 rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <SectionCard title="Lead pipeline" subtitle="Not available in the current database">
+            <EmptyState
+              icon={Target}
+              title="Lead records are not configured"
+              subtitle="No leads table exists in the current schema, so this overview does not show fabricated pipeline counts."
+            />
           </SectionCard>
         </div>
       </div>
@@ -315,30 +418,34 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
             </button>
           }
         >
-          <div className="space-y-3">
-            {topCustomers.map((c, i) => (
-              <motion.div key={c.id} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.04 * i, duration: 0.3 }} className="flex items-center gap-3">
-                <Avatar name={c.name} size="sm" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-foreground truncate">{c.name}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">{c.company}</p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-xs font-bold text-foreground">{fmtINR(c.totalRevenue)}</p>
-                  <div className="flex justify-end mt-0.5">
-                    {Array.from({ length: c.rating }).map((_, j) => (
-                      <Star key={j} className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
-                    ))}
+          {topCustomers.length ? (
+            <div className="space-y-3">
+              {topCustomers.map((c, i) => (
+                <motion.div key={c.id} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.04 * i, duration: 0.3 }} className="flex items-center gap-3">
+                  <Avatar name={c.name} size="sm" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-foreground truncate">{c.name}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{c.company_name || "—"}</p>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-xs font-bold text-foreground">{formatCrmCurrency(c.totalRevenue, currency)}</p>
+                    <div className="flex justify-end mt-0.5">
+                      {Array.from({ length: c.rating }).map((_, j) => (
+                        <Star key={j} className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState icon={BarChart2} title="No customer-linked invoices" subtitle="Revenue rankings appear when invoices are linked to customers." />
+          )}
         </SectionCard>
 
         {/* Recent Activities */}
         <SectionCard title="Recent Activities" subtitle="Latest 8 CRM events">
-          <div className="space-y-3">
+          {recentActivities.length ? <div className="space-y-3">
             {recentActivities.map((act, i) => {
               const { bg, color, icon: Icon } = activityIcon(act.type);
               return (
@@ -348,43 +455,20 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-foreground truncate">{act.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{act.subtitle} · {fmtDate(act.timestamp)}</p>
+                    <p className="text-[11px] text-muted-foreground">{act.subtitle} · {formatCrmDate(act.timestamp)}</p>
                   </div>
                 </motion.div>
               );
             })}
-          </div>
+          </div> : <EmptyState icon={Activity} title="No recorded customer activity" subtitle="Customer, invoice, and payment events will appear here when records exist." />}
         </SectionCard>
 
-        {/* Upcoming Follow-ups */}
-        <SectionCard
-          title="Upcoming Follow-ups"
-          subtitle="Pending follow-ups by date"
-          action={
-            <button onClick={() => onNavigate("follow-ups")} className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-              View all
-            </button>
-          }
-        >
-          {upcomingFollowUps.length === 0 ? (
-            <p className="py-8 text-center text-xs text-muted-foreground">No upcoming follow-ups</p>
-          ) : (
-            <div className="space-y-3">
-              {upcomingFollowUps.map((fu, i) => (
-                <motion.div key={fu.id} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.04 * i, duration: 0.3 }} className="flex items-start gap-3">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-amber-50">
-                    <Clock className="h-3.5 w-3.5 text-amber-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-foreground truncate">{fu.subjectName}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">{fu.purpose}</p>
-                    <p className="text-[11px] text-slate-500">{fmtDate(fu.date)} · {fu.time}</p>
-                  </div>
-                  <CrmStatusPill status={fu.priority} label={fu.priority} />
-                </motion.div>
-              ))}
-            </div>
-          )}
+        <SectionCard title="Follow-ups" subtitle="Not available in the current database">
+          <EmptyState
+            icon={Calendar}
+            title="Follow-up records are not configured"
+            subtitle="No follow-up table exists in the current schema. No sample reminders are shown or persisted."
+          />
         </SectionCard>
       </div>
 
@@ -406,7 +490,7 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
                 <Avatar name={c.name} size="sm" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-foreground truncate">{c.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{c.city} · {fmtDate(c.createdDate)}</p>
+                  <p className="text-[11px] text-muted-foreground">{c.city || "—"} · {formatCrmDate(c.created_at)}</p>
                 </div>
                 <CrmStatusPill status={c.status} />
               </motion.div>
@@ -420,7 +504,7 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
           subtitle="Customers with pending receivables"
           action={<AlertCircle className="h-4 w-4 text-red-500" />}
         >
-          <div className="space-y-3">
+          {outstandingCustomers.length ? <div className="space-y-3">
             {outstandingCustomers.map((c, i) => {
               const pct = Math.round((c.outstandingAmount / (outstandingCustomers[0]?.outstandingAmount ?? 1)) * 100);
               return (
@@ -428,9 +512,9 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-semibold text-foreground truncate">{c.name}</p>
-                      <p className="text-[11px] text-muted-foreground">{c.company}</p>
+                      <p className="text-[11px] text-muted-foreground">{c.company_name || "—"}</p>
                     </div>
-                    <span className="shrink-0 text-xs font-bold text-red-600">{fmtINR(c.outstandingAmount)}</span>
+                    <span className="shrink-0 text-xs font-bold text-red-600">{formatCrmCurrency(c.outstandingAmount, currency)}</span>
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-slate-100">
                     <div className="h-1.5 rounded-full bg-red-400 transition-all" style={{ width: `${pct}%` }} />
@@ -438,7 +522,7 @@ export function OverviewTab({ onNavigate }: { onNavigate: (id: string) => void }
                 </motion.div>
               );
             })}
-          </div>
+          </div> : <EmptyState icon={AlertCircle} title="No outstanding balances" subtitle="No opening balances or unpaid customer invoices were found." />}
         </SectionCard>
       </div>
     </div>
