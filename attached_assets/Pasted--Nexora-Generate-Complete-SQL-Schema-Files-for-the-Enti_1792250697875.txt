@@ -1,0 +1,172 @@
+# Nexora — Generate Complete SQL Schema Files for the Entire Existing Application
+
+Act as a senior database architect and Supabase engineer. Your task is to inspect my entire existing Nexora application and generate a complete, accurate collection of SQL schema files covering all currently working functionality and all database objects used by the application.
+
+## CRITICAL OBJECTIVE
+
+My Nexora application already connects to Supabase. It has working business modules, and when I create records such as brands through the application, those records appear in the live Supabase database.
+
+My repository already contains some SQL files, including files similar to:
+
+- `schema_billing.sql`
+- `schema_payments.sql`
+- `schema_documents.sql`
+- `schema_recurring.sql`
+- `schema_templates.sql`
+- `schema_purchase_flow.sql`
+- `schema_ai_conversations.sql`
+- `business_schema.sql`
+- `customers_schema.sql`
+
+However, Supabase contains many more tables than the number of local SQL files.
+
+I want a complete, verified SQL schema collection for the entire application, including all existing tables, relationships, functions, triggers, policies, and other relevant database objects.
+
+**This is a schema documentation and reproducibility task first. Do not rebuild the application, replace the database, or break existing functionality.**
+
+## Phase 1 — Audit the entire application
+
+Inspect the complete repository before creating files.
+
+Identify:
+- All existing SQL files and migrations.
+- Every frontend and backend module that accesses Supabase.
+- Every database client and query.
+- All tables, views, functions, RPC calls, triggers, and storage buckets referenced by the application.
+- All authentication and authorization mechanisms.
+- All existing database schema and migration conventions.
+- Any existing generated database types.
+
+Search the entire repository, including nested directories. Do not assume the existing SQL files cover the entire database.
+
+Create a verified inventory of all discovered objects and their source locations.
+
+## Phase 2 — Inspect the actual Supabase database
+
+If authorized Supabase database access is available, inspect the live database using read-only methods.
+
+Retrieve the actual definitions of:
+- All application tables and columns.
+- Column types, defaults, nullability, and identity properties.
+- Primary keys and foreign keys.
+- Unique constraints, check constraints, and indexes.
+- Views and materialized views.
+- SQL functions and procedures.
+- Triggers and their definitions.
+- Row Level Security (RLS) settings and policies.
+- Custom types and enums.
+- Sequences.
+- Relevant extensions.
+- Database grants and permissions where accessible.
+- Storage bucket definitions and storage policies, where accessible.
+
+Distinguish application-owned objects from Supabase-managed internal objects.
+
+Do not expose database passwords, API keys, access tokens, or other secrets.
+
+If live database access is unavailable, do not pretend that the inventory is complete. Generate what can be verified from the repository and provide the exact read-only SQL or Supabase CLI commands needed to retrieve the missing live definitions.
+
+## Phase 3 — Generate complete, organized SQL schema files
+
+Generate a well-organized collection of SQL files under:
+
+`supabase/schema/`
+
+Use separate files for logical modules where appropriate, for example:
+
+- `00_extensions_and_types.sql`
+- `01_business_and_organizations.sql`
+- `02_auth_and_profiles.sql`
+- `03_customers_and_crm.sql`
+- `04_products_and_inventory.sql`
+- `05_sales_and_invoices.sql`
+- `06_billing_and_payments.sql`
+- `07_purchasing_and_goods_received.sql`
+- `08_expenses_and_accounting.sql`
+- `09_documents_and_templates.sql`
+- `10_recurring_operations.sql`
+- `11_ai_conversations.sql`
+- `12_functions_and_procedures.sql`
+- `13_triggers_and_automation.sql`
+- `14_indexes_and_constraints.sql`
+- `15_rls_policies_and_grants.sql`
+- `16_storage_configuration.sql`
+- `17_views_and_reporting.sql`
+
+These names are examples, not mandatory assumptions. Adapt them to the actual database and existing repository conventions.
+
+Include every discovered application-owned object, even if it does not fit the example categories. Create additional files when necessary.
+
+Requirements:
+1. Include every verified table and all its columns.
+2. Preserve actual data types, defaults, constraints, and relationships.
+3. Preserve the actual function and trigger definitions.
+4. Reproduce the verified RLS policies and necessary grants.
+5. Preserve dependency order so objects can be created correctly.
+6. Add comments explaining each module and its purpose.
+7. Do not create fake tables, columns, relationships, or policies.
+8. Do not silently omit unsupported or inaccessible objects.
+9. Clearly document objects whose complete definitions could not be retrieved.
+
+## Phase 4 — Preserve existing files and application behavior
+
+- Inspect existing schema files before changing anything.
+- Do not delete or overwrite existing migration history.
+- Keep existing application migrations intact.
+- Do not change the live database as part of this task.
+- Do not reset Supabase or drop tables.
+- Do not insert sample or fake business records.
+- Do not change application queries, authentication, or frontend behavior just to make the schema files fit.
+- Avoid duplicate or conflicting definitions across generated files.
+- Preserve tenant isolation and existing RLS protections.
+
+If an existing schema file contains valid definitions that are missing from the generated collection, reconcile them carefully.
+
+## Phase 5 — Make the schema collection verifiable
+
+Generate these additional documentation files:
+
+### `supabase/schema/README.md`
+Explain the purpose of every generated file, dependencies between files, prerequisites, and how to validate the schemas safely.
+
+### `supabase/schema/SCHEMA_INVENTORY.md`
+List every discovered database object, its type, its exact source or generated file, and its verification status.
+
+### `supabase/schema/SCHEMA_DIFF.md`
+Compare the existing local definitions against the live Supabase database when live access is available.
+
+Categorize objects as:
+- Verified matching definitions.
+- Objects present in Supabase but not previously represented in local SQL files.
+- Locally defined objects absent from the live database.
+- Objects that could not be verified.
+
+### `supabase/schema/SCHEMA_COVERAGE.md`
+Map all working application modules to their associated database tables, views, functions, and policies. Identify any application database access for which the schema definition remains unknown.
+
+## Phase 6 — Validate without changing production
+
+Validate the generated SQL against the actual database definitions.
+
+- Check SQL syntax and dependency order.
+- Check for missing tables, columns, foreign keys, indexes, functions, and policies.
+- Detect duplicate object definitions and conflicting policies.
+- Confirm that all generated objects map to verified sources.
+- Use a temporary local or isolated test database for execution tests when available.
+- Do not execute the generated schema against production.
+- Do not claim that the schema can recreate the complete database unless that has been verified in an isolated environment.
+
+Keep the original migration history separate from the generated schema snapshot. A schema snapshot must not be treated as a replacement for migration history.
+
+## Phase 7 — Final report
+
+When complete, report:
+1. The exact names and paths of all files generated.
+2. The number of existing and newly discovered tables.
+3. The number of functions, triggers, views, policies, and other objects captured.
+4. Which definitions were retrieved from the live database and which came from local files.
+5. Any objects that could not be accessed or verified.
+6. Validation performed and actual results.
+7. Whether the generated collection is complete enough to reproduce the verified application schema in an isolated environment.
+
+**Start with the audit, then generate the files. Do not stop after providing a plan. Do not fabricate missing schema definitions. Do not modify the live database.**
