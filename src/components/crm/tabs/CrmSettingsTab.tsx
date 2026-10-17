@@ -3,7 +3,7 @@ import { Globe, Hash, Info, Loader2, Save, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBusiness } from "@/contexts/BusinessContext";
-import { useCustomers } from "@/hooks/useCustomersQuery";
+import { useCustomerGroups, useCustomers } from "@/hooks/useCustomersQuery";
 import { useUpsertBusiness } from "@/hooks/useBusinessQuery";
 import { EmptyState, SectionCard } from "@/components/crm/shared";
 
@@ -30,14 +30,15 @@ export function CrmSettingsTab() {
   const { business, businessLoading, businessError, refetchBusiness } = useBusiness();
   const businessId = business?.id ?? null;
   const customerQuery = useCustomers(businessId);
+  const customerGroupsQuery = useCustomerGroups(businessId);
   const upsertBusiness = useUpsertBusiness(user?.id ?? null);
   const customers = customerQuery.data ?? EMPTY_RECORDS;
   const persistedCurrency = business?.currency ?? "INR";
   const persistedCountry = business?.country ?? "India";
   const [currency, setCurrency] = useState(persistedCurrency);
   const [country, setCountry] = useState(persistedCountry);
-  const isLoading = businessLoading || customerQuery.isLoading;
-  const loadError = businessError || customerQuery.error;
+  const isLoading = businessLoading || customerQuery.isLoading || customerGroupsQuery.isLoading;
+  const loadError = businessError || customerQuery.error || customerGroupsQuery.error;
 
   useEffect(() => {
     setCurrency(persistedCurrency);
@@ -45,7 +46,10 @@ export function CrmSettingsTab() {
   }, [persistedCurrency, persistedCountry]);
 
   const groups = [
-    ...new Set(customers.map((customer) => customer.customer_group).filter(Boolean)),
+    ...new Set([
+      ...(customerGroupsQuery.data ?? []).map((group) => group.name),
+      ...customers.map((customer) => customer.customer_group).filter(Boolean),
+    ]),
   ].sort((a, b) => a.localeCompare(b));
   const currencyOptions =
     business?.currency && !CURRENCY_OPTIONS.some((option) => option.value === business.currency)

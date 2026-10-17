@@ -7,6 +7,7 @@ import {
   customersService,
   type Customer,
   type CustomerInsert,
+  type CustomerGroup,
   type CustomerUpdate,
 } from "../services/customers";
 
@@ -18,6 +19,7 @@ export const customerKeys = {
   detail: (id: string) => ["customers", "detail", id] as const,
   notes: (customerId: string) => ["customer_notes", customerId] as const,
   businessNotes: (businessId: string) => ["customer_notes", "business", businessId] as const,
+  groups: (businessId: string) => ["customer_groups", businessId] as const,
 };
 
 // ── Fetch hooks ────────────────────────────────────────────────────
@@ -30,6 +32,15 @@ export function useCustomers(businessId: string | null) {
     staleTime: 1000 * 30, // 30 s
     refetchInterval: 1000 * 30,
     refetchIntervalInBackground: false,
+  });
+}
+
+export function useCustomerGroups(businessId: string | null) {
+  return useQuery({
+    queryKey: businessId ? customerKeys.groups(businessId) : ["customer_groups", "_none"],
+    queryFn: () => customersService.getGroups(businessId!),
+    enabled: !!businessId,
+    staleTime: 1000 * 30,
   });
 }
 
@@ -74,6 +85,17 @@ export function useCreateCustomer(businessId: string | null) {
     mutationFn: (payload: CustomerInsert) => customersService.create(payload),
     onSuccess: () => {
       if (businessId) qc.invalidateQueries({ queryKey: customerKeys.byBusiness(businessId) });
+    },
+  });
+}
+
+export function useCreateCustomerGroup(businessId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => customersService.createGroup(businessId!, name),
+    onSuccess: (group: CustomerGroup) => {
+      if (businessId) qc.invalidateQueries({ queryKey: customerKeys.groups(businessId) });
+      return group;
     },
   });
 }

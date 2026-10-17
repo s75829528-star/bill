@@ -55,6 +55,7 @@ import {
 import { useBusiness } from "@/contexts/BusinessContext";
 import {
   useCustomers,
+  useCustomerGroups,
   useCreateCustomer,
   useUpdateCustomer,
   useDeleteCustomer,
@@ -676,6 +677,7 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
 
   // ── Server state ──────────────────────────────────────────────
   const customersQuery = useCustomers(businessId);
+  const customerGroupsQuery = useCustomerGroups(businessId);
   const {
     data: dbCustomers = [],
     isLoading: customersLoading,
@@ -687,8 +689,8 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
     isLoading: invoicesLoading,
     error: invoicesError,
   } = invoicesQuery;
-  const isLoading = businessLoading || customersLoading || invoicesLoading;
-  const loadError = businessError ?? customersError ?? invoicesError;
+  const isLoading = businessLoading || customersLoading || invoicesLoading || customerGroupsQuery.isLoading;
+  const loadError = businessError ?? customersError ?? invoicesError ?? customerGroupsQuery.error;
   const customers = useMemo(
     () => buildCustomerAnalytics(dbCustomers, invoices).map(dbToUi),
     [dbCustomers, invoices],
@@ -889,10 +891,14 @@ export function CustomersTab({ onViewCustomer }: { onViewCustomer: (id: string) 
   }
 
   const groups = useMemo(
-    () => [...new Set(["Retail", ...dbCustomers.map((customer) => customer.customer_group)])]
+    () => [...new Set([
+      "Retail",
+      ...(customerGroupsQuery.data ?? []).map((group) => group.name),
+      ...dbCustomers.map((customer) => customer.customer_group),
+    ])]
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b)),
-    [dbCustomers],
+    [dbCustomers, customerGroupsQuery.data],
   );
   const statuses = useMemo(
     () => [...new Set(["active", ...dbCustomers.map((customer) => customer.status)])]

@@ -37,6 +37,14 @@ export interface Customer {
   updated_at: string;
 }
 
+export interface CustomerGroup {
+  id: string;
+  business_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DbCustomerNote {
   id: string;
   customer_id: string;
@@ -152,6 +160,26 @@ export const customersService = {
       .update(payload)
       .in("id", ids);
     if (error) throw error;
+  },
+
+  async getGroups(businessId: string): Promise<CustomerGroup[]> {
+    const { data, error } = await supabase
+      .from("customer_groups")
+      .select("*")
+      .eq("business_id", businessId)
+      .order("name", { ascending: true });
+    if (error) throw error;
+    return (data ?? []) as CustomerGroup[];
+  },
+
+  async createGroup(businessId: string, name: string): Promise<CustomerGroup> {
+    const { data, error } = await supabase
+      .from("customer_groups")
+      .insert({ business_id: businessId, name: name.trim() })
+      .select()
+      .single();
+    if (error) throw error;
+    return data as CustomerGroup;
   },
 
   // ── Notes ──────────────────────────────────────────────────────

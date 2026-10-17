@@ -1,7 +1,8 @@
 // ── Customer Groups Tab ───────────────────────────────────────────
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Users, X } from "lucide-react";
+import { Plus, Users, X } from "lucide-react";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useBusiness } from "@/contexts/BusinessContext";
-import { useCustomers } from "@/hooks/useCustomersQuery";
+import { useCreateCustomerGroup, useCustomerGroups, useCustomers } from "@/hooks/useCustomersQuery";
 import { useInvoices } from "@/hooks/useInvoicesQuery";
 import { buildCustomerAnalytics, formatCrmCurrency, formatCrmDate } from "@/lib/crm-analytics";
 import {
@@ -28,25 +29,53 @@ export function CustomerGroupsTab() {
   const { business, businessLoading, businessError } = useBusiness();
   const businessId = business?.id ?? null;
   const customerQuery = useCustomers(businessId);
+  const groupsQuery = useCustomerGroups(businessId);
   const invoiceQuery = useInvoices(businessId);
   const customerRows = customerQuery.data ?? EMPTY_RECORDS;
+  const createGroupMutation = useCreateCustomerGroup(businessId);
   const invoices = invoiceQuery.data ?? EMPTY_RECORDS;
   const currency = business?.currency ?? "INR";
   const customerAnalytics = useMemo(
     () => buildCustomerAnalytics(customerRows, invoices),
     [customerRows, invoices],
   );
-  const groups = useMemo(
-    () => [...new Set(customerRows.map((customer) => customer.customer_group).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b)),
-    [customerRows],
-  );
+  const groups = useMemo(() => [...new Set([
+    ...(groupsQuery.data ?? []).map((group) => group.name),
+    ...customerRows.map((customer) => customer.customer_group).filter(Boolean),
+  ])].sort((a, b) => a.localeCompare(b)), [groupsQuery.data, customerRows]);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [groupError, setGroupError] = useState("");
   const groupMembers = expandedGroup
     ? customerAnalytics.filter((customer) => customer.customer_group === expandedGroup)
     : [];
-  const isLoading = businessLoading || customerQuery.isLoading || invoiceQuery.isLoading;
-  const loadError = businessError || customerQuery.error || invoiceQuery.error;
+  const isLoading = businessLoading || customerQuery.isLoading || groupsQuery.isLoading || invoiceQuery.isLoading;
+  const loadError = businessError || customerQuery.error || groupsQuery.error || invoiceQuery.error;
+
+  async function handleAddGroup(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const groupName = newGroupName.trim();
+    if (!groupName) {
+      setGroupError("Enter a group name.");
+      return;
+    }
+    if (groups.some((group) => group.toLocaleLowerCase() === groupName.toLocaleLowerCase())) {
+      setGroupError("A group with this name already exists.");
+      return;
+    }
+    try {
+      await createGroupMutation.mutateAsync(groupName);
+      toast.success(`Group "${groupName}" added`);
+      setIsAddGroupOpen(false);
+      setNewGroupName("");
+      setGroupError("");
+    } catch (error) {
+      setGroupError(error instanceof Error && error.message.includes("duplicate")
+        ? "A group with this name already exists."
+        : error instanceof Error ? error.message : "Could not add this group.");
+    }
+  }
 
   if (isLoading) {
     return (
@@ -74,18 +103,6 @@ export function CustomerGroupsTab() {
     );
   }
 
-  if (!businessId || groups.length === 0) {
-    return (
-      <SectionCard title="Customer groups">
-        <EmptyState
-          icon={Users}
-          title={businessId ? "No customer groups found" : "Business profile unavailable"}
-          subtitle={businessId ? "Groups are taken from existing customer records; add a customer group to see it here." : "Complete business setup to load tenant-scoped records."}
-        />
-      </SectionCard>
-    );
-  }
-
   const groupColors = [
     "bg-blue-50 text-blue-700 border-blue-200",
     "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -97,7 +114,30 @@ export function CustomerGroupsTab() {
 
   return (
     <div className="space-y-6">
-      {/* Group Cards Grid */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => {
+            setGroupError("");
+            setIsAddGroupOpen(true);
+          }}
+          disabled={!businessId || createGroupMutation.isPending}
+          className="inline-flex items-center gap-2 rounded-lg bg-[image:var(--gradient-brand)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus className="h-4 w-4" />
+          Add group
+        </button>
+      </div>
+
+      {!businessId ? (
+        <SectionCard title="Customer groups">
+          <EmptyState icon={Users} title="Business profile unavailable" subtitle="Complete business setup to load tenant-scoped records." />
+        </SectionCard>
+      ) : groups.length === 0 ? (
+        <SectionCard title="Customer groups">
+          <EmptyState icon={Users} title="No customer groups found" subtitle="Add a group to organize customers when you are ready." />
+        </SectionCard>
+      ) : (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((group, i) => {
           const members = customerAnalytics.filter((customer) => customer.customer_group === group);
@@ -124,7 +164,7 @@ export function CustomerGroupsTab() {
                     <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${groupColors[i % groupColors.length]}`}>
                       {group}
                     </span>
-                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">Existing customers assigned to this group.</p>
+                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">Customers assigned to this group.</p>
                   </div>
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
                     <Users className="h-5 w-5 text-slate-500" />
@@ -158,6 +198,66 @@ export function CustomerGroupsTab() {
           );
         })}
       </div>
+      )}
+
+      {isAddGroupOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4" role="presentation">
+          <form
+            onSubmit={handleAddGroup}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-customer-group-title"
+            className="w-full max-w-lg rounded-xl bg-white p-5 shadow-xl"
+          >
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h2 id="add-customer-group-title" className="text-base font-semibold text-foreground">Add customer group</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Create a group now and assign customers later.</p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={() => setIsAddGroupOpen(false)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <label htmlFor="customer-group-name" className="mb-1 block text-sm font-medium text-foreground">Group name</label>
+            <input
+              id="customer-group-name"
+              autoFocus
+              value={newGroupName}
+              onChange={(event) => {
+                setNewGroupName(event.target.value);
+                setGroupError("");
+              }}
+              maxLength={60}
+              placeholder="e.g. Wholesale"
+              className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-[color:var(--brand-electric)] focus:ring-1 focus:ring-[color:var(--brand-electric)]"
+            />
+
+            {groupError && <p role="alert" className="mt-3 text-sm text-red-600">{groupError}</p>}
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsAddGroupOpen(false)}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-foreground hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={createGroupMutation.isPending}
+                className="rounded-lg bg-[image:var(--gradient-brand)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {createGroupMutation.isPending ? "Saving..." : "Create group"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Members list — shown when a group is expanded */}
       {expandedGroup && (
